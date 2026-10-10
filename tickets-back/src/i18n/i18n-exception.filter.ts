@@ -71,10 +71,14 @@ export class I18nExceptionFilter implements ExceptionFilter {
       request.headers['accept-language'],
     );
     const status = exception.getStatus();
+    const message =
+      status === HttpStatus.TOO_MANY_REQUESTS
+        ? translate(language, 'errors.tooManyRequests')
+        : buildMessage(exception.getResponse(), language);
 
     response.status(status).json({
       statusCode: status,
-      message: buildMessage(exception.getResponse(), language),
+      message,
       error: HttpStatus[status],
     });
   }

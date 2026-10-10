@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Auth } from '../../auth/decorators';
 import { ValidRoles } from '../../auth/interfaces';
 import { OrganizationService } from '../services';
-import { UpsertOrganizationDto } from '../dtos';
+import { UpdatePortalDto, UpsertOrganizationDto } from '../dtos';
 
 @ApiTags('Organization')
 @Controller('organization')
@@ -20,6 +20,12 @@ export class OrganizationController {
   @Auth()
   find() {
     return this.organizationService.find();
+  }
+
+  @Patch('portal')
+  @Auth(ValidRoles.ADMIN)
+  updatePortal(@Body() dto: UpdatePortalDto) {
+    return this.organizationService.updatePortal(dto);
   }
 
   @Put()

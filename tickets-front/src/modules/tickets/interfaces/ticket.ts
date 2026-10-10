@@ -15,7 +15,7 @@ export type TicketStatus =
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 
-export type TicketChannel = 'WHATSAPP' | 'EMAIL' | 'CALL' | 'IN_PERSON' | 'OTHER';
+export type TicketChannel = 'WHATSAPP' | 'EMAIL' | 'CALL' | 'IN_PERSON' | 'PORTAL' | 'OTHER';
 
 export type RootCause =
   | 'OPERATIONAL_ERROR'
@@ -40,6 +40,7 @@ export interface Ticket {
   description: string;
   requesterName: string;
   requesterArea: string | null;
+  requesterEmail: string | null;
   siteId: number | null;
   Site: SiteSummary | null;
   categoryId: number | null;
@@ -72,6 +73,8 @@ export interface TicketEvent {
   fromStatus: TicketStatus | null;
   toStatus: TicketStatus | null;
   note: string | null;
+  isPublic: boolean;
+  authorName: string | null;
   createdAt: string;
   User: UserSummary;
 }

@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class AddNoteDto {
   @ApiProperty({ description: 'Nota de seguimiento' })
@@ -7,4 +13,12 @@ export class AddNoteDto {
   @MinLength(2)
   @MaxLength(4000)
   note: string;
+
+  @ApiProperty({
+    description: 'Visible para el solicitante en el portal',
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
 }

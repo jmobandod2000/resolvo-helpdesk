@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     if (!user || user.isDeleted)
       throw new UnauthorizedException(i18nMessage('errors.invalidCredentials'));
-    if (!user.isActive)
+    if (!user.isActive || user.isSystem)
       throw new UnauthorizedException(i18nMessage('errors.userInactive'));
 
     return user;

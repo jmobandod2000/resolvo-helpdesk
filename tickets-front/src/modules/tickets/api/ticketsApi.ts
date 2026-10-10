@@ -56,8 +56,21 @@ export const changeTicketStatus = async (id: number, payload: ChangeStatusPayloa
   return resp.data;
 };
 
-export const addTicketNote = async (id: number, note: string) => {
-  const resp = await api.post<TicketEvent>(`tickets/${id}/notes`, { note }, REQUEST_OPTIONS);
+export const addTicketNote = async (id: number, note: string, isPublic = false) => {
+  const resp = await api.post<TicketEvent>(
+    `tickets/${id}/notes`,
+    { note, isPublic },
+    REQUEST_OPTIONS,
+  );
+  return resp.data;
+};
+
+export const getTicketPublicLink = async (id: number) => {
+  const resp = await api.post<{ token: string }>(
+    `tickets/${id}/public-link`,
+    {},
+    REQUEST_OPTIONS,
+  );
   return resp.data;
 };
 

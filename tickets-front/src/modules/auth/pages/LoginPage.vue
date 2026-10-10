@@ -12,7 +12,7 @@ const { t } = useI18n();
 const formRef = useLocaleAwareForm();
 const { loginForm, login, loadRememberedEmail } = useAuth();
 const isPasswordVisible = ref(false);
-const { organizationName } = usePublicProfile();
+const { organizationName, portalEnabled } = usePublicProfile();
 
 const requiredRule = (value: string) => !!value || t('common.requiredField');
 const emailRule = (value: string) => /.+@.+\..+/.test(value) || t('auth.invalidEmail');
@@ -62,6 +62,18 @@ onMounted(loadRememberedEmail);
 
         <q-btn type="submit" color="primary" :label="t('auth.signIn')" class="full-width" unelevated />
       </q-form>
+      <div v-if="portalEnabled" class="text-center q-mt-md">
+        <q-separator class="q-mb-md" />
+        <div class="text-body2 text-grey-8">{{ t('auth.needHelp') }}</div>
+        <q-btn
+          flat
+          no-caps
+          color="primary"
+          icon="sym_r_support_agent"
+          :label="t('auth.openPortal')"
+          :to="{ name: 'portal' }"
+        />
+      </div>
     </q-card>
     <AppFooterLinks dark class="login-footer" />
   </q-page>

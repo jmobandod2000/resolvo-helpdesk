@@ -11,7 +11,7 @@ export class UsersService {
 
   findAll() {
     return this.prismaService.user.findMany({
-      where: { isDeleted: false },
+      where: { isDeleted: false, isSystem: false },
       omit: { password: true },
       orderBy: { name: 'asc' },
     });
@@ -54,7 +54,7 @@ export class UsersService {
 
   private async findActiveOrFail(id: number) {
     const user = await this.prismaService.user.findFirst({
-      where: { id, isDeleted: false },
+      where: { id, isDeleted: false, isSystem: false },
     });
     if (!user)
       throw new NotFoundException(i18nMessage('errors.userNotFound', { id }));

@@ -22,6 +22,19 @@ const messages: MessageSchema = {
     categoryNotFound: 'Category {id} was not found',
     categoryInactive: 'Category {name} is inactive',
     categoryDuplicate: 'A category named {name} already exists',
+    tooManyRequests: 'Too many attempts. Wait a few minutes and try again',
+    organizationMissing: 'Complete the company details first',
+    portalDisabled: 'The request portal is not available',
+    portalRejected:
+      'We could not receive the request. Check the details and try again',
+    portalTicketNotFound:
+      'We could not find that request. Check the follow-up link',
+    portalTicketClosed:
+      'This request is already closed. If the problem continues, create a new one',
+    portalReplyLimit:
+      'This request reached the maximum number of messages. Create a new one if needed',
+    portalBusy:
+      'The portal is receiving many requests. Try again in a few minutes',
     unexpected: 'An unexpected error occurred',
     db: {
       duplicate: 'A record with the same value already exists in: {fields}',
@@ -57,6 +70,13 @@ const messages: MessageSchema = {
     description: "Requester's message",
     requesterName: 'Requester',
     requesterArea: 'Area',
+    requesterEmail: 'Email',
+    urgent: 'Urgent',
+    message: 'Message',
+    elapsedMs: 'Fill time',
+    portalEnabled: 'Portal enabled',
+    portalMessage: 'Portal message',
+    isPublic: 'Visible to the requester',
     siteId: 'Site',
     code: 'Code',
     taxId: 'Tax ID',

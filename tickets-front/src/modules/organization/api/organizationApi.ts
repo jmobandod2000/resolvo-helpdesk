@@ -5,6 +5,7 @@ import type {
   CategoryPayload,
   Organization,
   OrganizationPayload,
+  PortalSettingsPayload,
   PublicProfile,
   Site,
   SitePayload,
@@ -27,6 +28,11 @@ export const getOrganization = async () => {
 
 export const saveOrganization = async (payload: OrganizationPayload) => {
   const resp = await api.put<Organization>('organization', payload, requestOptions());
+  return resp.data;
+};
+
+export const savePortalSettings = async (payload: PortalSettingsPayload) => {
+  const resp = await api.patch<Organization>('organization/portal', payload, requestOptions());
   return resp.data;
 };
 

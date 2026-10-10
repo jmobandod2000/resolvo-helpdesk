@@ -11,6 +11,7 @@ import TicketTimeline from '../components/TicketTimeline.vue';
 import TextBlockCard from '../components/TextBlockCard.vue';
 import AddNoteForm from '../components/AddNoteForm.vue';
 import ChangeStatusDialog from '../components/ChangeStatusDialog.vue';
+import PublicLinkButton from '../components/PublicLinkButton.vue';
 import { useTicketQuery } from '../composables/useTicketQuery';
 import { useTicketMutations } from '../composables/useTicketMutations';
 import type { ChangeStatusPayload } from '../interfaces/ticket';
@@ -34,8 +35,8 @@ const changeStatus = async (payload: ChangeStatusPayload) => {
   isStatusDialogOpen.value = false;
 };
 
-const addNote = (note: string) => {
-  if (ticket.value) addNoteMutation.mutate({ id: ticket.value.id, note });
+const addNote = (note: string, isPublic: boolean) => {
+  if (ticket.value) addNoteMutation.mutate({ id: ticket.value.id, note, isPublic });
 };
 
 const confirmDelete = () => {
@@ -85,6 +86,7 @@ const confirmDelete = () => {
             :label="t('tickets.actions.changeStatus')"
             @click="isStatusDialogOpen = true"
           />
+          <PublicLinkButton :ticket-id="ticket.id" :code="ticket.code" />
           <q-btn
             outline
             color="primary"

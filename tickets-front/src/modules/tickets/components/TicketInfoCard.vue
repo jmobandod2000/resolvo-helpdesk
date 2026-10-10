@@ -27,7 +27,9 @@ const rows = computed(() => [
   {
     key: 'requester',
     label: t('tickets.fields.requester'),
-    value: [props.ticket.requesterName, props.ticket.requesterArea].filter(Boolean).join(' · '),
+    value: [props.ticket.requesterName, props.ticket.requesterArea, props.ticket.requesterEmail]
+      .filter(Boolean)
+      .join(' · '),
   },
   {
     key: 'assignee',

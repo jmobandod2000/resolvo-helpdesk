@@ -5,8 +5,13 @@ import { useI18n } from 'vue-i18n';
 import useNotify from 'src/modules/shared/composables/useNotify';
 import useHandlerErrors from 'src/modules/shared/composables/useHandlerErrors';
 import useVueQuery from 'src/modules/shared/composables/useVueQuery';
-import { getOrganization, getPublicProfile, saveOrganization } from '../api/organizationApi';
-import type { OrganizationPayload } from '../interfaces/organization';
+import {
+  getOrganization,
+  getPublicProfile,
+  saveOrganization,
+  savePortalSettings,
+} from '../api/organizationApi';
+import type { OrganizationPayload, PortalSettingsPayload } from '../interfaces/organization';
 
 export const PUBLIC_PROFILE_KEY = ['organization', 'public'];
 const ORGANIZATION_KEY = ['organization', 'detail'];
@@ -20,8 +25,9 @@ export const usePublicProfile = () => {
 
   const organizationName = computed(() => data.value?.name ?? null);
   const isConfigured = computed(() => data.value?.configured ?? true);
+  const portalEnabled = computed(() => data.value?.portalEnabled ?? false);
 
-  return { organizationName, isConfigured, isFetched };
+  return { organizationName, isConfigured, portalEnabled, isFetched };
 };
 
 export const useOrganization = () => {
@@ -45,5 +51,15 @@ export const useOrganization = () => {
     onError: handleApiResponseError,
   });
 
-  return { organization: data, isFetching, saveMutation };
+  const savePortalMutation = useMutation({
+    mutationFn: (payload: PortalSettingsPayload) => savePortalSettings(payload),
+    onSuccess: () => {
+      successNotify(t('portalSettings.saved'));
+      invalidQuery({ queryKey: ['organization'] });
+      invalidQuery({ queryKey: ['portal'] });
+    },
+    onError: handleApiResponseError,
+  });
+
+  return { organization: data, isFetching, saveMutation, savePortalMutation };
 };

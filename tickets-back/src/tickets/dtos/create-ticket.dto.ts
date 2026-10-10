@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsEmail,
   IsDate,
   IsEnum,
   IsInt,
@@ -36,6 +37,12 @@ export class CreateTicketDto {
   @IsString()
   @MaxLength(80)
   requesterArea?: string;
+
+  @ApiProperty({ description: 'Correo del solicitante', required: false })
+  @IsOptional()
+  @IsEmail()
+  @MaxLength(120)
+  requesterEmail?: string | null;
 
   @ApiProperty({
     description: 'Sede o sucursal; vacío si aplica a todas',

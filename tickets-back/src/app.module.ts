@@ -14,6 +14,7 @@ import { MetricsModule } from './metrics/metrics.module';
 import { DropDownsModule } from './drop-downs/drop-downs.module';
 import { ReportsModule } from './reports/reports.module';
 import { OrganizationModule } from './organization/organization.module';
+import { PortalModule } from './portal/portal.module';
 import { I18nExceptionFilter } from './i18n';
 
 @Module({
@@ -31,6 +32,7 @@ import { I18nExceptionFilter } from './i18n';
     DropDownsModule,
     ReportsModule,
     OrganizationModule,
+    PortalModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: I18nExceptionFilter },

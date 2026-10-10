@@ -1,13 +1,19 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { validationExceptionFactory } from './i18n';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const logger = new Logger('Bootstrap');
+
+  app.set('trust proxy', 'loopback');
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.useBodyParser('json', { limit: '100kb' });
 
   app.setGlobalPrefix('api');
 

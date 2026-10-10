@@ -9,6 +9,7 @@ import GuideRouter from 'src/modules/guide/router';
 import ReportsRouter from 'src/modules/reports/router';
 import AboutRouter from 'src/modules/about/router';
 import OrganizationRouter from 'src/modules/organization/router';
+import PortalRouter from 'src/modules/portal/router';
 
 const routes: RouteRecordRaw[] = [
   AuthRouter,
@@ -19,6 +20,7 @@ const routes: RouteRecordRaw[] = [
     redirect: { name: 'dashboard' },
     children: [...DashboardRouter, ...TicketsRouter, ...ReportsRouter, ...UsersRouter, ...GuideRouter, ...AboutRouter, ...OrganizationRouter],
   },
+  PortalRouter,
   {
     path: '/:catchAll(.*)*',
     component: () => import('src/modules/shared/pages/NotFoundPage.vue'),

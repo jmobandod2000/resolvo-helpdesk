@@ -19,7 +19,7 @@ export class AuthService {
       where: { email: email.toLowerCase() },
     });
 
-    if (!user || user.isDeleted || !user.isActive)
+    if (!user || user.isDeleted || user.isSystem || !user.isActive)
       throw new UnauthorizedException(i18nMessage('errors.invalidCredentials'));
 
     const { password: hashedPassword, ...userLogged } = user;

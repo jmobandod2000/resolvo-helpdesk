@@ -55,7 +55,8 @@ export const useTicketMutations = () => {
   });
 
   const addNoteMutation = useMutation({
-    mutationFn: ({ id, note }: { id: number; note: string }) => addTicketNote(id, note),
+    mutationFn: ({ id, note, isPublic }: { id: number; note: string; isPublic?: boolean }) =>
+      addTicketNote(id, note, isPublic),
     onSuccess: () => {
       successNotify(t('tickets.notify.noteAdded'));
       invalidateTicketQueries();

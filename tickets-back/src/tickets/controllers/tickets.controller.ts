@@ -78,6 +78,12 @@ export class TicketsController {
     return this.ticketsService.addNote(id, addNoteDto, user);
   }
 
+  @Post(':id/public-link')
+  @Auth()
+  getPublicLink(@Param('id', ParseIntPipe) id: number) {
+    return this.ticketsService.getPublicLink(id);
+  }
+
   @Delete(':id')
   @Auth(ValidRoles.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {

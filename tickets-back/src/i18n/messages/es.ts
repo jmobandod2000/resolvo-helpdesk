@@ -22,6 +22,20 @@ export default {
     categoryNotFound: 'No se encontró la categoría {id}',
     categoryInactive: 'La categoría {name} está inactiva',
     categoryDuplicate: 'Ya existe una categoría llamada {name}',
+    tooManyRequests:
+      'Demasiados intentos. Espera unos minutos y vuelve a intentarlo',
+    organizationMissing: 'Primero completa los datos de la empresa',
+    portalDisabled: 'El portal de solicitudes no está disponible',
+    portalRejected:
+      'No pudimos recibir la solicitud. Revisa los datos y vuelve a intentarlo',
+    portalTicketNotFound:
+      'No encontramos esa solicitud. Revisa el enlace de seguimiento',
+    portalTicketClosed:
+      'Esta solicitud ya está cerrada. Si el problema continúa, crea una nueva',
+    portalReplyLimit:
+      'Esta solicitud alcanzó el máximo de mensajes. Crea una nueva si lo necesitas',
+    portalBusy:
+      'El portal está recibiendo muchas solicitudes. Intenta de nuevo en unos minutos',
     unexpected: 'Ocurrió un error inesperado',
     db: {
       duplicate: 'Ya existe un registro con el mismo valor en: {fields}',
@@ -57,6 +71,13 @@ export default {
     description: 'Mensaje del solicitante',
     requesterName: 'Solicitante',
     requesterArea: 'Área',
+    requesterEmail: 'Correo',
+    urgent: 'Urgente',
+    message: 'Mensaje',
+    elapsedMs: 'Tiempo de llenado',
+    portalEnabled: 'Portal activo',
+    portalMessage: 'Mensaje del portal',
+    isPublic: 'Visible para el solicitante',
     siteId: 'Sede',
     code: 'Código',
     taxId: 'Identificación fiscal',

@@ -40,6 +40,7 @@ const assigneeName = (note: string | null) => {
 const buildTitle = (event: TicketEvent) => {
   if (event.type === 'STATUS_CHANGED')
     return `${statusLabel(event.fromStatus)} → ${statusLabel(event.toStatus)}`;
+  if (event.type === 'NOTE' && event.authorName) return t('tickets.timeline.requesterReply');
   if (event.type === 'ASSIGNED')
     return t('tickets.timeline.assignedTo', { name: assigneeName(event.note) });
   return t(EVENT_TITLE_KEYS[event.type]);
@@ -51,6 +52,9 @@ const isNoteVisible = (event: TicketEvent) =>
   event.note !== buildTitle(event) &&
   !LEGACY_DEFAULT_NOTES.includes(event.note);
 
+const authorOf = (event: TicketEvent) =>
+  event.authorName ? t('tickets.timeline.viaPortal', { name: event.authorName }) : event.User.name;
+
 const eventColor = (event: TicketEvent) =>
   event.toStatus ? STATUS_COLORS[event.toStatus] : 'grey-7';
 </script>
@@ -61,13 +65,20 @@ const eventColor = (event: TicketEvent) =>
       v-for="event in events"
       :key="event.id"
       :title="buildTitle(event)"
-      :subtitle="`${formatDateTime(event.createdAt)} · ${event.User.name}`"
+      :subtitle="`${formatDateTime(event.createdAt)} · ${authorOf(event)}`"
       :icon="EVENT_ICONS[event.type]"
       :color="eventColor(event)"
     >
       <div v-if="isNoteVisible(event)" class="text-pre-line text-body2">
         {{ event.note }}
       </div>
+      <q-badge
+        v-if="event.type === 'NOTE'"
+        outline
+        class="q-mt-xs"
+        :color="event.isPublic ? 'primary' : 'grey-7'"
+        :label="event.isPublic ? t('tickets.note.publicBadge') : t('tickets.note.internalBadge')"
+      />
     </q-timeline-entry>
   </q-timeline>
 </template>

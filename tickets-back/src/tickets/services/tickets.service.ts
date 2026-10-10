@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, TicketEventType } from '@prisma/client';
 
@@ -37,6 +38,8 @@ const TICKET_DETAIL_INCLUDE = {
 } satisfies Prisma.TicketInclude;
 
 const buildTicketCode = (id: number) => `TK-${String(id).padStart(5, '0')}`;
+
+export const generatePublicToken = () => randomBytes(32).toString('base64url');
 
 @Injectable()
 export class TicketsService {
@@ -174,7 +177,7 @@ export class TicketsService {
     });
   }
 
-  async addNote(id: number, { note }: AddNoteDto, user: UserLogged) {
+  async addNote(id: number, { note, isPublic }: AddNoteDto, user: UserLogged) {
     const ticket = await this.findActiveOrFail(id);
 
     return this.prismaService.$transaction(async (tx) => {
@@ -190,10 +193,23 @@ export class TicketsService {
           userId: user.id,
           type: TicketEventType.NOTE,
           note,
+          isPublic: isPublic ?? false,
         },
         include: { User: USER_SUMMARY },
       });
     });
+  }
+
+  async getPublicLink(id: number) {
+    const ticket = await this.findActiveOrFail(id);
+    if (ticket.publicToken) return { token: ticket.publicToken };
+
+    const { publicToken } = await this.prismaService.ticket.update({
+      where: { id },
+      data: { publicToken: generatePublicToken() },
+      select: { publicToken: true },
+    });
+    return { token: publicToken };
   }
 
   async remove(id: number) {

@@ -383,6 +383,7 @@ export class ReportsService {
           COUNT(*) FILTER (WHERE e.type = 'STATUS_CHANGED') AS status_changes
         FROM "TicketEvent" e
         JOIN base b ON b.id = e."ticketId"
+        JOIN "User" eu ON eu.id = e."userId" AND eu."isSystem" = false
         CROSS JOIN bounds bd
         WHERE (e."createdAt" AT TIME ZONE 'UTC' AT TIME ZONE ${timeZone}) >= bd.rs
           AND (e."createdAt" AT TIME ZONE 'UTC' AT TIME ZONE ${timeZone}) < bd.re

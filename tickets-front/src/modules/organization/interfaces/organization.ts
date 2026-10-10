@@ -6,6 +6,8 @@ export interface Organization {
   phone: string | null;
   address: string | null;
   website: string | null;
+  portalEnabled: boolean;
+  portalMessage: string | null;
   updatedAt: string;
 }
 
@@ -18,9 +20,15 @@ export interface OrganizationPayload {
   website: string | null;
 }
 
+export interface PortalSettingsPayload {
+  portalEnabled: boolean;
+  portalMessage: string | null;
+}
+
 export interface PublicProfile {
   configured: boolean;
   name: string | null;
+  portalEnabled: boolean;
 }
 
 export interface SiteSummary {

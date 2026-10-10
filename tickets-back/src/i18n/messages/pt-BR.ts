@@ -24,6 +24,20 @@ const messages: MessageSchema = {
     categoryNotFound: 'A categoria {id} não foi encontrada',
     categoryInactive: 'A categoria {name} está inativa',
     categoryDuplicate: 'Já existe uma categoria chamada {name}',
+    tooManyRequests:
+      'Muitas tentativas. Aguarde alguns minutos e tente novamente',
+    organizationMissing: 'Primeiro preencha os dados da empresa',
+    portalDisabled: 'O portal de solicitações não está disponível',
+    portalRejected:
+      'Não foi possível receber a solicitação. Revise os dados e tente novamente',
+    portalTicketNotFound:
+      'Não encontramos essa solicitação. Verifique o link de acompanhamento',
+    portalTicketClosed:
+      'Esta solicitação já está fechada. Se o problema continuar, crie uma nova',
+    portalReplyLimit:
+      'Esta solicitação atingiu o máximo de mensagens. Crie uma nova se precisar',
+    portalBusy:
+      'O portal está recebendo muitas solicitações. Tente novamente em alguns minutos',
     unexpected: 'Ocorreu um erro inesperado',
     db: {
       duplicate: 'Já existe um registro com o mesmo valor em: {fields}',
@@ -59,6 +73,13 @@ const messages: MessageSchema = {
     description: 'Mensagem do solicitante',
     requesterName: 'Solicitante',
     requesterArea: 'Área',
+    requesterEmail: 'E-mail',
+    urgent: 'Urgente',
+    message: 'Mensagem',
+    elapsedMs: 'Tempo de preenchimento',
+    portalEnabled: 'Portal ativo',
+    portalMessage: 'Mensagem do portal',
+    isPublic: 'Visível para o solicitante',
     siteId: 'Unidade',
     code: 'Código',
     taxId: 'Identificação fiscal',

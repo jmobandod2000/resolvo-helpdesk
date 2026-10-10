@@ -8,5 +8,6 @@ import { OrganizationModule } from '../organization/organization.module';
   imports: [OrganizationModule],
   controllers: [TicketsController],
   providers: [TicketsService],
+  exports: [TicketsService],
 })
 export class TicketsModule {}

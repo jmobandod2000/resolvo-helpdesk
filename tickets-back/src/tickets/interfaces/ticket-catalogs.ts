@@ -39,6 +39,7 @@ export const CHANNEL_LABELS: Record<TicketChannel, string> = {
   EMAIL: 'Correo',
   CALL: 'Llamada',
   IN_PERSON: 'Presencial',
+  PORTAL: 'Portal',
   OTHER: 'Otro',
 };
 

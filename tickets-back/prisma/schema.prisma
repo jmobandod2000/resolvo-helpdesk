@@ -34,6 +34,7 @@ enum TicketChannel {
   EMAIL
   CALL
   IN_PERSON
+  PORTAL
   OTHER
 }
 
@@ -61,6 +62,7 @@ model User {
   password  String
   roles     UserRole @default(user)
   isActive  Boolean  @default(true)
+  isSystem  Boolean  @default(false)
   isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -73,15 +75,17 @@ model User {
 }
 
 model Organization {
-  id        Int      @id @default(1)
-  name      String
-  taxId     String?
-  email     String?
-  phone     String?
-  address   String?
-  website   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(1)
+  name          String
+  taxId         String?
+  email         String?
+  phone         String?
+  address       String?
+  website       String?
+  portalEnabled Boolean  @default(false)
+  portalMessage String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Site {
@@ -119,6 +123,8 @@ model Ticket {
   description     String
   requesterName   String
   requesterArea   String?
+  requesterEmail  String?
+  publicToken     String?        @unique
   siteId          Int?
   channel         TicketChannel  @default(WHATSAPP)
   categoryId      Int?
@@ -162,6 +168,8 @@ model TicketEvent {
   fromStatus TicketStatus?
   toStatus   TicketStatus?
   note       String?
+  isPublic   Boolean         @default(false)
+  authorName String?
   createdAt  DateTime        @default(now())
 
   ticketId Int
