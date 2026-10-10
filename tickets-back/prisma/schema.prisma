@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum TicketStatus {
+  OPEN
+  IN_ANALYSIS
+  WAITING_INFO
+  ESCALATED_DEV
+  RESOLVED
+  CLOSED
+  CANCELLED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Company {
+  MATURIN
+  BARQUISIMETO
+  BOTH
+}
+
+enum TicketChannel {
+  WHATSAPP
+  EMAIL
+  CALL
+  IN_PERSON
+  OTHER
+}
+
+enum TicketCategory {
+  INVENTORY
+  RECEIVING
+  RECHECK
+  PICKING
+  CYCLE_COUNT
+  TRANSFERS
+  BILLING
+  REPORTS
+  SYSTEM
+  OTHER
+}
+
+enum RootCause {
+  OPERATIONAL_ERROR
+  SYSTEM_DEFECT
+  USER_MISINTERPRETATION
+  MASTER_DATA
+  NO_ISSUE
+  OTHER
+}
+
+enum TicketEventType {
+  CREATED
+  STATUS_CHANGED
+  NOTE
+  ASSIGNED
+  UPDATED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  roles     UserRole @default(user)
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  AssignedTickets Ticket[]      @relation("TicketAssignee")
+  CreatedTickets  Ticket[]      @relation("TicketCreator")
+  TicketEvents    TicketEvent[]
+
+  @@index([isDeleted])
+}
+
+model Ticket {
+  id              Int            @id @default(autoincrement())
+  code            String?        @unique
+  title           String
+  description     String
+  requesterName   String
+  requesterArea   String?
+  company         Company
+  channel         TicketChannel  @default(WHATSAPP)
+  category        TicketCategory
+  priority        TicketPriority @default(MEDIUM)
+  status          TicketStatus   @default(OPEN)
+  rootCause       RootCause?
+  productCodes    String[]       @default([])
+  documents       String[]       @default([])
+  affectedUnits   Int?
+  diagnosis       String?
+  closureComment  String?
+  devRequestRef   String?
+  evidencePaths   String[]       @default([])
+  reportedAt      DateTime       @default(now())
+  firstResponseAt DateTime?
+  resolvedAt      DateTime?
+  closedAt        DateTime?
+  isDeleted       Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  assigneeId  Int?
+  Assignee    User? @relation("TicketAssignee", fields: [assigneeId], references: [id])
+  createdById Int
+  CreatedBy   User  @relation("TicketCreator", fields: [createdById], references: [id])
+
+  Events TicketEvent[]
+
+  @@index([status])
+  @@index([company])
+  @@index([category])
+  @@index([reportedAt])
+  @@index([isDeleted])
+}
+
+model TicketEvent {
+  id         Int             @id @default(autoincrement())
+  type       TicketEventType
+  fromStatus TicketStatus?
+  toStatus   TicketStatus?
+  note       String?
+  createdAt  DateTime        @default(now())
+
+  ticketId Int
+  Ticket   Ticket @relation(fields: [ticketId], references: [id])
+  userId   Int
+  User     User   @relation(fields: [userId], references: [id])
+
+  @@index([ticketId])
+}

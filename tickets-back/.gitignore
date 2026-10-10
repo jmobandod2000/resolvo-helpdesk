@@ -1,0 +1,25 @@
+/dist
+/node_modules
+/build
+
+logs
+*.log
+pnpm-debug.log*
+
+.DS_Store
+/coverage
+
+/.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+.env
+.env.local
+.stag.env
+.prod.env
+
+postgres-data
+
+# Tickets reales (solo local)
+prisma/data/*.local.ts

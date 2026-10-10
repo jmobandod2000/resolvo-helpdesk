@@ -1,0 +1,23 @@
+body {
+  background: #f4f6f9;
+}
+
+.page-title {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: $primary;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #37474f;
+}
+
+.text-pre-line {
+  white-space: pre-line;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
