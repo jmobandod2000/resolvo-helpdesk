@@ -10,6 +10,7 @@ import { useSites } from 'src/modules/organization/composables/useSites';
 import { useCategories } from 'src/modules/organization/composables/useCategories';
 import useAuth from 'src/modules/auth/composables/useAuth';
 import TagsInput from '../components/TagsInput.vue';
+import RequesterSelect from '../components/RequesterSelect.vue';
 import { useTicketForm } from '../composables/useTicketForm';
 import { useTicketQuery } from '../composables/useTicketQuery';
 import { useTicketMutations } from '../composables/useTicketMutations';
@@ -53,7 +54,9 @@ watch(
 watch(
   user,
   (value) => {
-    if (!isEditing.value && !form.value.assigneeId && value.id) form.value.assigneeId = value.id;
+    if (isEditing.value) return;
+    if (!form.value.assigneeId && value.id) form.value.assigneeId = value.id;
+    if (!form.value.requesterName && value.name) form.value.requesterName = value.name;
   },
   { immediate: true },
 );
@@ -110,11 +113,9 @@ const save = async () => {
                 />
               </div>
               <div class="col-12 col-sm-6">
-                <q-input
+                <RequesterSelect
                   v-model="form.requesterName"
                   :label="t('tickets.fields.requester')"
-                  outlined
-                  dense
                   :rules="[requiredRule]"
                 />
               </div>

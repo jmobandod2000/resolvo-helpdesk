@@ -118,6 +118,7 @@ export default {
   },
   tickets: {
     hints: {
+      requester: 'Elige un usuario o escribe el nombre de quien reporta',
       site: 'Déjalo vacío si el ticket aplica a todas las sedes',
     },
     title: 'Tickets',

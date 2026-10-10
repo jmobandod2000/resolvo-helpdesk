@@ -120,6 +120,7 @@ const messages: MessageSchema = {
   },
   tickets: {
     hints: {
+      requester: 'Escolha um usuário ou digite o nome de quem está reportando',
       site: 'Deixe vazio se o ticket se aplica a todas as unidades',
     },
     title: 'Tickets',
