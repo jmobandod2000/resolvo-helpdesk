@@ -1,7 +1,7 @@
 export default {
   app: {
-    name: 'Tickets WMS',
-    subtitle: 'Seguimiento interno de soporte',
+    name: 'Resolvo',
+    subtitle: 'Mesa de ayuda de TI',
   },
   language: {
     label: 'Idioma',

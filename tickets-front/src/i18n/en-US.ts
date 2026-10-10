@@ -2,8 +2,8 @@ import type { MessageSchema } from './index';
 
 const messages: MessageSchema = {
   app: {
-    name: 'WMS Tickets',
-    subtitle: 'Internal support tracking',
+    name: 'Resolvo',
+    subtitle: 'IT help desk',
   },
   language: {
     label: 'Language',

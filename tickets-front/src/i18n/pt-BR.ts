@@ -2,8 +2,8 @@ import type { MessageSchema } from './index';
 
 const messages: MessageSchema = {
   app: {
-    name: 'Tickets WMS',
-    subtitle: 'Acompanhamento interno de suporte',
+    name: 'Resolvo',
+    subtitle: 'Central de ajuda de TI',
   },
   language: {
     label: 'Idioma',

@@ -1,8 +1,8 @@
 {
-  "name": "tickets-back",
+  "name": "resolvo-back",
   "version": "1.0.0",
-  "description": "Control interno de tickets de soporte WMS: historial, seguimiento y métricas",
-  "productName": "Tickets WMS",
+  "description": "Resolvo: mesa de ayuda (help desk) de TI de código abierto, autoalojada y en tres idiomas",
+  "productName": "Resolvo",
   "private": true,
   "author": "Juan M. Obando",
   "license": "Apache-2.0",

@@ -1,8 +1,8 @@
 {
-  "name": "tickets-front",
+  "name": "resolvo-front",
   "version": "1.0.0",
-  "description": "Control interno de tickets de soporte WMS: historial, seguimiento y métricas",
-  "productName": "Tickets WMS",
+  "description": "Resolvo: mesa de ayuda (help desk) de TI de código abierto, autoalojada y en tres idiomas",
+  "productName": "Resolvo",
   "type": "module",
   "private": true,
   "author": "Juan M. Obando",

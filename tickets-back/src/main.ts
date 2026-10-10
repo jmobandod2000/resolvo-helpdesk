@@ -22,8 +22,8 @@ async function bootstrap() {
   );
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('API Tickets WMS')
-    .setDescription('Control interno de tickets de soporte WMS')
+    .setTitle('Resolvo API')
+    .setDescription('API de Resolvo, mesa de ayuda de TI de código abierto')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'JWT',

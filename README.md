@@ -1,13 +1,32 @@
-# Tickets WMS
+<h1 align="center">Resolvo</h1>
 
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-![Node 20+](https://img.shields.io/badge/node-%3E%3D20-339933)
-![PostgreSQL 17](https://img.shields.io/badge/PostgreSQL-17-336791)
-![i18n](https://img.shields.io/badge/i18n-es%20%7C%20en--US%20%7C%20pt--BR-informational)
+<p align="center">
+  <b>Mesa de ayuda de TI open source y autoalojada.</b><br />
+  Registra, da seguimiento y mide los tickets de soporte de tu equipo, en español, English y português.
+</p>
 
-Sistema web para que un equipo de TI registre, dé seguimiento y mida sus tickets de soporte. Ofrece historial completo, flujo de estados, métricas, reportes descargables y tres idiomas. Se instala en tu propio servidor; tus datos no salen de tu red.
+<p align="center">
+  <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" /></a>
+  <img alt="Node 20+" src="https://img.shields.io/badge/node-%3E%3D20-339933" />
+  <img alt="PostgreSQL 17" src="https://img.shields.io/badge/PostgreSQL-17-336791" />
+  <img alt="i18n" src="https://img.shields.io/badge/i18n-es%20%7C%20en--US%20%7C%20pt--BR-informational" />
+  <a href="https://github.com/jmobandod2000/resolvo-helpdesk/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/jmobandod2000/resolvo-helpdesk?style=social" /></a>
+</p>
 
-> **English:** Tickets WMS is a self-hosted help-desk tracker for IT teams (NestJS + PostgreSQL + Vue/Quasar), available in Spanish, English and Portuguese. Setup and deployment steps are below; commands are the same in any language.
+<p align="center">
+  <a href="#instalación-para-desarrollo">Instalar</a> ·
+  <a href="#despliegue-en-producción">Desplegar</a> ·
+  <a href="#funcionalidades">Funcionalidades</a> ·
+  <a href="#apoya-el-proyecto">Apoyar</a>
+</p>
+
+**Resolvo** es un *help desk* y sistema de tickets para equipos de TI de pequeñas y medianas empresas: solicitudes con historial completo, flujo de estados, sedes y categorías configurables, métricas, reportes en Excel y un asistente de configuración inicial. Es una alternativa ligera a herramientas como osTicket, GLPI o Zendesk que se instala en tu propio servidor en minutos; tus datos no salen de tu red.
+
+Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo encuentran.
+
+> 🇺🇸 **English:** Resolvo is an open-source, self-hosted IT help desk and ticketing system for small and mid-sized teams (NestJS + PostgreSQL + Vue/Quasar). It covers ticket tracking, configurable sites and categories, metrics, Excel reports and a setup wizard, in English, Spanish and Portuguese. A lightweight alternative to osTicket, GLPI or Zendesk. The setup commands below are the same in any language.
+>
+> 🇧🇷 **Português:** Resolvo é uma central de ajuda (help desk) de TI de código aberto e auto-hospedada, com controle de tickets, unidades e categorias configuráveis, métricas, relatórios em Excel e assistente de configuração, em português, espanhol e inglês. Os comandos de instalação abaixo valem para qualquer idioma.
 
 ## Contenido
 
@@ -56,8 +75,8 @@ La base de datos oficial es **PostgreSQL**: viene lista en `docker-compose.yml` 
 ## Instalación para desarrollo
 
 ```bash
-git clone https://github.com/jmobandod2000/tickets-app.git
-cd tickets-app
+git clone https://github.com/jmobandod2000/resolvo-helpdesk.git
+cd resolvo-helpdesk
 ```
 
 ### Backend
@@ -217,7 +236,7 @@ cd tickets-back && pnpm install --frozen-lockfile && pnpm build && npx prisma mi
 cd ../tickets-front && pnpm install --frozen-lockfile && pnpm build   # copia dist/spa al servidor web
 ```
 
-Haz un respaldo antes de actualizar. Las notas de cada versión están en [Releases](https://github.com/jmobandod2000/tickets-app/releases).
+Haz un respaldo antes de actualizar. Las notas de cada versión están en [Releases](https://github.com/jmobandod2000/resolvo-helpdesk/releases).
 
 ## Solución de problemas
 
@@ -268,7 +287,7 @@ El software se entrega tal cual, sin garantías de ningún tipo.
 
 ## Apoya el proyecto
 
-Tickets WMS es y seguirá siendo gratuito. Si le ahorra tiempo a tu equipo, puedes colaborar de forma voluntaria con su mantenimiento:
+Resolvo es y seguirá siendo gratuito. Si le ahorra tiempo a tu equipo, puedes colaborar de forma voluntaria con su mantenimiento:
 
 | Método | Dato |
 |---|---|

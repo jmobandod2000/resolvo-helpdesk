@@ -1,10 +1,10 @@
 # Cómo contribuir
 
-Gracias por tu interés en mejorar **Tickets WMS**. Toda contribución es bienvenida: reportes de errores, traducciones, documentación y código.
+Gracias por tu interés en mejorar **Resolvo**. Toda contribución es bienvenida: reportes de errores, traducciones, documentación y código.
 
 ## Antes de empezar
 
-- Para errores o ideas, abre un [issue](https://github.com/jmobandod2000/tickets-app/issues) con la plantilla correspondiente.
+- Para errores o ideas, abre un [issue](https://github.com/jmobandod2000/resolvo-helpdesk/issues) con la plantilla correspondiente.
 - Para cambios grandes, abre primero un issue y acordemos el enfoque, así nadie pierde tiempo.
 - Nunca incluyas datos reales de tu empresa (tickets, nombres, documentos, credenciales) en issues, capturas o código.
 
