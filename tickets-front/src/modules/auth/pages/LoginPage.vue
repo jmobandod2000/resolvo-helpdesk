@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import useLocaleAwareForm from 'src/modules/shared/composables/useLocaleAwareForm';
 import LanguageSelector from 'src/modules/shared/components/LanguageSelector.vue';
+import resolvoLogo from 'src/assets/brand/resolvo-logo.png';
 import AppFooterLinks from 'src/modules/shared/components/AppFooterLinks.vue';
 import { usePublicProfile } from 'src/modules/organization/composables/useOrganization';
 import useAuth from '../composables/useAuth';
@@ -24,8 +25,7 @@ onMounted(loadRememberedEmail);
     <LanguageSelector dark class="language-corner" />
     <q-card class="login-card q-pa-md" flat>
       <q-card-section class="text-center">
-        <q-icon name="sym_r_confirmation_number" size="48px" color="primary" />
-        <div class="text-h6 text-primary q-mt-sm">{{ t('app.name') }}</div>
+        <img :src="resolvoLogo" :alt="t('app.name')" style="width: 190px; max-width: 70%" />
         <div class="text-caption text-grey-7">{{ organizationName ?? t('app.subtitle') }}</div>
       </q-card-section>
 

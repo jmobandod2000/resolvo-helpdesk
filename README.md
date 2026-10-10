@@ -1,4 +1,6 @@
-<h1 align="center">Resolvo</h1>
+<p align="center">
+  <img src="assets/brand/resolvo-logo.png" alt="Resolvo, help desk de TI open source" width="300" />
+</p>
 
 <p align="center">
   <b>Mesa de ayuda de TI open source y autoalojada.</b><br />

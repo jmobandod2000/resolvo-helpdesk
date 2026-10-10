@@ -8,6 +8,7 @@ import { OrganizationRoutes } from 'src/modules/organization/interfaces/organiza
 import WelcomeDialog from 'src/modules/guide/components/WelcomeDialog.vue';
 import LanguageSelector from '../components/LanguageSelector.vue';
 import AppFooterLinks from '../components/AppFooterLinks.vue';
+import resolvoIcon from 'src/assets/brand/resolvo-icon.png';
 
 interface MenuLink {
   labelKey: string;
@@ -58,6 +59,7 @@ const visibleLinks = computed(() => links.filter((link) => !link.adminOnly || is
       <q-toolbar>
         <q-btn flat dense round icon="sym_r_menu" @click="isDrawerOpen = !isDrawerOpen" />
         <q-toolbar-title class="text-weight-medium row items-center no-wrap">
+          <img :src="resolvoIcon" alt="" style="width: 30px; height: 30px" class="q-mr-sm" />
           <span>{{ t('app.name') }}</span>
           <template v-if="organizationName">
             <q-separator vertical dark inset class="q-mx-sm gt-xs" />
