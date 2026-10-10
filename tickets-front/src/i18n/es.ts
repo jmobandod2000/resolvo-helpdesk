@@ -63,6 +63,7 @@ export default {
     network: 'No se pudo conectar con el servidor. Verifica tu conexión.',
     unexpected: 'Ocurrió un error inesperado. Intenta nuevamente.',
     timeout: {
+      notifications: 'Tiempo de espera agotado al consultar las notificaciones',
       portal: 'Tiempo de espera agotado al conectar con el portal',
       organization: 'Tiempo de espera agotado al consultar la configuración',
       reports: 'Tiempo de espera agotado al generar el reporte',
@@ -131,6 +132,7 @@ export default {
       shareMessage:
         'Hola, registramos tu solicitud {code}. Puedes ver cómo va y respondernos aquí: {url}',
       copyMessage: 'Copiar mensaje',
+      whatsapp: 'Enviar por WhatsApp',
     },
     hints: {
       requester: 'Elige un usuario o escribe el nombre de quien reporta',
@@ -747,6 +749,8 @@ export default {
       resolved: 'Resuelta',
     },
     track: {
+      newActivity: 'Tienes novedades en tu solicitud',
+      enableAlerts: 'Activar avisos',
       notFoundTitle: 'No encontramos esa solicitud',
       notFoundBody: 'Revisa que el enlace esté completo o crea una nueva solicitud.',
       createdTitle: '¡Listo! Recibimos tu solicitud {code}',
@@ -772,6 +776,21 @@ export default {
       sendReply: 'Enviar',
       replySent: 'Mensaje enviado',
       closed: 'Esta solicitud está cerrada. Si el problema continúa, crea una nueva.',
+    },
+  },
+  notifications: {
+    title: 'Notificaciones',
+    empty: 'No tienes notificaciones',
+    markAll: 'Marcar todas como leídas',
+    soundOn: 'Sonido activado',
+    soundOff: 'Sonido desactivado',
+    enableDesktop: 'Recibir avisos aunque la pestaña esté en segundo plano',
+    someone: 'Alguien',
+    newMany: 'Tienes {n} notificaciones nuevas',
+    types: {
+      NEW_PORTAL_TICKET: '{actor} abrió {code} desde el portal',
+      REQUESTER_REPLY: '{actor} respondió en {code}',
+      TICKET_ASSIGNED: '{actor} te asignó {code}',
     },
   },
   enums: {

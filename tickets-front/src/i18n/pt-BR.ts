@@ -65,6 +65,7 @@ const messages: MessageSchema = {
     network: 'Não foi possível conectar ao servidor. Verifique sua conexão.',
     unexpected: 'Ocorreu um erro inesperado. Tente novamente.',
     timeout: {
+      notifications: 'Tempo esgotado ao consultar as notificações',
       portal: 'Tempo esgotado ao conectar com o portal',
       organization: 'Tempo esgotado ao consultar as configurações',
       reports: 'Tempo esgotado ao gerar o relatório',
@@ -133,6 +134,7 @@ const messages: MessageSchema = {
       shareMessage:
         'Olá, registramos sua solicitação {code}. Você pode acompanhar e nos responder aqui: {url}',
       copyMessage: 'Copiar mensagem',
+      whatsapp: 'Enviar pelo WhatsApp',
     },
     hints: {
       requester: 'Escolha um usuário ou digite o nome de quem está reportando',
@@ -748,6 +750,8 @@ const messages: MessageSchema = {
       resolved: 'Resolvida',
     },
     track: {
+      newActivity: 'Há novidades na sua solicitação',
+      enableAlerts: 'Ativar avisos',
       notFoundTitle: 'Não encontramos essa solicitação',
       notFoundBody: 'Verifique se o link está completo ou crie uma nova solicitação.',
       createdTitle: 'Pronto! Recebemos sua solicitação {code}',
@@ -772,6 +776,21 @@ const messages: MessageSchema = {
       sendReply: 'Enviar',
       replySent: 'Mensagem enviada',
       closed: 'Esta solicitação está fechada. Se o problema continuar, crie uma nova.',
+    },
+  },
+  notifications: {
+    title: 'Notificações',
+    empty: 'Você não tem notificações',
+    markAll: 'Marcar todas como lidas',
+    soundOn: 'Som ativado',
+    soundOff: 'Som desativado',
+    enableDesktop: 'Receber avisos mesmo com a aba em segundo plano',
+    someone: 'Alguém',
+    newMany: 'Você tem {n} novas notificações',
+    types: {
+      NEW_PORTAL_TICKET: '{actor} abriu {code} pelo portal',
+      REQUESTER_REPLY: '{actor} respondeu em {code}',
+      TICKET_ASSIGNED: '{actor} atribuiu {code} a você',
     },
   },
   enums: {

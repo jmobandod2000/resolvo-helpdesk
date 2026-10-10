@@ -35,6 +35,7 @@ const messages: MessageSchema = {
       'This request reached the maximum number of messages. Create a new one if needed',
     portalBusy:
       'The portal is receiving many requests. Try again in a few minutes',
+    notificationNotFound: 'Notification {id} was not found',
     unexpected: 'An unexpected error occurred',
     db: {
       duplicate: 'A record with the same value already exists in: {fields}',

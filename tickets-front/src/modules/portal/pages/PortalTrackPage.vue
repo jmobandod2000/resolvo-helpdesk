@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { copyToClipboard } from 'quasar';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
@@ -9,6 +9,8 @@ import { useI18n } from 'vue-i18n';
 import useDates from 'src/modules/shared/composables/useDates';
 import useNotify from 'src/modules/shared/composables/useNotify';
 import useHandlerErrors from 'src/modules/shared/composables/useHandlerErrors';
+import useAlerts from 'src/modules/shared/composables/useAlerts';
+import useTitleBadge from 'src/modules/shared/composables/useTitleBadge';
 import type { TicketStatus } from 'src/modules/tickets/interfaces/ticket';
 import { getPortalTicket, replyPortalTicket } from '../api/portalApi';
 import usePortalStorage from '../composables/usePortalStorage';
@@ -36,7 +38,9 @@ const route = useRoute();
 const router = useRouter();
 const queryClient = useQueryClient();
 const { formatDateTime } = useDates();
-const { successNotify, errorNotify } = useNotify();
+const { successNotify, errorNotify, infoNotify } = useNotify();
+const { playChime, showDesktopNotification, desktopPermission, requestDesktopPermission } =
+  useAlerts();
 const { handleApiResponseError } = useHandlerErrors();
 const { saveTicket } = usePortalStorage();
 
@@ -48,20 +52,53 @@ const reply = ref('');
 const { data: ticket, isLoading, error } = useQuery({
   queryKey: ['portal', 'ticket', token],
   queryFn: () => getPortalTicket(token.value),
-  refetchInterval: 60_000,
+  refetchInterval: 30_000,
+  refetchIntervalInBackground: true,
   retry: (count, err) => !(isAxiosError(err) && err.response?.status === 404) && count < 2,
 });
 
 const notFound = computed(() => isAxiosError(error.value) && !!error.value.response);
 
+const isMessage = (event: PortalEvent) => event.type === 'NOTE' && !!event.message;
+
+const unseen = ref(0);
+const lastSignature = ref<string | null>(null);
+const skipNextAlert = ref(false);
+
+useTitleBadge(unseen);
+
+const signatureOf = (value: NonNullable<typeof ticket.value>) =>
+  `${value.status}|${value.events.filter((event) => isMessage(event) && !event.fromRequester).length}`;
+
+const clearUnseen = () => {
+  if (document.visibilityState === 'visible') unseen.value = 0;
+};
+
+onMounted(() => document.addEventListener('visibilitychange', clearUnseen));
+onBeforeUnmount(() => document.removeEventListener('visibilitychange', clearUnseen));
+
 watch(ticket, (value) => {
-  if (value)
-    saveTicket({
-      code: value.code,
-      title: value.title,
-      token: token.value,
-      createdAt: value.reportedAt,
-    });
+  if (!value) return;
+  saveTicket({
+    code: value.code,
+    title: value.title,
+    token: token.value,
+    createdAt: value.reportedAt,
+  });
+
+  const signature = signatureOf(value);
+  const changed = lastSignature.value !== null && lastSignature.value !== signature;
+  lastSignature.value = signature;
+  if (!changed) return;
+  if (skipNextAlert.value) {
+    skipNextAlert.value = false;
+    return;
+  }
+
+  void playChime();
+  infoNotify(t('portal.track.newActivity'));
+  showDesktopNotification(value.code, t('portal.track.newActivity'));
+  if (document.visibilityState !== 'visible') unseen.value += 1;
 });
 
 const stage = computed<Stage>(() => (ticket.value ? STAGE_BY_STATUS[ticket.value.status] : 'received'));
@@ -72,7 +109,6 @@ const isWaiting = computed(() => ticket.value?.status === 'WAITING_INFO');
 const statusLabel = (status: TicketStatus | null) =>
   status ? t(`portal.status.${status}`) : '';
 
-const isMessage = (event: PortalEvent) => event.type === 'NOTE' && !!event.message;
 
 const replyRule = (value: string) =>
   value.trim().length >= 2 || t('portal.track.replyRule');
@@ -80,6 +116,7 @@ const replyRule = (value: string) =>
 const mutation = useMutation({
   mutationFn: (message: string) => replyPortalTicket(token.value, message),
   onSuccess: (updated) => {
+    skipNextAlert.value = true;
     queryClient.setQueryData(['portal', 'ticket', token], updated);
     reply.value = '';
     successNotify(t('portal.track.replySent'));
@@ -169,6 +206,16 @@ const dismissNew = () => void router.replace({ query: {} });
                 {{ statusLabel(ticket.status) }}
               </q-badge>
               <q-space />
+              <q-btn
+                v-if="desktopPermission === 'default'"
+                flat
+                dense
+                no-caps
+                color="primary"
+                icon="sym_r_notifications_active"
+                :label="t('portal.track.enableAlerts')"
+                @click="requestDesktopPermission"
+              />
               <q-btn flat dense no-caps color="primary" icon="sym_r_link" :label="t('portal.track.copyLink')" @click="copyLink" />
             </div>
             <div class="ticket-title q-mt-sm">{{ ticket.title }}</div>

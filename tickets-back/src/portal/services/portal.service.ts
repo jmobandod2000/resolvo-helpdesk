@@ -27,6 +27,7 @@ import {
   generatePublicToken,
   TicketsService,
 } from '../../tickets/services/tickets.service';
+import { NotificationsService } from '../../notifications/services';
 import { CreatePortalTicketDto, PortalReplyDto } from '../dtos';
 
 const SYSTEM_USER_EMAIL = 'portal@system.resolvo';
@@ -72,6 +73,7 @@ export class PortalService {
     private readonly sitesService: SitesService,
     private readonly categoriesService: CategoriesService,
     private readonly ticketsService: TicketsService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async getConfig() {
@@ -168,6 +170,7 @@ export class PortalService {
       }),
     ]);
 
+    await this.notificationsService.newPortalTicket(ticket, dto.requesterName);
     return { code: ticket.code, token, duplicate: false };
   }
 
@@ -221,6 +224,10 @@ export class PortalService {
       });
     });
 
+    await this.notificationsService.requesterReply(
+      ticket,
+      ticket.requesterName,
+    );
     return this.getTicket(token);
   }
 

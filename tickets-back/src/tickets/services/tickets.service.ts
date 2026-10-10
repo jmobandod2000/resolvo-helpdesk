@@ -15,6 +15,7 @@ import {
 import { buildStatusChangeData, buildTicketWhere } from '../helpers';
 import { i18nMessage } from '../../i18n';
 import { CategoriesService, SitesService } from '../../organization/services';
+import { NotificationsService } from '../../notifications/services';
 import {
   CATEGORY_SUMMARY_SELECT,
   SITE_SUMMARY_SELECT,
@@ -47,12 +48,13 @@ export class TicketsService {
     private readonly prismaService: PrismaService,
     private readonly sitesService: SitesService,
     private readonly categoriesService: CategoriesService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(createTicketDto: CreateTicketDto, user: UserLogged) {
     await this.sitesService.assertAssignable(createTicketDto.siteId);
     await this.categoriesService.assertAssignable(createTicketDto.categoryId);
-    return this.prismaService.$transaction(async (tx) => {
+    const created = await this.prismaService.$transaction(async (tx) => {
       const ticket = await tx.ticket.create({
         data: { ...createTicketDto, createdById: user.id },
       });
@@ -72,6 +74,13 @@ export class TicketsService {
         include: TICKET_LIST_INCLUDE,
       });
     });
+
+    await this.notificationsService.ticketAssigned(
+      created.id,
+      created.assigneeId,
+      user,
+    );
+    return created;
   }
 
   async findAll(
@@ -129,7 +138,7 @@ export class TicketsService {
       updateTicketDto.assigneeId !== undefined &&
       updateTicketDto.assigneeId !== ticket.assigneeId;
 
-    return this.prismaService.$transaction(async (tx) => {
+    const result = await this.prismaService.$transaction(async (tx) => {
       const updated = await tx.ticket.update({
         where: { id },
         data: updateTicketDto,
@@ -149,6 +158,14 @@ export class TicketsService {
 
       return updated;
     });
+
+    if (isReassigned)
+      await this.notificationsService.ticketAssigned(
+        id,
+        result.assigneeId,
+        user,
+      );
+    return result;
   }
 
   async changeStatus(id: number, dto: ChangeStatusDto, user: UserLogged) {

@@ -65,6 +65,7 @@ const messages: MessageSchema = {
     network: 'Could not connect to the server. Check your connection.',
     unexpected: 'An unexpected error occurred. Please try again.',
     timeout: {
+      notifications: 'Notifications took too long to load',
       portal: 'The portal took too long to respond',
       organization: 'The settings took too long to load',
       reports: 'The report took too long to generate',
@@ -132,6 +133,7 @@ const messages: MessageSchema = {
       messageLabel: 'Message to send',
       shareMessage: 'Hi, we logged your request {code}. You can follow it and reply here: {url}',
       copyMessage: 'Copy message',
+      whatsapp: 'Send via WhatsApp',
     },
     hints: {
       requester: 'Pick a user or type the name of whoever is reporting',
@@ -746,6 +748,8 @@ const messages: MessageSchema = {
       resolved: 'Resolved',
     },
     track: {
+      newActivity: 'There are updates on your request',
+      enableAlerts: 'Turn on alerts',
       notFoundTitle: 'We could not find that request',
       notFoundBody: 'Check that the link is complete or create a new request.',
       createdTitle: 'Done! We received your request {code}',
@@ -770,6 +774,21 @@ const messages: MessageSchema = {
       sendReply: 'Send',
       replySent: 'Message sent',
       closed: 'This request is closed. If the problem continues, create a new one.',
+    },
+  },
+  notifications: {
+    title: 'Notifications',
+    empty: 'You have no notifications',
+    markAll: 'Mark all as read',
+    soundOn: 'Sound on',
+    soundOff: 'Sound off',
+    enableDesktop: 'Get alerts even when the tab is in the background',
+    someone: 'Someone',
+    newMany: 'You have {n} new notifications',
+    types: {
+      NEW_PORTAL_TICKET: '{actor} opened {code} from the portal',
+      REQUESTER_REPLY: '{actor} replied on {code}',
+      TICKET_ASSIGNED: '{actor} assigned {code} to you',
     },
   },
   enums: {

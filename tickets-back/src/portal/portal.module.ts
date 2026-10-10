@@ -3,6 +3,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
 import { OrganizationModule } from '../organization/organization.module';
 import { TicketsModule } from '../tickets/tickets.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { PortalController } from './controllers';
 import { PortalService } from './services';
 
@@ -10,6 +11,7 @@ import { PortalService } from './services';
   imports: [
     OrganizationModule,
     TicketsModule,
+    NotificationsModule,
     ThrottlerModule.forRoot([
       { name: 'default', ttl: 60_000, limit: 60 },
       { name: 'hourly', ttl: 3_600_000, limit: 300 },

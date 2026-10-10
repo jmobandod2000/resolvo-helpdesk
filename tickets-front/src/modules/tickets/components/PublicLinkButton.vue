@@ -21,6 +21,7 @@ const isOpen = ref(false);
 const token = ref<string | null>(null);
 const url = computed(() => (token.value ? buildTrackingUrl(token.value) : ''));
 const message = computed(() => t('tickets.publicLink.shareMessage', { code: props.code, url: url.value }));
+const whatsappUrl = computed(() => `https://wa.me/?text=${encodeURIComponent(message.value)}`);
 
 const mutation = useMutation({
   mutationFn: () => getTicketPublicLink(props.ticketId),
@@ -77,6 +78,16 @@ const copy = async (text: string) => {
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat no-caps :label="t('common.close')" v-close-popup />
+        <q-btn
+          outline
+          no-caps
+          color="positive"
+          icon="sym_r_chat"
+          :label="t('tickets.publicLink.whatsapp')"
+          :href="whatsappUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        />
         <q-btn
           unelevated
           no-caps

@@ -47,6 +47,12 @@ enum RootCause {
   OTHER
 }
 
+enum NotificationType {
+  NEW_PORTAL_TICKET
+  REQUESTER_REPLY
+  TICKET_ASSIGNED
+}
+
 enum TicketEventType {
   CREATED
   STATUS_CHANGED
@@ -67,8 +73,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  AssignedTickets Ticket[]      @relation("TicketAssignee")
-  CreatedTickets  Ticket[]      @relation("TicketCreator")
+  Notifications   Notification[]
+  AssignedTickets Ticket[]       @relation("TicketAssignee")
+  CreatedTickets  Ticket[]       @relation("TicketCreator")
   TicketEvents    TicketEvent[]
 
   @@index([isDeleted])
@@ -153,7 +160,8 @@ model Ticket {
   createdById Int
   CreatedBy   User      @relation("TicketCreator", fields: [createdById], references: [id])
 
-  Events TicketEvent[]
+  Events        TicketEvent[]
+  Notifications Notification[]
 
   @@index([status])
   @@index([siteId])
@@ -178,4 +186,20 @@ model TicketEvent {
   User     User   @relation(fields: [userId], references: [id])
 
   @@index([ticketId])
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  type      NotificationType
+  actorName String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  userId   Int
+  User     User   @relation(fields: [userId], references: [id])
+  ticketId Int
+  Ticket   Ticket @relation(fields: [ticketId], references: [id])
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
 }

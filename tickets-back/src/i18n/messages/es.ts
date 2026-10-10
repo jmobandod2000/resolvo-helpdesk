@@ -36,6 +36,7 @@ export default {
       'Esta solicitud alcanzó el máximo de mensajes. Crea una nueva si lo necesitas',
     portalBusy:
       'El portal está recibiendo muchas solicitudes. Intenta de nuevo en unos minutos',
+    notificationNotFound: 'No se encontró la notificación {id}',
     unexpected: 'Ocurrió un error inesperado',
     db: {
       duplicate: 'Ya existe un registro con el mismo valor en: {fields}',

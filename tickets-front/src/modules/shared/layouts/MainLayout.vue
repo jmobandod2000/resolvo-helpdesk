@@ -6,6 +6,7 @@ import useAuth from 'src/modules/auth/composables/useAuth';
 import { usePublicProfile } from 'src/modules/organization/composables/useOrganization';
 import { OrganizationRoutes } from 'src/modules/organization/interfaces/organization';
 import WelcomeDialog from 'src/modules/guide/components/WelcomeDialog.vue';
+import NotificationBell from 'src/modules/notifications/components/NotificationBell.vue';
 import LanguageSelector from '../components/LanguageSelector.vue';
 import AppFooterLinks from '../components/AppFooterLinks.vue';
 import resolvoIcon from 'src/assets/brand/resolvo-icon.png';
@@ -66,6 +67,7 @@ const visibleLinks = computed(() => links.filter((link) => !link.adminOnly || is
             <span class="organization-name gt-xs ellipsis">{{ organizationName }}</span>
           </template>
         </q-toolbar-title>
+        <NotificationBell />
         <LanguageSelector dark class="q-mr-sm" />
         <div class="q-mr-sm gt-xs">{{ user.name }}</div>
         <q-btn flat dense round icon="sym_r_logout" @click="logout">
