@@ -11,7 +11,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { TicketCategory, TicketChannel, TicketPriority } from '@prisma/client';
+import { TicketChannel, TicketPriority } from '@prisma/client';
 
 export class CreateTicketDto {
   @ApiProperty({ description: 'Título corto del ticket' })
@@ -53,9 +53,12 @@ export class CreateTicketDto {
   @IsEnum(TicketChannel)
   channel?: TicketChannel;
 
-  @ApiProperty({ enum: TicketCategory })
-  @IsEnum(TicketCategory)
-  category: TicketCategory;
+  @ApiProperty({ description: 'Categoría', required: false, nullable: true })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  categoryId?: number | null;
 
   @ApiProperty({ enum: TicketPriority, required: false })
   @IsOptional()

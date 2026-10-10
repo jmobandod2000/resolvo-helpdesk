@@ -31,7 +31,7 @@ const STEP_BY_GROUP: Record<ReportGroupBy, string> = {
 const DIMENSION_KEYS: Record<ReportDimension, string> = {
   assignee: `COALESCE(b."assigneeId"::text, 'NONE')`,
   site: `COALESCE(b."siteId"::text, 'NONE')`,
-  category: `b."category"::text`,
+  category: `COALESCE(b."categoryId"::text, 'NONE')`,
   priority: `b."priority"::text`,
   rootCause: `COALESCE(b."rootCause"::text, 'NONE')`,
   requester: `b."requesterName"`,
@@ -126,7 +126,7 @@ export class ReportsService {
       this.getPeriods(base, filter, groupBy, timeZone),
       this.getByAssignee(base, timeZone),
       this.getBySite(base),
-      this.getByDimension('category', base),
+      this.getByCategory(base),
       this.getByDimension('priority', base),
       this.getByDimension('rootCause', base),
       this.getByDimension('requester', base),
@@ -178,13 +178,12 @@ export class ReportsService {
   }
 
   private buildBase(
-    { siteId, category, priority, assigneeId, from, to }: FilterReportDto,
+    { siteId, categoryId, priority, assigneeId, from, to }: FilterReportDto,
     timeZone: string,
   ): Prisma.Sql {
     const conditions: Prisma.Sql[] = [Prisma.sql`t."isDeleted" = false`];
     if (siteId) conditions.push(Prisma.sql`t."siteId" = ${siteId}`);
-    if (category)
-      conditions.push(Prisma.sql`t."category" = ${category}::"TicketCategory"`);
+    if (categoryId) conditions.push(Prisma.sql`t."categoryId" = ${categoryId}`);
     if (priority)
       conditions.push(Prisma.sql`t."priority" = ${priority}::"TicketPriority"`);
     if (assigneeId) conditions.push(Prisma.sql`t."assigneeId" = ${assigneeId}`);
@@ -347,6 +346,21 @@ export class ReportsService {
     });
   }
 
+  private async getByCategory(base: Prisma.Sql): Promise<ReportDimensionRow[]> {
+    const [rows, categories] = await Promise.all([
+      this.getByDimension('category', base),
+      this.prismaService.category.findMany({
+        select: { id: true, name: true },
+      }),
+    ]);
+
+    return rows.map((row) => ({
+      ...row,
+      label:
+        categories.find((item) => String(item.id) === row.key)?.name ?? null,
+    }));
+  }
+
   private async getByAssignee(
     base: Prisma.Sql,
     timeZone: string,
@@ -435,7 +449,7 @@ export class ReportsService {
         title: string;
         requesterName: string;
         site: string | null;
-        category: string;
+        category: string | null;
         priority: string;
         status: string;
         assignee: string | null;
@@ -447,7 +461,7 @@ export class ReportsService {
       SELECT
         b.id, b.code, b.title, b."requesterName",
         NULLIF(concat_ws(' ', st.code, st.name), '') AS site,
-        b.category::text AS category,
+        ct.name AS category,
         b.priority::text AS priority,
         b.status::text AS status,
         u.name AS assignee,
@@ -456,6 +470,7 @@ export class ReportsService {
       FROM base b
       LEFT JOIN "User" u ON u.id = b."assigneeId"
       LEFT JOIN "Site" st ON st.id = b."siteId"
+      LEFT JOIN "Category" ct ON ct.id = b."categoryId"
       WHERE b.status IN (${OPEN_LIST})
       ORDER BY b."reportedAt"
     `;
@@ -483,7 +498,7 @@ export class ReportsService {
         requesterArea: string | null;
         site: string | null;
         channel: string;
-        category: string;
+        category: string | null;
         priority: string;
         status: string;
         rootCause: string | null;
@@ -502,7 +517,7 @@ export class ReportsService {
         b.id, b.code, b.title, b."requesterName", b."requesterArea",
         NULLIF(concat_ws(' ', st.code, st.name), '') AS site,
         b.channel::text AS channel,
-        b.category::text AS category,
+        ct.name AS category,
         b.priority::text AS priority,
         b.status::text AS status,
         b."rootCause"::text AS "rootCause",
@@ -513,6 +528,7 @@ export class ReportsService {
       CROSS JOIN bounds bd
       LEFT JOIN "User" u ON u.id = b."assigneeId"
       LEFT JOIN "Site" st ON st.id = b."siteId"
+      LEFT JOIN "Category" ct ON ct.id = b."categoryId"
       WHERE (b.reported >= bd.rs AND b.reported < bd.re)
          OR (b.resolved >= bd.rs AND b.resolved < bd.re)
          OR (b.closed >= bd.rs AND b.closed < bd.re)

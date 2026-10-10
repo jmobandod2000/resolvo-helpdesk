@@ -19,7 +19,7 @@ import type { CountByKey } from '../interfaces/metrics';
 const router = useRouter();
 const { t, te } = useI18n();
 const { formatHours, formatNumber } = useDates();
-const { statusLabel, categoryLabel, priorityLabel, rootCauseLabel } = useCatalogs();
+const { statusLabel, priorityLabel, rootCauseLabel } = useCatalogs();
 const { metrics, isFetching } = useMetricsQuery();
 const { filters: dashboardFilters } = useDashboardManageStore();
 const { resetFilters, setFilters } = useTicketsManageStore();
@@ -62,7 +62,12 @@ const bySite = computed(() =>
     label: item.key === 'NONE' ? t('sites.general') : item.label,
   })),
 );
-const byCategory = computed(() => relabel(metrics.value?.byCategory, categoryLabel));
+const byCategory = computed(() =>
+  (metrics.value?.byCategory ?? []).map((item) => ({
+    ...item,
+    label: item.key === 'NONE' ? t('categories.none') : item.label,
+  })),
+);
 const byPriority = computed(() => relabel(metrics.value?.byPriority, priorityLabel));
 const byRootCause = computed(() => relabel(metrics.value?.byRootCause, rootCauseLabel));
 const backlogAging = computed(() =>
@@ -88,7 +93,7 @@ const hasKey = (item: CountByKey) => item.key !== 'NONE';
 const selectStatus = (item: CountByKey) =>
   openFilteredTickets({ status: [item.key as TicketFilters['status'][number]] });
 const selectCategory = (item: CountByKey) =>
-  openFilteredTickets({ category: item.key as TicketFilters['category'] });
+  hasKey(item) && openFilteredTickets({ categoryId: Number(item.key) });
 const selectSite = (item: CountByKey) =>
   hasKey(item) && openFilteredTickets({ siteId: Number(item.key) });
 const selectPriority = (item: CountByKey) =>

@@ -1,6 +1,5 @@
 import {
   RootCause,
-  TicketCategory,
   TicketChannel,
   TicketPriority,
   TicketStatus,
@@ -13,7 +12,7 @@ export interface HistoricalTicket {
   requesterArea?: string;
   siteCode?: string | null;
   channel: TicketChannel;
-  category: TicketCategory;
+  categoryName?: string | null;
   priority: TicketPriority;
   status: TicketStatus;
   rootCause?: RootCause;
@@ -45,6 +44,16 @@ export const HISTORICAL_SITES: HistoricalSite[] = [
   { code: 'B', name: 'Sede B' },
 ];
 
+export const HISTORICAL_CATEGORIES: string[] = [
+  'Hardware',
+  'Software y sistemas',
+  'Red y conectividad',
+  'Accesos y cuentas',
+  'Inventario',
+  'Reportes',
+  'Otro',
+];
+
 export const HISTORICAL_TICKETS: HistoricalTicket[] = [
   {
     title:
@@ -54,7 +63,7 @@ export const HISTORICAL_TICKETS: HistoricalTicket[] = [
     requesterName: 'Inventario Sede A',
     siteCode: 'A',
     channel: TicketChannel.WHATSAPP,
-    category: TicketCategory.REPORTS,
+    categoryName: 'Reportes',
     priority: TicketPriority.MEDIUM,
     status: TicketStatus.RESOLVED,
     rootCause: RootCause.SYSTEM_DEFECT,
@@ -77,7 +86,7 @@ export const HISTORICAL_TICKETS: HistoricalTicket[] = [
     requesterName: 'Inventario Sede B',
     siteCode: 'B',
     channel: TicketChannel.EMAIL,
-    category: TicketCategory.INVENTORY,
+    categoryName: 'Inventario',
     priority: TicketPriority.HIGH,
     status: TicketStatus.WAITING_INFO,
     rootCause: RootCause.OPERATIONAL_ERROR,

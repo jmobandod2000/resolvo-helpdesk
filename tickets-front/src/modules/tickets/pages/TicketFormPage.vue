@@ -7,6 +7,7 @@ import useLocaleAwareForm from 'src/modules/shared/composables/useLocaleAwareFor
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import { useUsersQuery } from 'src/modules/users/composables/useUsersQuery';
 import { useSites } from 'src/modules/organization/composables/useSites';
+import { useCategories } from 'src/modules/organization/composables/useCategories';
 import useAuth from 'src/modules/auth/composables/useAuth';
 import TagsInput from '../components/TagsInput.vue';
 import { useTicketForm } from '../composables/useTicketForm';
@@ -21,6 +22,9 @@ const formRef = useLocaleAwareForm();
 const { catalogs } = useCatalogs();
 const { userOptions } = useUsersQuery();
 const { siteOptions } = useSites();
+const { categoryOptions } = useCategories();
+const categoryRule = (value: unknown) =>
+  !categoryOptions.value.length || !!value || t('common.requiredField');
 const { user } = useAuth();
 const { form, loadTicket, buildPayload } = useTicketForm();
 const { createMutation, updateMutation } = useTicketMutations();
@@ -204,14 +208,14 @@ const save = async () => {
                 bottom-slots
               />
               <q-select
-                v-model="form.category"
-                :options="catalogs.categories"
+                v-model="form.categoryId"
+                :options="categoryOptions"
                 :label="t('tickets.fields.category')"
                 outlined
                 dense
                 emit-value
                 map-options
-                :rules="[requiredRule]"
+                :rules="[categoryRule]"
               />
               <q-select
                 v-model="form.priority"

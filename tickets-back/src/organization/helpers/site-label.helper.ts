@@ -1,3 +1,5 @@
+export const CATEGORY_SUMMARY_SELECT = { id: true, name: true } as const;
+
 export const SITE_SUMMARY_SELECT = {
   id: true,
   code: true,

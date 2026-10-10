@@ -37,19 +37,6 @@ enum TicketChannel {
   OTHER
 }
 
-enum TicketCategory {
-  INVENTORY
-  RECEIVING
-  RECHECK
-  PICKING
-  CYCLE_COUNT
-  TRANSFERS
-  BILLING
-  REPORTS
-  SYSTEM
-  OTHER
-}
-
 enum RootCause {
   OPERATIONAL_ERROR
   SYSTEM_DEFECT
@@ -111,6 +98,20 @@ model Site {
   @@index([isDeleted])
 }
 
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Tickets Ticket[]
+
+  @@index([isDeleted])
+}
+
 model Ticket {
   id              Int            @id @default(autoincrement())
   code            String?        @unique
@@ -120,7 +121,7 @@ model Ticket {
   requesterArea   String?
   siteId          Int?
   channel         TicketChannel  @default(WHATSAPP)
-  category        TicketCategory
+  categoryId      Int?
   priority        TicketPriority @default(MEDIUM)
   status          TicketStatus   @default(OPEN)
   rootCause       RootCause?
@@ -139,17 +140,18 @@ model Ticket {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
-  Site        Site? @relation(fields: [siteId], references: [id])
+  Site        Site?     @relation(fields: [siteId], references: [id])
+  Category    Category? @relation(fields: [categoryId], references: [id])
   assigneeId  Int?
-  Assignee    User? @relation("TicketAssignee", fields: [assigneeId], references: [id])
+  Assignee    User?     @relation("TicketAssignee", fields: [assigneeId], references: [id])
   createdById Int
-  CreatedBy   User  @relation("TicketCreator", fields: [createdById], references: [id])
+  CreatedBy   User      @relation("TicketCreator", fields: [createdById], references: [id])
 
   Events TicketEvent[]
 
   @@index([status])
   @@index([siteId])
-  @@index([category])
+  @@index([categoryId])
   @@index([reportedAt])
   @@index([isDeleted])
 }

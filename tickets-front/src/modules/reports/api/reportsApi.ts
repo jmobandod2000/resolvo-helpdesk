@@ -14,7 +14,7 @@ export const getTicketsReport = async (filters: ReportFilters) => {
       groupBy: filters.groupBy,
       timeZone: browserTimeZone(),
       ...(filters.siteId && { siteId: filters.siteId }),
-      ...(filters.category && { category: filters.category }),
+      ...(filters.categoryId && { categoryId: filters.categoryId }),
       ...(filters.priority && { priority: filters.priority }),
       ...(filters.assigneeId && { assigneeId: filters.assigneeId }),
     },

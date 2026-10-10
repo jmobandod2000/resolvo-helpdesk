@@ -19,6 +19,9 @@ export default {
     siteNotFound: 'No se encontró la sede {id}',
     siteInactive: 'La sede {name} está inactiva',
     siteDuplicate: 'Ya existe una sede llamada {name}',
+    categoryNotFound: 'No se encontró la categoría {id}',
+    categoryInactive: 'La categoría {name} está inactiva',
+    categoryDuplicate: 'Ya existe una categoría llamada {name}',
     unexpected: 'Ocurrió un error inesperado',
     db: {
       duplicate: 'Ya existe un registro con el mismo valor en: {fields}',
@@ -61,7 +64,7 @@ export default {
     address: 'Dirección',
     website: 'Sitio web',
     channel: 'Canal',
-    category: 'Categoría',
+    categoryId: 'Categoría',
     priority: 'Prioridad',
     productCodes: 'Códigos de producto',
     documents: 'Documentos',

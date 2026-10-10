@@ -11,7 +11,6 @@ const EMPTY_CATALOGS: Catalogs = {
   statuses: [],
   priorities: [],
   channels: [],
-  categories: [],
   rootCauses: [],
 };
 
@@ -19,7 +18,6 @@ const ENUM_KEYS: Record<CatalogKey, string> = {
   statuses: 'enums.status',
   priorities: 'enums.priority',
   channels: 'enums.channel',
-  categories: 'enums.category',
   rootCauses: 'enums.rootCause',
 };
 
@@ -48,7 +46,6 @@ const useCatalogs = () => {
       statuses: translateOptions('statuses'),
       priorities: translateOptions('priorities'),
       channels: translateOptions('channels'),
-      categories: translateOptions('categories'),
       rootCauses: translateOptions('rootCauses'),
     };
   });
@@ -62,7 +59,6 @@ const useCatalogs = () => {
     statusLabel: labelOf('statuses'),
     priorityLabel: labelOf('priorities'),
     channelLabel: labelOf('channels'),
-    categoryLabel: labelOf('categories'),
     rootCauseLabel: labelOf('rootCauses'),
   };
 };

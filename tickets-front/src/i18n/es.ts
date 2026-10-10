@@ -288,7 +288,7 @@ export default {
         title: 'Ajusta tu espacio',
         body: 'Elige tu idioma con el botón de idioma de la barra superior; se recuerda en este navegador.',
         tip1: 'Disponible en español, inglés y portugués.',
-        tip2: 'Los administradores crean y desactivan usuarios en "Usuarios".',
+        tip2: 'Los administradores gestionan los usuarios en "Usuarios" y la empresa, sedes y categorías en "Configuración".',
         tip3: 'Puedes volver a esta guía cuando quieras desde el menú.',
       },
     },
@@ -524,12 +524,82 @@ export default {
       deleted: 'Sede {name} eliminada',
     },
   },
+  categories: {
+    none: 'Sin categoría',
+    description:
+      'Define cómo clasifica tu equipo las solicitudes. Usa nombres que todos entiendan; puedes desactivar las que ya no uses.',
+    add: 'Agregar categoría',
+    addSuggested: 'Agregar sugeridas ({n})',
+    createTitle: 'Nueva categoría',
+    editTitle: 'Editar categoría',
+    empty: 'Aún no hay categorías. Agrega las sugeridas o crea las tuyas.',
+    active: 'Activa: disponible para tickets nuevos',
+    inactive: 'Inactiva: se conserva en el historial, pero no se puede elegir en tickets nuevos',
+    deleteTitle: 'Eliminar categoría',
+    deleteMessage: '¿Eliminar la categoría {name}?',
+    deleteWithTickets:
+      'La categoría {name} tiene {n} tickets. Los tickets la conservarán en su historial, pero ya no aparecerá en las listas. ¿Eliminarla?',
+    fields: {
+      name: 'Nombre',
+      description: 'Descripción',
+      tickets: 'Tickets',
+      status: 'Activa',
+    },
+    hints: {
+      name: 'Por ejemplo: Impresoras, Accesos y cuentas',
+      description: 'Opcional: qué tipo de solicitudes incluye',
+    },
+    rules: {
+      name: 'Escribe el nombre de la categoría (mínimo 2 caracteres)',
+    },
+    notify: {
+      created: 'Categoría {name} creada',
+      updated: 'Categoría {name} actualizada',
+      deleted: 'Categoría {name} eliminada',
+      suggestedAdded: 'Se agregaron {n} categorías sugeridas',
+    },
+    suggested: {
+      hardware: {
+        name: 'Hardware y equipos',
+        description: 'Computadoras, monitores, periféricos y otros equipos',
+      },
+      software: {
+        name: 'Software y aplicaciones',
+        description: 'Instalación, errores y actualizaciones de programas',
+      },
+      network: {
+        name: 'Red e internet',
+        description: 'Conectividad, wifi, VPN y caídas del servicio',
+      },
+      access: {
+        name: 'Accesos y cuentas',
+        description: 'Usuarios, contraseñas y permisos',
+      },
+      email: {
+        name: 'Correo y comunicaciones',
+        description: 'Correo electrónico, telefonía y mensajería',
+      },
+      printing: {
+        name: 'Impresoras',
+        description: 'Impresión, escaneo y consumibles',
+      },
+      businessSystems: {
+        name: 'Sistemas de la empresa',
+        description: 'ERP, inventario, facturación y otros sistemas de gestión',
+      },
+      other: {
+        name: 'Otro',
+        description: 'Solicitudes que no encajan en otra categoría',
+      },
+    },
+  },
   setup: {
     title: 'Configuración inicial',
     subtitle: 'Prepara la app para tu empresa. Podrás cambiar todo después en Configuración.',
     steps: {
       organization: 'Empresa',
       sites: 'Sedes',
+      categories: 'Categorías',
       done: 'Listo',
     },
     organizationIntro:
@@ -539,6 +609,8 @@ export default {
     finish: 'Comenzar a usar la app',
     doneTitle: '¡{name} está lista!',
     doneSites: 'Registraste {n} sedes: {sites}.',
+    doneCategories: 'Tienes {n} categorías para clasificar los tickets.',
+    doneNoCategories: 'No registraste categorías; podrás agregarlas en Configuración.',
     doneNoSites: 'No registraste sedes; los tickets quedarán como “General”.',
     doneHint:
       'Siguiente paso recomendado: crea a los analistas en Usuarios y revisa la Guía de uso.',
@@ -547,10 +619,11 @@ export default {
   },
   settings: {
     title: 'Configuración',
-    subtitle: 'Datos de la empresa y sedes que atiende el equipo de TI',
+    subtitle: 'Datos de la empresa, sedes y categorías de los tickets',
     tabs: {
       organization: 'Empresa',
       sites: 'Sedes',
+      categories: 'Categorías',
     },
   },
   enums: {
@@ -574,18 +647,6 @@ export default {
       EMAIL: 'Correo',
       CALL: 'Llamada',
       IN_PERSON: 'Presencial',
-      OTHER: 'Otro',
-    },
-    category: {
-      INVENTORY: 'Inventario / existencias',
-      RECEIVING: 'Recepción',
-      RECHECK: 'Rechequeo',
-      PICKING: 'Picking',
-      CYCLE_COUNT: 'Conteo cíclico',
-      TRANSFERS: 'Traslados',
-      BILLING: 'Facturación',
-      REPORTS: 'Reportes',
-      SYSTEM: 'Sistema',
       OTHER: 'Otro',
     },
     rootCause: {

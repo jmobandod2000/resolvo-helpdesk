@@ -44,7 +44,6 @@ $new = Invoke-Api 'POST' 'tickets' @{
   title = 'Prueba de humo del sistema de tickets'
   description = 'Ticket creado por el script de prueba'
   requesterName = 'QA'
-  category = 'SYSTEM'
   productCodes = @('999999')
 } $token
 "8. Creado: $($new.code) estado=$($new.status)"
@@ -75,4 +74,4 @@ $metrics = Invoke-Api 'GET' 'metrics/summary' $null $token
 "    Semanas: $($metrics.weeklyTrend.Count), top producto: $($metrics.topProducts[0].productCode)"
 
 $catalogs = Invoke-Api 'GET' 'drop-downs/catalogs' $null $token
-"16. Catalogos: estados=$($catalogs.statuses.Count) categorias=$($catalogs.categories.Count)"
+"16. Catalogos: estados=$($catalogs.statuses.Count) prioridades=$($catalogs.priorities.Count)"

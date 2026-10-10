@@ -29,6 +29,13 @@ export class FilterMetricsDto {
   @Type(() => Number)
   siteId?: number;
 
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  categoryId?: number;
+
   @ApiProperty({ description: 'Semanas de la tendencia', required: false })
   @IsOptional()
   @IsInt()

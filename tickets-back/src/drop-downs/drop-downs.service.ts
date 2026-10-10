@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 import {
-  CATEGORY_LABELS,
   CHANNEL_LABELS,
   PRIORITY_LABELS,
   ROOT_CAUSE_LABELS,
@@ -18,7 +17,6 @@ export class DropDownsService {
       statuses: toOptions(STATUS_LABELS),
       priorities: toOptions(PRIORITY_LABELS),
       channels: toOptions(CHANNEL_LABELS),
-      categories: toOptions(CATEGORY_LABELS),
       rootCauses: toOptions(ROOT_CAUSE_LABELS),
     };
   }

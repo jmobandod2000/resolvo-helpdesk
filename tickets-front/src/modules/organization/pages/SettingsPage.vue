@@ -4,9 +4,10 @@ import { useI18n } from 'vue-i18n';
 
 import OrganizationForm from '../components/OrganizationForm.vue';
 import SitesManager from '../components/SitesManager.vue';
+import CategoriesManager from '../components/CategoriesManager.vue';
 import { useOrganization } from '../composables/useOrganization';
 
-type SettingsTab = 'organization' | 'sites';
+type SettingsTab = 'organization' | 'sites' | 'categories';
 
 const { t } = useI18n();
 const { organization, saveMutation } = useOrganization();
@@ -33,6 +34,11 @@ const tab = ref<SettingsTab>('organization');
         >
           <q-tab name="organization" icon="sym_r_apartment" :label="t('settings.tabs.organization')" />
           <q-tab name="sites" icon="sym_r_store" :label="t('settings.tabs.sites')" />
+          <q-tab
+            name="categories"
+            icon="sym_r_category"
+            :label="t('settings.tabs.categories')"
+          />
         </q-tabs>
         <q-separator />
         <q-tab-panels v-model="tab" animated>
@@ -47,6 +53,9 @@ const tab = ref<SettingsTab>('organization');
           </q-tab-panel>
           <q-tab-panel name="sites">
             <SitesManager />
+          </q-tab-panel>
+          <q-tab-panel name="categories">
+            <CategoriesManager />
           </q-tab-panel>
         </q-tab-panels>
       </q-card>

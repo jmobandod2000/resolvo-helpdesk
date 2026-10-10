@@ -31,7 +31,7 @@ export const buildTicketWhere = (
 ): Prisma.TicketWhereInput => {
   const {
     siteId,
-    category,
+    categoryId,
     priority,
     rootCause,
     assigneeId,
@@ -44,7 +44,7 @@ export const buildTicketWhere = (
     isDeleted: false,
     ...buildStatusFilter(filter),
     ...(siteId && { siteId }),
-    ...(category && { category }),
+    ...(categoryId && { categoryId }),
     ...(priority && { priority }),
     ...(rootCause && { rootCause }),
     ...(assigneeId && { assigneeId }),

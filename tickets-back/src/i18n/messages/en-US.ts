@@ -19,6 +19,9 @@ const messages: MessageSchema = {
     siteNotFound: 'Site {id} was not found',
     siteInactive: 'Site {name} is inactive',
     siteDuplicate: 'A site named {name} already exists',
+    categoryNotFound: 'Category {id} was not found',
+    categoryInactive: 'Category {name} is inactive',
+    categoryDuplicate: 'A category named {name} already exists',
     unexpected: 'An unexpected error occurred',
     db: {
       duplicate: 'A record with the same value already exists in: {fields}',
@@ -61,7 +64,7 @@ const messages: MessageSchema = {
     address: 'Address',
     website: 'Website',
     channel: 'Channel',
-    category: 'Category',
+    categoryId: 'Category',
     priority: 'Priority',
     productCodes: 'Product codes',
     documents: 'Documents',

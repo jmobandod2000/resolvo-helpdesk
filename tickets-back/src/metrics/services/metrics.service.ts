@@ -4,7 +4,6 @@ import { Prisma, TicketStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { siteLabel } from '../../organization/helpers';
 import {
-  CATEGORY_LABELS,
   DONE_STATUSES,
   OPEN_STATUSES,
   PRIORITY_LABELS,
@@ -21,7 +20,7 @@ import {
   WeeklyTrendItem,
 } from '../interfaces';
 
-type GroupableField = 'status' | 'category' | 'priority' | 'rootCause';
+type GroupableField = 'status' | 'priority' | 'rootCause';
 
 const AGING_BUCKETS = [
   { key: '0-2', label: '0 a 2 días', min: 0, max: 2 },
@@ -59,7 +58,7 @@ export class MetricsService {
       this.getTotals(where),
       this.getTimes(sqlWhere),
       this.countBy('status', where, STATUS_LABELS),
-      this.countBy('category', where, CATEGORY_LABELS),
+      this.countByCategory(where),
       this.countBySite(where),
       this.countBy('priority', where, PRIORITY_LABELS),
       this.countBy('rootCause', where, ROOT_CAUSE_LABELS),
@@ -88,19 +87,27 @@ export class MetricsService {
     from,
     to,
     siteId,
+    categoryId,
   }: FilterMetricsDto): Prisma.TicketWhereInput {
     return {
       isDeleted: false,
       ...(siteId && { siteId }),
+      ...(categoryId && { categoryId }),
       ...((from || to) && {
         reportedAt: { ...(from && { gte: from }), ...(to && { lte: to }) },
       }),
     };
   }
 
-  private buildSqlWhere({ from, to, siteId }: FilterMetricsDto): Prisma.Sql {
+  private buildSqlWhere({
+    from,
+    to,
+    siteId,
+    categoryId,
+  }: FilterMetricsDto): Prisma.Sql {
     const conditions: Prisma.Sql[] = [Prisma.sql`t."isDeleted" = false`];
     if (siteId) conditions.push(Prisma.sql`t."siteId" = ${siteId}`);
+    if (categoryId) conditions.push(Prisma.sql`t."categoryId" = ${categoryId}`);
     if (from) conditions.push(Prisma.sql`t."reportedAt" >= ${from}`);
     if (to) conditions.push(Prisma.sql`t."reportedAt" <= ${to}`);
     return Prisma.join(conditions, ' AND ');
@@ -190,16 +197,16 @@ export class MetricsService {
   private async countBySite(
     where: Prisma.TicketWhereInput,
   ): Promise<CountByKey[]> {
-    const rows = await this.prismaService.ticket.groupBy({
-      by: ['siteId'],
-      where,
-      _count: { _all: true },
-    });
-
-    const sites = await this.prismaService.site.findMany({
-      where: { id: { in: rows.map((row) => row.siteId).filter(Boolean) } },
-      select: { id: true, code: true, name: true },
-    });
+    const [rows, sites] = await Promise.all([
+      this.prismaService.ticket.groupBy({
+        by: ['siteId'],
+        where,
+        _count: { _all: true },
+      }),
+      this.prismaService.site.findMany({
+        select: { id: true, code: true, name: true },
+      }),
+    ]);
 
     return rows
       .map((row) => {
@@ -210,6 +217,30 @@ export class MetricsService {
           count: row._count._all,
         };
       })
+      .sort((a, b) => b.count - a.count);
+  }
+
+  private async countByCategory(
+    where: Prisma.TicketWhereInput,
+  ): Promise<CountByKey[]> {
+    const [rows, categories] = await Promise.all([
+      this.prismaService.ticket.groupBy({
+        by: ['categoryId'],
+        where,
+        _count: { _all: true },
+      }),
+      this.prismaService.category.findMany({
+        select: { id: true, name: true },
+      }),
+    ]);
+
+    return rows
+      .map((row) => ({
+        key: String(row.categoryId ?? 'NONE'),
+        label:
+          categories.find((item) => item.id === row.categoryId)?.name ?? '',
+        count: row._count._all,
+      }))
       .sort((a, b) => b.count - a.count);
   }
 

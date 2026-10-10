@@ -21,7 +21,7 @@ const buildQueryParams = (filters: TicketFilters, limit: number, offset: number)
   ...(filters.search.trim() && { search: filters.search.trim() }),
   ...(filters.status.length && { status: filters.status.join(',') }),
   ...(filters.siteId && { siteId: filters.siteId }),
-  ...(filters.category && { category: filters.category }),
+  ...(filters.categoryId && { categoryId: filters.categoryId }),
   ...(filters.priority && { priority: filters.priority }),
   ...(filters.rootCause && { rootCause: filters.rootCause }),
   ...(filters.assigneeId && { assigneeId: filters.assigneeId }),

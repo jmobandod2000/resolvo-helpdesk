@@ -290,7 +290,7 @@ const messages: MessageSchema = {
         title: 'Ajuste seu espaço',
         body: 'Escolha seu idioma no botão de idioma da barra superior; ele fica salvo neste navegador.',
         tip1: 'Disponível em espanhol, inglês e português.',
-        tip2: 'Os administradores criam e desativam usuários em "Usuários".',
+        tip2: 'Os administradores gerenciam os usuários em "Usuários" e a empresa, unidades e categorias em "Configurações".',
         tip3: 'Você pode voltar a este guia quando quiser pelo menu.',
       },
     },
@@ -525,12 +525,82 @@ const messages: MessageSchema = {
       deleted: 'Unidade {name} excluída',
     },
   },
+  categories: {
+    none: 'Sem categoria',
+    description:
+      'Defina como sua equipe classifica as solicitações. Use nomes que todos entendam; você pode desativar as que não usa mais.',
+    add: 'Adicionar categoria',
+    addSuggested: 'Adicionar sugeridas ({n})',
+    createTitle: 'Nova categoria',
+    editTitle: 'Editar categoria',
+    empty: 'Ainda não há categorias. Adicione as sugeridas ou crie as suas.',
+    active: 'Ativa: disponível para novos tickets',
+    inactive: 'Inativa: mantida no histórico, mas não pode ser escolhida em novos tickets',
+    deleteTitle: 'Excluir categoria',
+    deleteMessage: 'Excluir a categoria {name}?',
+    deleteWithTickets:
+      'A categoria {name} tem {n} tickets. Eles a manterão no histórico, mas ela não aparecerá mais nas listas. Excluir?',
+    fields: {
+      name: 'Nome',
+      description: 'Descrição',
+      tickets: 'Tickets',
+      status: 'Ativa',
+    },
+    hints: {
+      name: 'Por exemplo: Impressoras, Acessos e contas',
+      description: 'Opcional: que tipo de solicitações inclui',
+    },
+    rules: {
+      name: 'Informe o nome da categoria (mínimo 2 caracteres)',
+    },
+    notify: {
+      created: 'Categoria {name} criada',
+      updated: 'Categoria {name} atualizada',
+      deleted: 'Categoria {name} excluída',
+      suggestedAdded: '{n} categorias sugeridas adicionadas',
+    },
+    suggested: {
+      hardware: {
+        name: 'Hardware e equipamentos',
+        description: 'Computadores, monitores, periféricos e outros equipamentos',
+      },
+      software: {
+        name: 'Software e aplicativos',
+        description: 'Instalação, erros e atualizações de programas',
+      },
+      network: {
+        name: 'Rede e internet',
+        description: 'Conectividade, wi-fi, VPN e quedas do serviço',
+      },
+      access: {
+        name: 'Acessos e contas',
+        description: 'Usuários, senhas e permissões',
+      },
+      email: {
+        name: 'E-mail e comunicações',
+        description: 'E-mail, telefonia e mensagens',
+      },
+      printing: {
+        name: 'Impressoras',
+        description: 'Impressão, digitalização e suprimentos',
+      },
+      businessSystems: {
+        name: 'Sistemas da empresa',
+        description: 'ERP, estoque, faturamento e outros sistemas de gestão',
+      },
+      other: {
+        name: 'Outro',
+        description: 'Solicitações que não se encaixam em outra categoria',
+      },
+    },
+  },
   setup: {
     title: 'Configuração inicial',
     subtitle: 'Prepare o app para a sua empresa. Você pode alterar tudo depois em Configurações.',
     steps: {
       organization: 'Empresa',
       sites: 'Unidades',
+      categories: 'Categorias',
       done: 'Pronto',
     },
     organizationIntro:
@@ -540,6 +610,8 @@ const messages: MessageSchema = {
     finish: 'Começar a usar o app',
     doneTitle: '{name} está pronta!',
     doneSites: 'Você cadastrou {n} unidades: {sites}.',
+    doneCategories: 'Você tem {n} categorias para classificar os tickets.',
+    doneNoCategories: 'Você não cadastrou categorias; poderá adicioná-las em Configurações.',
     doneNoSites: 'Você não cadastrou unidades; os tickets ficarão como “Geral”.',
     doneHint:
       'Próximo passo recomendado: crie os analistas em Usuários e veja o Guia de uso.',
@@ -548,10 +620,11 @@ const messages: MessageSchema = {
   },
   settings: {
     title: 'Configurações',
-    subtitle: 'Dados da empresa e unidades atendidas pela equipe de TI',
+    subtitle: 'Dados da empresa, unidades e categorias dos tickets',
     tabs: {
       organization: 'Empresa',
       sites: 'Unidades',
+      categories: 'Categorias',
     },
   },
   enums: {
@@ -575,18 +648,6 @@ const messages: MessageSchema = {
       EMAIL: 'E-mail',
       CALL: 'Ligação',
       IN_PERSON: 'Presencial',
-      OTHER: 'Outro',
-    },
-    category: {
-      INVENTORY: 'Inventário / estoque',
-      RECEIVING: 'Recebimento',
-      RECHECK: 'Reconferência',
-      PICKING: 'Separação',
-      CYCLE_COUNT: 'Contagem cíclica',
-      TRANSFERS: 'Transferências',
-      BILLING: 'Faturamento',
-      REPORTS: 'Relatórios',
-      SYSTEM: 'Sistema',
       OTHER: 'Outro',
     },
     rootCause: {

@@ -31,7 +31,7 @@ const buildInitialFilters = (): ReportFilters => ({
   ...presetRange('last3Months')!,
   groupBy: 'month',
   siteId: null,
-  category: null,
+  categoryId: null,
   priority: null,
   assigneeId: null,
 });

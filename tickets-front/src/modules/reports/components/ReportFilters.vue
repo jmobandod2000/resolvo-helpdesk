@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import { useUsersQuery } from 'src/modules/users/composables/useUsersQuery';
 import { useSites } from 'src/modules/organization/composables/useSites';
+import { useCategories } from 'src/modules/organization/composables/useCategories';
 import { useReportsManageStore } from '../composables/useReportsManageStore';
 import type { ReportGroupBy, ReportPreset } from '../interfaces/report';
 
@@ -22,6 +23,7 @@ const { t } = useI18n();
 const { catalogs } = useCatalogs();
 const { userOptions } = useUsersQuery();
 const { allSiteOptions } = useSites();
+const { allCategoryOptions } = useCategories();
 const { filters, setFilters, setPreset, setDates, resetFilters } = useReportsManageStore();
 
 const presetOptions = computed(() =>
@@ -122,15 +124,15 @@ const isRangeInvalid = computed(
       </div>
       <div class="col-6 col-sm-4 col-md-3">
         <q-select
-          :model-value="filters.category"
-          :options="catalogs.categories"
+          :model-value="filters.categoryId"
+          :options="allCategoryOptions"
           :label="t('reports.filters.category')"
           outlined
           dense
           emit-value
           map-options
           clearable
-          @update:model-value="(value) => setFilters({ category: value })"
+          @update:model-value="(value) => setFilters({ categoryId: value })"
         />
       </div>
       <div class="col-6 col-sm-4 col-md-3">

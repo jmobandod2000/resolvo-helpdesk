@@ -1,4 +1,7 @@
-import type { SiteSummary } from 'src/modules/organization/interfaces/organization';
+import type {
+  CategorySummary,
+  SiteSummary,
+} from 'src/modules/organization/interfaces/organization';
 
 export type TicketStatus =
   | 'OPEN'
@@ -13,18 +16,6 @@ export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 
 export type TicketChannel = 'WHATSAPP' | 'EMAIL' | 'CALL' | 'IN_PERSON' | 'OTHER';
-
-export type TicketCategory =
-  | 'INVENTORY'
-  | 'RECEIVING'
-  | 'RECHECK'
-  | 'PICKING'
-  | 'CYCLE_COUNT'
-  | 'TRANSFERS'
-  | 'BILLING'
-  | 'REPORTS'
-  | 'SYSTEM'
-  | 'OTHER';
 
 export type RootCause =
   | 'OPERATIONAL_ERROR'
@@ -51,8 +42,9 @@ export interface Ticket {
   requesterArea: string | null;
   siteId: number | null;
   Site: SiteSummary | null;
+  categoryId: number | null;
+  Category: CategorySummary | null;
   channel: TicketChannel;
-  category: TicketCategory;
   priority: TicketPriority;
   status: TicketStatus;
   rootCause: RootCause | null;
@@ -92,7 +84,7 @@ export interface TicketFilters {
   search: string;
   status: TicketStatus[];
   siteId: number | null;
-  category: TicketCategory | null;
+  categoryId: number | null;
   priority: TicketPriority | null;
   rootCause: RootCause | null;
   assigneeId: number | null;
@@ -105,8 +97,8 @@ export interface TicketPayload {
   requesterName: string;
   requesterArea?: string | undefined;
   siteId: number | null;
+  categoryId: number | null;
   channel: TicketChannel;
-  category: TicketCategory;
   priority: TicketPriority;
   productCodes: string[];
   documents: string[];

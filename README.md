@@ -27,7 +27,7 @@ Sistema web para que un equipo de TI registre, dé seguimiento y mida sus ticket
 
 ## Funcionalidades
 
-- **Configuración empresarial:** asistente inicial con los datos de la empresa (nombre, identificación fiscal, contacto) y sus sedes o sucursales, con los nombres y códigos que cada empresa use. Se puede cambiar después en **Configuración**.
+- **Configuración empresarial:** asistente inicial con los datos de la empresa (nombre, identificación fiscal, contacto), sus sedes o sucursales y las categorías de los tickets, con los nombres que cada empresa use. Incluye un juego de categorías sugeridas para TI (hardware, software, red, accesos, correo, impresoras, sistemas de la empresa). Se puede cambiar después en **Configuración**.
 - **Tickets:** solicitante, área, sede (o general para todas), canal, categoría, prioridad, productos, documentos, unidades, diagnóstico, evidencias y referencia a la solicitud de desarrollo.
 - **Flujo de estados:** Abierto → En análisis → Esperando información / Escalado a desarrollo → Resuelto → Cerrado (o Cancelado). Para cerrar se exigen causa raíz y comentario de cierre.
 - **Historial:** cada creación, cambio de estado, reasignación, edición y nota queda registrada con usuario y hora.
@@ -86,7 +86,7 @@ pnpm dev
 ```
 
 - App: `http://localhost:9010`
-- Inicia sesión con el administrador del seed. La primera vez se abre el **asistente de configuración inicial**: registra el nombre de tu empresa y sus sedes. Después crea a los analistas en **Usuarios**.
+- Inicia sesión con el administrador del seed. La primera vez se abre el **asistente de configuración inicial**: registra el nombre de tu empresa, sus sedes y las categorías de los tickets. Después crea a los analistas en **Usuarios**.
 
 ## Variables de entorno
 
@@ -160,7 +160,7 @@ pnpm build
 
 El resultado queda en `tickets-front/dist/spa`. Cópialo a la carpeta que servirá Nginx, por ejemplo `/var/www/tickets`. La app usa rutas con `#`, así que no necesita reglas especiales de reescritura.
 
-Al entrar por primera vez con el administrador, la app abre el asistente de configuración inicial para registrar la empresa y sus sedes.
+Al entrar por primera vez con el administrador, la app abre el asistente de configuración inicial para registrar la empresa, sus sedes y las categorías.
 
 ### 4. Nginx
 
@@ -237,18 +237,19 @@ Documentación interactiva completa en `/docs` (Swagger). Endpoints principales:
 |---|---|---|
 | POST | `/api/auth/login` | Inicio de sesión |
 | GET | `/api/auth/check-auth-token` | Renovar sesión |
-| GET/POST | `/api/tickets` | Listar con filtros (`siteId`, `category`, `status`...) y paginación / crear |
+| GET/POST | `/api/tickets` | Listar con filtros (`siteId`, `categoryId`, `status`...) y paginación / crear |
 | GET | `/api/tickets/:term` | Detalle por id o código (`TK-00001`) |
 | PATCH | `/api/tickets/:id` | Editar |
 | PATCH | `/api/tickets/:id/status` | Cambiar estado |
 | POST | `/api/tickets/:id/notes` | Agregar nota |
 | DELETE | `/api/tickets/:id` | Borrado lógico (administrador) |
-| GET | `/api/metrics/summary` | Métricas (`from`, `to`, `siteId`, `weeks`) |
-| GET | `/api/reports` | Reporte (`from`, `to`, `groupBy`, `timeZone`, `siteId`, `category`, `priority`, `assigneeId`) |
+| GET | `/api/metrics/summary` | Métricas (`from`, `to`, `siteId`, `categoryId`, `weeks`) |
+| GET | `/api/reports` | Reporte (`from`, `to`, `groupBy`, `timeZone`, `siteId`, `categoryId`, `priority`, `assigneeId`) |
 | GET | `/api/drop-downs/catalogs` | Catálogos para los selectores |
 | GET | `/api/organization/public` | Nombre de la empresa y si la configuración inicial está hecha (sin sesión) |
 | GET/PUT | `/api/organization` | Datos de la empresa (editar: administrador) |
 | GET/POST/PATCH/DELETE | `/api/sites` | Sedes o sucursales (editar: administrador) |
+| GET/POST/PATCH/DELETE | `/api/categories` | Categorías de los tickets (editar: administrador) |
 | GET/POST/PATCH/DELETE | `/api/users` | Usuarios |
 
 El API responde en el idioma indicado en el encabezado `x-lang` (`es`, `en-US`, `pt-BR`) o, en su defecto, en el de `Accept-Language`.

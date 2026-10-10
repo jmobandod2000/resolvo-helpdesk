@@ -40,6 +40,23 @@ export interface SitePayload {
   isActive?: boolean;
 }
 
+export interface CategorySummary {
+  id: number;
+  name: string;
+}
+
+export interface Category extends CategorySummary {
+  description: string | null;
+  isActive: boolean;
+  _count: { Tickets: number };
+}
+
+export interface CategoryPayload {
+  name: string;
+  description: string | null;
+  isActive?: boolean;
+}
+
 export enum OrganizationRoutes {
   SETUP = 'setup',
   SETTINGS = 'settings',

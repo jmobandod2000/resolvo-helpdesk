@@ -7,6 +7,5 @@ export interface Catalogs {
   statuses: SelectOption[];
   priorities: SelectOption[];
   channels: SelectOption[];
-  categories: SelectOption[];
   rootCauses: SelectOption[];
 }

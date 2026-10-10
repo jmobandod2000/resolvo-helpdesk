@@ -13,13 +13,17 @@ import {
 } from '../dtos';
 import { buildStatusChangeData, buildTicketWhere } from '../helpers';
 import { i18nMessage } from '../../i18n';
-import { SitesService } from '../../organization/services';
-import { SITE_SUMMARY_SELECT } from '../../organization/helpers';
+import { CategoriesService, SitesService } from '../../organization/services';
+import {
+  CATEGORY_SUMMARY_SELECT,
+  SITE_SUMMARY_SELECT,
+} from '../../organization/helpers';
 
 const USER_SUMMARY = { select: { id: true, name: true, email: true } };
 
 const TICKET_LIST_INCLUDE = {
   Site: { select: SITE_SUMMARY_SELECT },
+  Category: { select: CATEGORY_SUMMARY_SELECT },
   Assignee: USER_SUMMARY,
   CreatedBy: USER_SUMMARY,
 } satisfies Prisma.TicketInclude;
@@ -39,10 +43,12 @@ export class TicketsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly sitesService: SitesService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async create(createTicketDto: CreateTicketDto, user: UserLogged) {
     await this.sitesService.assertAssignable(createTicketDto.siteId);
+    await this.categoriesService.assertAssignable(createTicketDto.categoryId);
     return this.prismaService.$transaction(async (tx) => {
       const ticket = await tx.ticket.create({
         data: { ...createTicketDto, createdById: user.id },
@@ -111,6 +117,10 @@ export class TicketsService {
     await this.sitesService.assertAssignable(
       updateTicketDto.siteId,
       ticket.siteId,
+    );
+    await this.categoriesService.assertAssignable(
+      updateTicketDto.categoryId,
+      ticket.categoryId,
     );
     const isReassigned =
       updateTicketDto.assigneeId !== undefined &&

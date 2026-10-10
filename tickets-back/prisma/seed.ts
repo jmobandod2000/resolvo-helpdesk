@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import {
+  HISTORICAL_CATEGORIES as EXAMPLE_CATEGORIES,
   HISTORICAL_SITES as EXAMPLE_SITES,
   HISTORICAL_TICKETS as EXAMPLE_TICKETS,
   HistoricalSite,
@@ -25,6 +26,7 @@ const LOCAL_TICKETS_FILE = path.join(
   'historical-tickets.local.ts',
 );
 interface HistoricalData {
+  categories: string[];
   sites: HistoricalSite[];
   tickets: HistoricalTicket[];
 }
@@ -32,18 +34,30 @@ interface HistoricalData {
 const loadHistoricalData = (): HistoricalData => {
   if (!fs.existsSync(LOCAL_TICKETS_FILE))
     return process.env.SEED_EXAMPLE_TICKETS === 'true'
-      ? { sites: EXAMPLE_SITES, tickets: EXAMPLE_TICKETS }
-      : { sites: [], tickets: [] };
+      ? {
+          categories: EXAMPLE_CATEGORIES,
+          sites: EXAMPLE_SITES,
+          tickets: EXAMPLE_TICKETS,
+        }
+      : { categories: [], sites: [], tickets: [] };
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const local = require('./data/historical-tickets.local') as {
+    HISTORICAL_CATEGORIES: string[];
     HISTORICAL_SITES: HistoricalSite[];
     HISTORICAL_TICKETS: HistoricalTicket[];
   };
-  return { sites: local.HISTORICAL_SITES, tickets: local.HISTORICAL_TICKETS };
+  return {
+    categories: local.HISTORICAL_CATEGORIES,
+    sites: local.HISTORICAL_SITES,
+    tickets: local.HISTORICAL_TICKETS,
+  };
 };
 
-const { sites: HISTORICAL_SITES, tickets: HISTORICAL_TICKETS } =
-  loadHistoricalData();
+const {
+  categories: HISTORICAL_CATEGORIES,
+  sites: HISTORICAL_SITES,
+  tickets: HISTORICAL_TICKETS,
+} = loadHistoricalData();
 
 const prisma = new PrismaClient();
 
@@ -134,6 +148,23 @@ const seedHistoricalSites = async () => {
   return siteIds;
 };
 
+const seedHistoricalCategories = async () => {
+  const categoryIds = new Map<string, number>();
+  const names = new Set([
+    ...HISTORICAL_CATEGORIES,
+    ...HISTORICAL_TICKETS.map((ticket) => ticket.categoryName).filter(Boolean),
+  ]);
+  for (const name of names) {
+    const existing = await prisma.category.findFirst({
+      where: { name, isDeleted: false },
+    });
+    const category =
+      existing ?? (await prisma.category.create({ data: { name } }));
+    categoryIds.set(name, category.id);
+  }
+  return categoryIds;
+};
+
 const seedHistoricalTickets = async (userId: number) => {
   const existing = await prisma.ticket.count();
   if (existing > 0) {
@@ -144,6 +175,7 @@ const seedHistoricalTickets = async (userId: number) => {
   }
 
   const siteIds = await seedHistoricalSites();
+  const categoryIds = await seedHistoricalCategories();
 
   for (const historical of HISTORICAL_TICKETS) {
     const {
@@ -152,6 +184,7 @@ const seedHistoricalTickets = async (userId: number) => {
       resolvedAt,
       closedAt,
       siteCode,
+      categoryName,
       ...ticketData
     } = historical;
 
@@ -163,6 +196,9 @@ const seedHistoricalTickets = async (userId: number) => {
         resolvedAt: resolvedAt ? new Date(resolvedAt) : null,
         closedAt: closedAt ? new Date(closedAt) : null,
         siteId: siteCode ? (siteIds.get(siteCode) ?? null) : null,
+        categoryId: categoryName
+          ? (categoryIds.get(categoryName) ?? null)
+          : null,
         createdById: userId,
         assigneeId: userId,
         createdAt: new Date(reportedAt),

@@ -9,12 +9,7 @@ import {
   IsPositive,
   IsString,
 } from 'class-validator';
-import {
-  RootCause,
-  TicketCategory,
-  TicketPriority,
-  TicketStatus,
-} from '@prisma/client';
+import { RootCause, TicketPriority, TicketStatus } from '@prisma/client';
 import { PaginationDto } from '../../common/dtos/pagination.dto';
 
 const toArray = ({ value }: { value: unknown }) =>
@@ -34,10 +29,12 @@ export class FilterTicketDto extends PaginationDto {
   @Type(() => Number)
   siteId?: number;
 
-  @ApiProperty({ enum: TicketCategory, required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsEnum(TicketCategory)
-  category?: TicketCategory;
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  categoryId?: number;
 
   @ApiProperty({ enum: TicketPriority, required: false })
   @IsOptional()

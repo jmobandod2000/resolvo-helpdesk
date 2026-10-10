@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import { useSites } from 'src/modules/organization/composables/useSites';
+import { useCategories } from 'src/modules/organization/composables/useCategories';
 import { useUsersQuery } from 'src/modules/users/composables/useUsersQuery';
 import { useTicketsManageStore } from '../composables/useTicketsManageStore';
 
@@ -11,6 +12,7 @@ const { t } = useI18n();
 const { catalogs } = useCatalogs();
 const { userOptions } = useUsersQuery();
 const { allSiteOptions } = useSites();
+const { allCategoryOptions } = useCategories();
 const { filters, setFilters, resetFilters } = useTicketsManageStore();
 
 const searchText = ref(filters.value.search);
@@ -72,15 +74,15 @@ watch(
       </div>
       <div class="col-6 col-md-2">
         <q-select
-          :model-value="filters.category"
-          :options="catalogs.categories"
+          :model-value="filters.categoryId"
+          :options="allCategoryOptions"
           :label="t('tickets.fields.category')"
           outlined
           dense
           emit-value
           map-options
           clearable
-          @update:model-value="(value) => setFilters({ category: value })"
+          @update:model-value="(value) => setFilters({ categoryId: value })"
         />
       </div>
       <div class="col-6 col-md-2">

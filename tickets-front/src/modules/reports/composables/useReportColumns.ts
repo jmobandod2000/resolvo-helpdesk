@@ -30,7 +30,6 @@ const useReportColumns = () => {
   const { t } = useI18n();
   const { formatDate, formatDateTime, formatHours, formatNumber } = useDates();
   const {
-    categoryLabel,
     priorityLabel,
     statusLabel,
     channelLabel,
@@ -112,7 +111,7 @@ const useReportColumns = () => {
 
   const breakdownLabel: Record<ReportBreakdown, (row: ReportDimensionRow) => string> = {
     site: (row) => (row.key === 'NONE' ? t('sites.general') : (row.label ?? row.key)),
-    category: (row) => categoryLabel(row.key),
+    category: (row) => (row.key === 'NONE' ? t('categories.none') : (row.label ?? row.key)),
     priority: (row) => priorityLabel(row.key),
     rootCause: (row) =>
       row.key === 'NONE' ? t('reports.noRootCause') : rootCauseLabel(row.key),
@@ -141,7 +140,7 @@ const useReportColumns = () => {
     column<ReportBacklogItem>('assignee', 'text', (row) => assigneeName(row.assignee)),
     column<ReportBacklogItem>('requester', 'text', (row) => row.requesterName),
     column<ReportBacklogItem>('site', 'text', (row) => siteName(row.site)),
-    column<ReportBacklogItem>('category', 'text', (row) => categoryLabel(row.category)),
+    column<ReportBacklogItem>('category', 'text', (row) => row.category ?? t('categories.none')),
     column<ReportBacklogItem>('reportedAt', 'datetime', (row) => row.reportedAt),
     column<ReportBacklogItem>('ageDays', 'number', (row) => row.ageDays),
     column<ReportBacklogItem>('lastActivityAt', 'datetime', (row) => row.lastActivityAt),
@@ -158,7 +157,7 @@ const useReportColumns = () => {
     column<ReportTicketItem>('area', 'text', (row) => row.requesterArea),
     column<ReportTicketItem>('site', 'text', (row) => siteName(row.site)),
     column<ReportTicketItem>('channel', 'text', (row) => channelLabel(row.channel)),
-    column<ReportTicketItem>('category', 'text', (row) => categoryLabel(row.category)),
+    column<ReportTicketItem>('category', 'text', (row) => row.category ?? t('categories.none')),
     column<ReportTicketItem>('rootCause', 'text', (row) =>
       row.rootCause ? rootCauseLabel(row.rootCause) : null,
     ),

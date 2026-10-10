@@ -7,6 +7,7 @@ import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import useDates from 'src/modules/shared/composables/useDates';
 import useNotify from 'src/modules/shared/composables/useNotify';
 import { useSites } from 'src/modules/organization/composables/useSites';
+import { useCategories } from 'src/modules/organization/composables/useCategories';
 import { usePublicProfile } from 'src/modules/organization/composables/useOrganization';
 import useReportColumns from './useReportColumns';
 import type { ReportColumn, ReportColumnKind } from './useReportColumns';
@@ -55,7 +56,8 @@ const styleHeader = (sheet: Worksheet, row: number) => {
 const useReportExport = () => {
   const { t } = useI18n();
   const { formatDate, formatDateTime } = useDates();
-  const { categoryLabel, priorityLabel } = useCatalogs();
+  const { priorityLabel } = useCatalogs();
+  const { categories } = useCategories();
   const { siteLabelById } = useSites();
   const { organizationName } = usePublicProfile();
   const { errorNotify } = useNotify();
@@ -124,7 +126,9 @@ const useReportExport = () => {
       ],
       [t('reports.filters.groupBy'), t(`reports.filters.${report.range.groupBy}`)],
       [t('reports.filters.site'), filters.siteId ? siteLabelById(filters.siteId) : all],
-      [t('reports.filters.category'), filters.category ? categoryLabel(filters.category) : all],
+      [t('reports.filters.category'), filters.categoryId
+          ? (categories.value.find((item) => item.id === filters.categoryId)?.name ?? all)
+          : all],
       [t('reports.filters.priority'), filters.priority ? priorityLabel(filters.priority) : all],
       [t('reports.filters.assignee'), assigneeName ?? all],
       [t('reports.excel.timeZone'), report.range.timeZone],

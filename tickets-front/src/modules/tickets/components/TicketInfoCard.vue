@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import { useSites } from 'src/modules/organization/composables/useSites';
+import { useCategories } from 'src/modules/organization/composables/useCategories';
 import useDates from 'src/modules/shared/composables/useDates';
 import TicketPriorityBadge from './TicketPriorityBadge.vue';
 import type { Ticket } from '../interfaces/ticket';
@@ -11,7 +12,8 @@ import type { Ticket } from '../interfaces/ticket';
 const props = defineProps<{ ticket: Ticket }>();
 
 const { t } = useI18n();
-const { categoryLabel, channelLabel, rootCauseLabel } = useCatalogs();
+const { channelLabel, rootCauseLabel } = useCatalogs();
+const { categoryLabel } = useCategories();
 const { siteLabel } = useSites();
 const { formatDateTime, formatHours, formatNumber } = useDates();
 
@@ -20,7 +22,7 @@ const hoursBetween = (start: string, end: string | null) =>
 
 const rows = computed(() => [
   { key: 'site', label: t('tickets.fields.site'), value: siteLabel(props.ticket.Site) },
-  { key: 'category', label: t('tickets.fields.category'), value: categoryLabel(props.ticket.category) },
+  { key: 'category', label: t('tickets.fields.category'), value: categoryLabel(props.ticket.Category) },
   { key: 'channel', label: t('tickets.fields.channel'), value: channelLabel(props.ticket.channel) },
   {
     key: 'requester',

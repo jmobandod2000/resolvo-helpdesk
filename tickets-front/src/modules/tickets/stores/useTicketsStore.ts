@@ -6,7 +6,7 @@ const initialFilters: TicketFilters = {
   search: '',
   status: [],
   siteId: null,
-  category: null,
+  categoryId: null,
   priority: null,
   rootCause: null,
   assigneeId: null,

@@ -290,7 +290,7 @@ const messages: MessageSchema = {
         title: 'Set up your space',
         body: 'Choose your language with the language button in the top bar; it is remembered in this browser.',
         tip1: 'Available in Spanish, English and Portuguese.',
-        tip2: 'Administrators create and deactivate users in "Users".',
+        tip2: 'Administrators manage users in "Users" and the company, sites and categories in "Settings".',
         tip3: 'You can come back to this guide anytime from the menu.',
       },
     },
@@ -525,12 +525,82 @@ const messages: MessageSchema = {
       deleted: 'Site {name} deleted',
     },
   },
+  categories: {
+    none: 'No category',
+    description:
+      'Define how your team classifies requests. Use names everyone understands; you can deactivate the ones you no longer use.',
+    add: 'Add category',
+    addSuggested: 'Add suggested ({n})',
+    createTitle: 'New category',
+    editTitle: 'Edit category',
+    empty: 'No categories yet. Add the suggested ones or create your own.',
+    active: 'Active: available for new tickets',
+    inactive: 'Inactive: kept in the history but cannot be chosen for new tickets',
+    deleteTitle: 'Delete category',
+    deleteMessage: 'Delete the category {name}?',
+    deleteWithTickets:
+      'The category {name} has {n} tickets. They will keep it in their history, but it will no longer appear in lists. Delete it?',
+    fields: {
+      name: 'Name',
+      description: 'Description',
+      tickets: 'Tickets',
+      status: 'Active',
+    },
+    hints: {
+      name: 'For example: Printers, Access and accounts',
+      description: 'Optional: what kind of requests it covers',
+    },
+    rules: {
+      name: 'Enter the category name (at least 2 characters)',
+    },
+    notify: {
+      created: 'Category {name} created',
+      updated: 'Category {name} updated',
+      deleted: 'Category {name} deleted',
+      suggestedAdded: '{n} suggested categories added',
+    },
+    suggested: {
+      hardware: {
+        name: 'Hardware and devices',
+        description: 'Computers, monitors, peripherals and other devices',
+      },
+      software: {
+        name: 'Software and applications',
+        description: 'Installation, errors and updates of programs',
+      },
+      network: {
+        name: 'Network and internet',
+        description: 'Connectivity, wifi, VPN and outages',
+      },
+      access: {
+        name: 'Access and accounts',
+        description: 'Users, passwords and permissions',
+      },
+      email: {
+        name: 'Email and communications',
+        description: 'Email, phones and messaging',
+      },
+      printing: {
+        name: 'Printers',
+        description: 'Printing, scanning and supplies',
+      },
+      businessSystems: {
+        name: 'Business systems',
+        description: 'ERP, inventory, billing and other management systems',
+      },
+      other: {
+        name: 'Other',
+        description: 'Requests that do not fit another category',
+      },
+    },
+  },
   setup: {
     title: 'Initial setup',
     subtitle: 'Get the app ready for your company. You can change everything later in Settings.',
     steps: {
       organization: 'Company',
       sites: 'Sites',
+      categories: 'Categories',
       done: 'Done',
     },
     organizationIntro:
@@ -540,6 +610,8 @@ const messages: MessageSchema = {
     finish: 'Start using the app',
     doneTitle: '{name} is ready!',
     doneSites: 'You registered {n} sites: {sites}.',
+    doneCategories: 'You have {n} categories to classify tickets.',
+    doneNoCategories: 'You did not add categories; you can add them later in Settings.',
     doneNoSites: 'You did not register any sites; tickets will be marked as “General”.',
     doneHint: 'Recommended next step: create your analysts in Users and check the User guide.',
     pendingForUsers:
@@ -547,10 +619,11 @@ const messages: MessageSchema = {
   },
   settings: {
     title: 'Settings',
-    subtitle: 'Company details and the sites supported by the IT team',
+    subtitle: 'Company details, sites and ticket categories',
     tabs: {
       organization: 'Company',
       sites: 'Sites',
+      categories: 'Categories',
     },
   },
   enums: {
@@ -574,18 +647,6 @@ const messages: MessageSchema = {
       EMAIL: 'Email',
       CALL: 'Phone call',
       IN_PERSON: 'In person',
-      OTHER: 'Other',
-    },
-    category: {
-      INVENTORY: 'Inventory / stock',
-      RECEIVING: 'Receiving',
-      RECHECK: 'Recheck',
-      PICKING: 'Picking',
-      CYCLE_COUNT: 'Cycle count',
-      TRANSFERS: 'Transfers',
-      BILLING: 'Billing',
-      REPORTS: 'Reports',
-      SYSTEM: 'System',
       OTHER: 'Other',
     },
     rootCause: {

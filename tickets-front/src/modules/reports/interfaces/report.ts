@@ -17,7 +17,7 @@ export interface ReportFilters {
   to: string;
   groupBy: ReportGroupBy;
   siteId: number | null;
-  category: string | null;
+  categoryId: number | null;
   priority: string | null;
   assigneeId: number | null;
 }
@@ -63,7 +63,7 @@ export interface ReportBacklogItem {
   title: string;
   requesterName: string;
   site: string | null;
-  category: string;
+  category: string | null;
   priority: string;
   status: string;
   assignee: string | null;
@@ -81,7 +81,7 @@ export interface ReportTicketItem {
   requesterArea: string | null;
   site: string | null;
   channel: string;
-  category: string;
+  category: string | null;
   priority: string;
   status: string;
   rootCause: string | null;

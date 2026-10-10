@@ -1,6 +1,5 @@
 import {
   RootCause,
-  TicketCategory,
   TicketChannel,
   TicketPriority,
   TicketStatus,
@@ -40,19 +39,6 @@ export const CHANNEL_LABELS: Record<TicketChannel, string> = {
   EMAIL: 'Correo',
   CALL: 'Llamada',
   IN_PERSON: 'Presencial',
-  OTHER: 'Otro',
-};
-
-export const CATEGORY_LABELS: Record<TicketCategory, string> = {
-  INVENTORY: 'Inventario / existencias',
-  RECEIVING: 'Recepción',
-  RECHECK: 'Rechequeo',
-  PICKING: 'Picking',
-  CYCLE_COUNT: 'Conteo cíclico',
-  TRANSFERS: 'Traslados',
-  BILLING: 'Facturación',
-  REPORTS: 'Reportes',
-  SYSTEM: 'Sistema',
   OTHER: 'Otro',
 };
 

@@ -4,8 +4,8 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import type { QTableColumn, QTableProps } from 'quasar';
 
-import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import { useSites } from 'src/modules/organization/composables/useSites';
+import { useCategories } from 'src/modules/organization/composables/useCategories';
 import useDates from 'src/modules/shared/composables/useDates';
 import TicketStatusBadge from './TicketStatusBadge.vue';
 import TicketPriorityBadge from './TicketPriorityBadge.vue';
@@ -16,7 +16,7 @@ import { TicketRoutes } from '../interfaces/ticket-routes';
 
 const router = useRouter();
 const { t } = useI18n();
-const { categoryLabel } = useCatalogs();
+const { categoryLabel } = useCategories();
 const { siteLabel } = useSites();
 const { formatDateTime, fromNow } = useDates();
 const { tickets, total, isFetching } = useTicketsQuery();
@@ -46,9 +46,8 @@ const columns = computed<QTableColumn<Ticket>[]>(() => [
   {
     name: 'category',
     label: t('tickets.fields.category'),
-    field: 'category',
+    field: (ticket: Ticket) => categoryLabel(ticket.Category),
     align: 'left',
-    format: (value: string) => categoryLabel(value),
   },
   { name: 'priority', label: t('tickets.fields.priority'), field: 'priority', align: 'center' },
   { name: 'status', label: t('tickets.fields.status'), field: 'status', align: 'center' },

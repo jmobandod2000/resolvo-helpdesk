@@ -4,7 +4,6 @@ import useDates from 'src/modules/shared/composables/useDates';
 import type {
   RootCause,
   Ticket,
-  TicketCategory,
   TicketChannel,
   TicketPayload,
   TicketPriority,
@@ -17,7 +16,7 @@ export interface TicketFormModel {
   requesterArea: string;
   siteId: number | null;
   channel: TicketChannel;
-  category: TicketCategory | null;
+  categoryId: number | null;
   priority: TicketPriority;
   productCodes: string[];
   documents: string[];
@@ -43,7 +42,7 @@ export const useTicketForm = () => {
     requesterArea: '',
     siteId: null,
     channel: 'WHATSAPP',
-    category: null,
+    categoryId: null,
     priority: 'MEDIUM',
     productCodes: [],
     documents: [],
@@ -67,7 +66,7 @@ export const useTicketForm = () => {
       requesterArea: ticket.requesterArea ?? '',
       siteId: ticket.siteId,
       channel: ticket.channel,
-      category: ticket.category,
+      categoryId: ticket.categoryId,
       priority: ticket.priority,
       productCodes: [...ticket.productCodes],
       documents: [...ticket.documents],
@@ -95,7 +94,7 @@ export const useTicketForm = () => {
       requesterArea: optionalText(value.requesterArea),
       siteId: value.siteId,
       channel: value.channel,
-      category: value.category as TicketCategory,
+      categoryId: value.categoryId,
       priority: value.priority,
       productCodes: value.productCodes,
       documents: value.documents,

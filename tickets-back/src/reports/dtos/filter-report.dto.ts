@@ -8,7 +8,7 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
-import { TicketCategory, TicketPriority } from '@prisma/client';
+import { TicketPriority } from '@prisma/client';
 
 import { ReportGroupBy } from '../interfaces';
 
@@ -50,10 +50,12 @@ export class FilterReportDto {
   @Type(() => Number)
   siteId?: number;
 
-  @ApiProperty({ enum: TicketCategory, required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsEnum(TicketCategory)
-  category?: TicketCategory;
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  categoryId?: number;
 
   @ApiProperty({ enum: TicketPriority, required: false })
   @IsOptional()

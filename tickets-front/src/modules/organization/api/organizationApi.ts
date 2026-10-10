@@ -1,6 +1,8 @@
 import { api } from 'src/boot/axios';
 import { i18n } from 'src/i18n';
 import type {
+  Category,
+  CategoryPayload,
   Organization,
   OrganizationPayload,
   PublicProfile,
@@ -45,5 +47,25 @@ export const updateSite = async (id: number, payload: Partial<SitePayload>) => {
 
 export const deleteSite = async (id: number) => {
   const resp = await api.delete<Site>(`sites/${id}`, requestOptions());
+  return resp.data;
+};
+
+export const getCategories = async () => {
+  const resp = await api.get<Category[]>('categories', requestOptions());
+  return resp.data;
+};
+
+export const createCategory = async (payload: CategoryPayload) => {
+  const resp = await api.post<Category>('categories', payload, requestOptions());
+  return resp.data;
+};
+
+export const updateCategory = async (id: number, payload: Partial<CategoryPayload>) => {
+  const resp = await api.patch<Category>(`categories/${id}`, payload, requestOptions());
+  return resp.data;
+};
+
+export const deleteCategory = async (id: number) => {
+  const resp = await api.delete<Category>(`categories/${id}`, requestOptions());
   return resp.data;
 };
