@@ -4,7 +4,8 @@
   "description": "Control interno de tickets de soporte WMS: historial, seguimiento y métricas",
   "productName": "Tickets WMS",
   "private": true,
-  "license": "UNLICENSED",
+  "author": "Juan M. Obando",
+  "license": "Apache-2.0",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"prisma/**/*.ts\"",

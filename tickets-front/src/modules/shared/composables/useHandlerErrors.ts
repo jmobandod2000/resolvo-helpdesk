@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+import { useI18n } from 'vue-i18n';
 import useNotify from './useNotify';
 
 interface ApiErrorBody {
@@ -10,41 +11,37 @@ const extractServerMessage = (body: ApiErrorBody | undefined) => {
   return Array.isArray(body.message) ? body.message.join('. ') : body.message;
 };
 
-const messageByStatus: Record<number, string> = {
-  401: 'No autorizado. Por favor, inicia sesión.',
-  403: 'Acceso denegado. No tienes permisos para realizar esta acción.',
-  404: 'Recurso no encontrado.',
-  409: 'Ya existe un registro con los mismos datos.',
-  500: 'Error interno del servidor. Intenta nuevamente más tarde.',
+const messageKeyByStatus: Record<number, string> = {
+  401: 'errors.unauthorized',
+  403: 'errors.forbidden',
+  404: 'errors.notFound',
+  409: 'errors.conflict',
+  500: 'errors.server',
 };
 
 const useHandlerErrors = () => {
+  const { t } = useI18n();
   const { errorNotify } = useNotify();
 
   const handleApiResponseError = (error: unknown) => {
     if (!isAxiosError<ApiErrorBody>(error)) {
-      console.error('Error desconocido', error);
-      errorNotify('Error al procesar la petición. Intenta nuevamente.');
+      console.error('Unknown error', error);
+      errorNotify(t('errors.request'));
       return;
     }
 
     if (!error.response) {
-      console.error('Error de red: no se recibió respuesta del servidor');
-      errorNotify('No se pudo conectar con el servidor. Verifica tu conexión.');
+      console.error('Network error: no response from the server');
+      errorNotify(t('errors.network'));
       return;
     }
 
     const { status, data } = error.response;
     const serverMessage = extractServerMessage(data);
-    console.error(`Error del servidor (${status}): ${serverMessage ?? 'sin mensaje'}`);
+    console.error(`Server error (${status}): ${serverMessage ?? 'no message'}`);
 
-    const preferServerMessage = status === 400 || status === 404;
-    errorNotify(
-      (preferServerMessage && serverMessage) ||
-        messageByStatus[status] ||
-        serverMessage ||
-        'Ocurrió un error inesperado. Intenta nuevamente.',
-    );
+    const statusKey = messageKeyByStatus[status];
+    errorNotify(serverMessage || (statusKey && t(statusKey)) || t('errors.unexpected'));
   };
 
   return { handleApiResponseError };

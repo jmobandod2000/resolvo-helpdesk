@@ -35,7 +35,7 @@ export interface MetricsSummary {
   times: MetricsTimes;
   byStatus: CountByKey[];
   byCategory: CountByKey[];
-  byCompany: CountByKey[];
+  bySite: CountByKey[];
   byPriority: CountByKey[];
   byRootCause: CountByKey[];
   byAssignee: CountByKey[];

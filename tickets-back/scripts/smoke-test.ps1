@@ -44,7 +44,6 @@ $new = Invoke-Api 'POST' 'tickets' @{
   title = 'Prueba de humo del sistema de tickets'
   description = 'Ticket creado por el script de prueba'
   requesterName = 'QA'
-  company = 'MATURIN'
   category = 'SYSTEM'
   productCodes = @('999999')
 } $token
@@ -71,7 +70,7 @@ $deleted = Invoke-Api 'DELETE' "tickets/$($new.id)" $null $token
 $metrics = Invoke-Api 'GET' 'metrics/summary' $null $token
 "15. Metricas: total=$($metrics.totals.total) abiertos=$($metrics.totals.open) resueltos=$($metrics.totals.resolved) tasa=$($metrics.totals.resolutionRate)% escalados=$($metrics.totals.escalatedToDev)"
 "    Tiempos: 1ra respuesta=$($metrics.times.avgFirstResponseHours)h resolucion=$($metrics.times.avgResolutionHours)h mediana=$($metrics.times.medianResolutionHours)h"
-"    Por sede: " + (($metrics.byCompany | ForEach-Object { "$($_.label)=$($_.count)" }) -join ', ')
+"    Por sede: " + (($metrics.bySite | ForEach-Object { "$($_.label)=$($_.count)" }) -join ', ')
 "    Antiguedad backlog: " + (($metrics.backlogAging | ForEach-Object { "$($_.label)=$($_.count)" }) -join ', ')
 "    Semanas: $($metrics.weeklyTrend.Count), top producto: $($metrics.topProducts[0].productCode)"
 

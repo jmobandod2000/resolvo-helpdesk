@@ -10,7 +10,6 @@ import {
   IsString,
 } from 'class-validator';
 import {
-  Company,
   RootCause,
   TicketCategory,
   TicketPriority,
@@ -28,10 +27,12 @@ export class FilterTicketDto extends PaginationDto {
   @IsEnum(TicketStatus, { each: true })
   status?: TicketStatus[];
 
-  @ApiProperty({ enum: Company, required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsEnum(Company)
-  company?: Company;
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  siteId?: number;
 
   @ApiProperty({ enum: TicketCategory, required: false })
   @IsOptional()

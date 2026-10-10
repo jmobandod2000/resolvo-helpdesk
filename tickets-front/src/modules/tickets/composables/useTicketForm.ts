@@ -2,7 +2,6 @@ import { ref } from 'vue';
 
 import useDates from 'src/modules/shared/composables/useDates';
 import type {
-  Company,
   RootCause,
   Ticket,
   TicketCategory,
@@ -16,7 +15,7 @@ export interface TicketFormModel {
   description: string;
   requesterName: string;
   requesterArea: string;
-  company: Company | null;
+  siteId: number | null;
   channel: TicketChannel;
   category: TicketCategory | null;
   priority: TicketPriority;
@@ -42,7 +41,7 @@ export const useTicketForm = () => {
     description: '',
     requesterName: '',
     requesterArea: '',
-    company: null,
+    siteId: null,
     channel: 'WHATSAPP',
     category: null,
     priority: 'MEDIUM',
@@ -66,7 +65,7 @@ export const useTicketForm = () => {
       description: ticket.description,
       requesterName: ticket.requesterName,
       requesterArea: ticket.requesterArea ?? '',
-      company: ticket.company,
+      siteId: ticket.siteId,
       channel: ticket.channel,
       category: ticket.category,
       priority: ticket.priority,
@@ -94,7 +93,7 @@ export const useTicketForm = () => {
       description: value.description.trim(),
       requesterName: value.requesterName.trim(),
       requesterArea: optionalText(value.requesterArea),
-      company: value.company as Company,
+      siteId: value.siteId,
       channel: value.channel,
       category: value.category as TicketCategory,
       priority: value.priority,

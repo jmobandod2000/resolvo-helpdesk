@@ -5,5 +5,6 @@ declare namespace NodeJS {
     VUE_ROUTER_BASE: string | undefined;
     BASE_URL: string | undefined;
     BASE_URL_PROD: string | undefined;
+    APP_VERSION: string | undefined;
   }
 }

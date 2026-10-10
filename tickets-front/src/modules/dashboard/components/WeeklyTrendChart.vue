@@ -1,14 +1,25 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import dayjs from 'dayjs';
+import { useI18n } from 'vue-i18n';
 import type { WeeklyTrendItem } from '../interfaces/metrics';
 
-const props = defineProps<{ items: WeeklyTrendItem[] }>();
+const props = defineProps<{
+  items: WeeklyTrendItem[];
+  title?: string;
+  formatLabel?: (week: string) => string;
+  formatTooltip?: (week: string) => string;
+  periodHeader?: string;
+}>();
+const { t } = useI18n();
 
-const SERIES = [
-  { key: 'created', label: 'Recibidos', color: '#2a78d6' },
-  { key: 'resolved', label: 'Resueltos', color: '#eb6834' },
-] as const;
+const SERIES = computed(
+  () =>
+    [
+      { key: 'created', label: t('dashboard.chart.received'), color: '#2a78d6' },
+      { key: 'resolved', label: t('dashboard.chart.resolved'), color: '#eb6834' },
+    ] as const,
+);
 
 const CHART_HEIGHT = 200;
 const PADDING = { top: 12, right: 8, bottom: 28, left: 32 };
@@ -48,7 +59,14 @@ const barPath = (x: number, value: number) => {
   return `M${x},${bottom} V${y + radius} Q${x},${y} ${x + radius},${y} H${x + BAR_WIDTH - radius} Q${x + BAR_WIDTH},${y} ${x + BAR_WIDTH},${y + radius} V${bottom} Z`;
 };
 
-const weekLabel = (week: string) => dayjs(week).format('DD/MM');
+const weekLabel = (week: string) =>
+  props.formatLabel ? props.formatLabel(week) : dayjs(week).format('DD/MM');
+const tooltipTitle = (week: string) =>
+  props.formatTooltip
+    ? props.formatTooltip(week)
+    : t('dashboard.chart.weekOf', { date: weekLabel(week) });
+const chartTitle = computed(() => props.title ?? t('dashboard.chart.title'));
+const periodHeaderLabel = computed(() => props.periodHeader ?? t('dashboard.chart.week'));
 const hoveredItem = computed(() =>
   hoveredIndex.value === null ? null : props.items[hoveredIndex.value],
 );
@@ -60,7 +78,7 @@ const tooltipLeft = computed(() =>
 <template>
   <q-card flat bordered>
     <q-card-section class="row items-center q-pb-none">
-      <div class="section-title col">Tickets por semana</div>
+      <div class="section-title col">{{ chartTitle }}</div>
       <div class="row items-center q-gutter-md text-caption text-grey-8">
         <div v-for="series in SERIES" :key="series.key" class="row items-center no-wrap">
           <span class="legend-swatch" :style="{ background: series.color }" />
@@ -71,7 +89,7 @@ const tooltipLeft = computed(() =>
           dense
           size="sm"
           :icon="isTableVisible ? 'sym_r_bar_chart' : 'sym_r_table'"
-          :label="isTableVisible ? 'Gráfico' : 'Tabla'"
+          :label="isTableVisible ? t('dashboard.chart.chart') : t('dashboard.chart.table')"
           @click="isTableVisible = !isTableVisible"
         />
       </div>
@@ -79,7 +97,12 @@ const tooltipLeft = computed(() =>
 
     <q-card-section v-if="!isTableVisible" class="chart-scroll">
       <div class="chart-wrap" :style="{ width: `${chartWidth}px` }">
-        <svg :width="chartWidth" :height="CHART_HEIGHT" role="img" aria-label="Tickets por semana">
+        <svg
+          :width="chartWidth"
+          :height="CHART_HEIGHT"
+          role="img"
+          :aria-label="chartTitle"
+        >
           <g v-for="tick in yTicks" :key="tick">
             <line
               :x1="PADDING.left"
@@ -133,7 +156,9 @@ const tooltipLeft = computed(() =>
         </svg>
 
         <div v-if="hoveredItem" class="chart-tooltip" :style="{ left: `${tooltipLeft}px` }">
-          <div class="text-weight-medium">Semana del {{ weekLabel(hoveredItem.week) }}</div>
+          <div class="text-weight-medium">
+            {{ tooltipTitle(hoveredItem.week) }}
+          </div>
           <div v-for="series in SERIES" :key="series.key" class="row items-center no-wrap">
             <span class="legend-swatch" :style="{ background: series.color }" />
             {{ series.label }}: <b class="q-ml-xs">{{ hoveredItem[series.key] }}</b>
@@ -146,9 +171,9 @@ const tooltipLeft = computed(() =>
       <q-markup-table flat dense bordered>
         <thead>
           <tr>
-            <th class="text-left">Semana</th>
-            <th class="text-right">Recibidos</th>
-            <th class="text-right">Resueltos</th>
+            <th class="text-left">{{ periodHeaderLabel }}</th>
+            <th class="text-right">{{ t('dashboard.chart.received') }}</th>
+            <th class="text-right">{{ t('dashboard.chart.resolved') }}</th>
           </tr>
         </thead>
         <tbody>

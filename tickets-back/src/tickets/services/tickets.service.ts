@@ -12,10 +12,14 @@ import {
   UpdateTicketDto,
 } from '../dtos';
 import { buildStatusChangeData, buildTicketWhere } from '../helpers';
+import { i18nMessage } from '../../i18n';
+import { SitesService } from '../../organization/services';
+import { SITE_SUMMARY_SELECT } from '../../organization/helpers';
 
 const USER_SUMMARY = { select: { id: true, name: true, email: true } };
 
 const TICKET_LIST_INCLUDE = {
+  Site: { select: SITE_SUMMARY_SELECT },
   Assignee: USER_SUMMARY,
   CreatedBy: USER_SUMMARY,
 } satisfies Prisma.TicketInclude;
@@ -32,9 +36,13 @@ const buildTicketCode = (id: number) => `TK-${String(id).padStart(5, '0')}`;
 
 @Injectable()
 export class TicketsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly sitesService: SitesService,
+  ) {}
 
   async create(createTicketDto: CreateTicketDto, user: UserLogged) {
+    await this.sitesService.assertAssignable(createTicketDto.siteId);
     return this.prismaService.$transaction(async (tx) => {
       const ticket = await tx.ticket.create({
         data: { ...createTicketDto, createdById: user.id },
@@ -46,7 +54,6 @@ export class TicketsService {
           userId: user.id,
           type: TicketEventType.CREATED,
           toStatus: ticket.status,
-          note: 'Ticket registrado',
         },
       });
 
@@ -92,12 +99,19 @@ export class TicketsService {
       include: TICKET_DETAIL_INCLUDE,
     });
 
-    if (!ticket) throw new NotFoundException(`Ticket ${term} not found`);
+    if (!ticket)
+      throw new NotFoundException(
+        i18nMessage('errors.ticketNotFound', { term }),
+      );
     return ticket;
   }
 
   async update(id: number, updateTicketDto: UpdateTicketDto, user: UserLogged) {
     const ticket = await this.findActiveOrFail(id);
+    await this.sitesService.assertAssignable(
+      updateTicketDto.siteId,
+      ticket.siteId,
+    );
     const isReassigned =
       updateTicketDto.assigneeId !== undefined &&
       updateTicketDto.assigneeId !== ticket.assigneeId;
@@ -116,9 +130,7 @@ export class TicketsService {
           type: isReassigned
             ? TicketEventType.ASSIGNED
             : TicketEventType.UPDATED,
-          note: isReassigned
-            ? `Asignado a ${updated.Assignee?.name ?? 'nadie'}`
-            : 'Datos del ticket actualizados',
+          note: isReassigned ? (updated.Assignee?.name ?? null) : null,
         },
       });
 
@@ -187,7 +199,10 @@ export class TicketsService {
     const ticket = await this.prismaService.ticket.findFirst({
       where: { id, isDeleted: false },
     });
-    if (!ticket) throw new NotFoundException(`Ticket with id ${id} not found`);
+    if (!ticket)
+      throw new NotFoundException(
+        i18nMessage('errors.ticketNotFound', { term: id }),
+      );
     return ticket;
   }
 }

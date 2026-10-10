@@ -5,7 +5,7 @@ import type { TicketFilters } from '../interfaces/ticket';
 const initialFilters: TicketFilters = {
   search: '',
   status: [],
-  company: null,
+  siteId: null,
   category: null,
   priority: null,
   rootCause: null,

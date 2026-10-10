@@ -1,4 +1,5 @@
 import { api } from 'src/boot/axios';
+import { i18n } from 'src/i18n';
 import type { PaginatedResponse } from 'src/modules/shared/interfaces/pagination';
 import type {
   ChangeStatusPayload,
@@ -11,7 +12,7 @@ import type {
 
 const REQUEST_OPTIONS = {
   timeout: 1000 * 15,
-  timeoutErrorMessage: 'Tiempo de espera agotado al consultar los tickets',
+  timeoutErrorMessage: i18n.global.t('errors.timeout.tickets'),
 };
 
 const buildQueryParams = (filters: TicketFilters, limit: number, offset: number) => ({
@@ -19,7 +20,7 @@ const buildQueryParams = (filters: TicketFilters, limit: number, offset: number)
   offset,
   ...(filters.search.trim() && { search: filters.search.trim() }),
   ...(filters.status.length && { status: filters.status.join(',') }),
-  ...(filters.company && { company: filters.company }),
+  ...(filters.siteId && { siteId: filters.siteId }),
   ...(filters.category && { category: filters.category }),
   ...(filters.priority && { priority: filters.priority }),
   ...(filters.rootCause && { rootCause: filters.rootCause }),

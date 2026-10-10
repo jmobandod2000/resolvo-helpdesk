@@ -6,7 +6,6 @@ export interface SelectOption<T extends string = string> {
 export interface Catalogs {
   statuses: SelectOption[];
   priorities: SelectOption[];
-  companies: SelectOption[];
   channels: SelectOption[];
   categories: SelectOption[];
   rootCauses: SelectOption[];

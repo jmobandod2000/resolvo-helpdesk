@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
+import { useSites } from 'src/modules/organization/composables/useSites';
 import { useUsersQuery } from 'src/modules/users/composables/useUsersQuery';
 import { useTicketsManageStore } from '../composables/useTicketsManageStore';
 
+const { t } = useI18n();
 const { catalogs } = useCatalogs();
 const { userOptions } = useUsersQuery();
+const { allSiteOptions } = useSites();
 const { filters, setFilters, resetFilters } = useTicketsManageStore();
 
 const searchText = ref(filters.value.search);
@@ -34,7 +38,7 @@ watch(
           outlined
           dense
           clearable
-          placeholder="Buscar por código, título, solicitante, producto o documento"
+          :placeholder="t('tickets.filters.search')"
         >
           <template #prepend><q-icon name="sym_r_search" /></template>
         </q-input>
@@ -43,7 +47,7 @@ watch(
         <q-select
           :model-value="filters.status"
           :options="catalogs.statuses"
-          label="Estado"
+          :label="t('tickets.fields.status')"
           outlined
           dense
           multiple
@@ -55,22 +59,22 @@ watch(
       </div>
       <div class="col-6 col-md-2">
         <q-select
-          :model-value="filters.company"
-          :options="catalogs.companies"
-          label="Sede"
+          :model-value="filters.siteId"
+          :options="allSiteOptions"
+          :label="t('tickets.fields.site')"
           outlined
           dense
           emit-value
           map-options
           clearable
-          @update:model-value="(value) => setFilters({ company: value })"
+          @update:model-value="(value) => setFilters({ siteId: value })"
         />
       </div>
       <div class="col-6 col-md-2">
         <q-select
           :model-value="filters.category"
           :options="catalogs.categories"
-          label="Categoría"
+          :label="t('tickets.fields.category')"
           outlined
           dense
           emit-value
@@ -83,7 +87,7 @@ watch(
         <q-select
           :model-value="filters.priority"
           :options="catalogs.priorities"
-          label="Prioridad"
+          :label="t('tickets.fields.priority')"
           outlined
           dense
           emit-value
@@ -96,7 +100,7 @@ watch(
         <q-select
           :model-value="filters.rootCause"
           :options="catalogs.rootCauses"
-          label="Causa raíz"
+          :label="t('tickets.fields.rootCause')"
           outlined
           dense
           emit-value
@@ -109,7 +113,7 @@ watch(
         <q-select
           :model-value="filters.assigneeId"
           :options="userOptions"
-          label="Asignado a"
+          :label="t('tickets.fields.assignee')"
           outlined
           dense
           emit-value
@@ -121,12 +125,12 @@ watch(
       <div class="col-6 col-md-3">
         <q-toggle
           :model-value="filters.onlyOpen"
-          label="Solo abiertos"
+          :label="t('tickets.filters.onlyOpen')"
           @update:model-value="(value) => setFilters({ onlyOpen: value })"
         />
       </div>
       <div class="col-6 col-md-3 text-right">
-        <q-btn flat color="primary" icon="sym_r_filter_alt_off" label="Limpiar" @click="resetFilters" />
+        <q-btn flat color="primary" icon="sym_r_filter_alt_off" :label="t('common.clear')" @click="resetFilters" />
       </div>
     </div>
   </q-card>

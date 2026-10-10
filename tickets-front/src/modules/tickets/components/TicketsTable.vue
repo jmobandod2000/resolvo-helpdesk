@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import type { QTableColumn, QTableProps } from 'quasar';
 
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
+import { useSites } from 'src/modules/organization/composables/useSites';
 import useDates from 'src/modules/shared/composables/useDates';
 import TicketStatusBadge from './TicketStatusBadge.vue';
 import TicketPriorityBadge from './TicketPriorityBadge.vue';
@@ -13,7 +15,9 @@ import type { Ticket } from '../interfaces/ticket';
 import { TicketRoutes } from '../interfaces/ticket-routes';
 
 const router = useRouter();
-const { companyLabel, categoryLabel } = useCatalogs();
+const { t } = useI18n();
+const { categoryLabel } = useCatalogs();
+const { siteLabel } = useSites();
 const { formatDateTime, fromNow } = useDates();
 const { tickets, total, isFetching } = useTicketsQuery();
 const { page, rowsPerPage, setPagination } = useTicketsManageStore();
@@ -24,28 +28,32 @@ const pagination = computed(() => ({
   rowsNumber: total.value,
 }));
 
-const columns: QTableColumn<Ticket>[] = [
-  { name: 'code', label: 'Código', field: 'code', align: 'left' },
-  { name: 'title', label: 'Título', field: 'title', align: 'left' },
-  { name: 'requesterName', label: 'Solicitante', field: 'requesterName', align: 'left' },
+const columns = computed<QTableColumn<Ticket>[]>(() => [
+  { name: 'code', label: t('tickets.fields.code'), field: 'code', align: 'left' },
+  { name: 'title', label: t('tickets.fields.title'), field: 'title', align: 'left' },
   {
-    name: 'company',
-    label: 'Sede',
-    field: 'company',
+    name: 'requesterName',
+    label: t('tickets.fields.requester'),
+    field: 'requesterName',
     align: 'left',
-    format: (value: string) => companyLabel(value),
+  },
+  {
+    name: 'site',
+    label: t('tickets.fields.site'),
+    field: (ticket: Ticket) => siteLabel(ticket.Site),
+    align: 'left',
   },
   {
     name: 'category',
-    label: 'Categoría',
+    label: t('tickets.fields.category'),
     field: 'category',
     align: 'left',
     format: (value: string) => categoryLabel(value),
   },
-  { name: 'priority', label: 'Prioridad', field: 'priority', align: 'center' },
-  { name: 'status', label: 'Estado', field: 'status', align: 'center' },
-  { name: 'reportedAt', label: 'Reportado', field: 'reportedAt', align: 'left' },
-];
+  { name: 'priority', label: t('tickets.fields.priority'), field: 'priority', align: 'center' },
+  { name: 'status', label: t('tickets.fields.status'), field: 'status', align: 'center' },
+  { name: 'reportedAt', label: t('tickets.fields.reported'), field: 'reportedAt', align: 'left' },
+]);
 
 const onRequest: QTableProps['onRequest'] = ({ pagination: next }) => {
   setPagination(next.page ?? 1, next.rowsPerPage ?? 15);
@@ -67,8 +75,8 @@ const openTicket = (_event: Event, ticket: Ticket) => {
     flat
     bordered
     binary-state-sort
-    no-data-label="No hay tickets con esos filtros"
-    rows-per-page-label="Filas por página"
+    :no-data-label="t('tickets.empty.table')"
+    :rows-per-page-label="t('common.rowsPerPage')"
     class="cursor-pointer"
     @request="onRequest"
     @row-click="openTicket"

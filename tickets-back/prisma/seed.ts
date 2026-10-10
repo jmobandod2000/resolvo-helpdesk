@@ -10,27 +10,40 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import {
+  HISTORICAL_SITES as EXAMPLE_SITES,
   HISTORICAL_TICKETS as EXAMPLE_TICKETS,
+  HistoricalSite,
   HistoricalTicket,
 } from './data/historical-tickets';
 
 dotenv.config();
 
-// Tickets reales: prisma/data/historical-tickets.local.ts (ignorado por git). Si no existe, se usan los de ejemplo.
+// Tickets reales: prisma/data/historical-tickets.local.ts (ignorado por git). Si no existe, se usan los de ejemplo solo con SEED_EXAMPLE_TICKETS=true.
 const LOCAL_TICKETS_FILE = path.join(
   __dirname,
   'data',
   'historical-tickets.local.ts',
 );
-const loadHistoricalTickets = (): HistoricalTicket[] => {
-  if (!fs.existsSync(LOCAL_TICKETS_FILE)) return EXAMPLE_TICKETS;
+interface HistoricalData {
+  sites: HistoricalSite[];
+  tickets: HistoricalTicket[];
+}
+
+const loadHistoricalData = (): HistoricalData => {
+  if (!fs.existsSync(LOCAL_TICKETS_FILE))
+    return process.env.SEED_EXAMPLE_TICKETS === 'true'
+      ? { sites: EXAMPLE_SITES, tickets: EXAMPLE_TICKETS }
+      : { sites: [], tickets: [] };
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const local = require('./data/historical-tickets.local') as {
+    HISTORICAL_SITES: HistoricalSite[];
     HISTORICAL_TICKETS: HistoricalTicket[];
   };
-  return local.HISTORICAL_TICKETS;
+  return { sites: local.HISTORICAL_SITES, tickets: local.HISTORICAL_TICKETS };
 };
-const HISTORICAL_TICKETS = loadHistoricalTickets();
+
+const { sites: HISTORICAL_SITES, tickets: HISTORICAL_TICKETS } =
+  loadHistoricalData();
 
 const prisma = new PrismaClient();
 
@@ -108,6 +121,19 @@ const buildEvents = (ticket: HistoricalTicket, userId: number) => {
   return events.map((event) => ({ ...event, userId }));
 };
 
+const seedHistoricalSites = async () => {
+  const siteIds = new Map<string, number>();
+  for (const { code, name } of HISTORICAL_SITES) {
+    const existing = await prisma.site.findFirst({
+      where: { code, isDeleted: false },
+    });
+    const site =
+      existing ?? (await prisma.site.create({ data: { code, name } }));
+    siteIds.set(code, site.id);
+  }
+  return siteIds;
+};
+
 const seedHistoricalTickets = async (userId: number) => {
   const existing = await prisma.ticket.count();
   if (existing > 0) {
@@ -117,9 +143,17 @@ const seedHistoricalTickets = async (userId: number) => {
     return;
   }
 
+  const siteIds = await seedHistoricalSites();
+
   for (const historical of HISTORICAL_TICKETS) {
-    const { reportedAt, firstResponseAt, resolvedAt, closedAt, ...ticketData } =
-      historical;
+    const {
+      reportedAt,
+      firstResponseAt,
+      resolvedAt,
+      closedAt,
+      siteCode,
+      ...ticketData
+    } = historical;
 
     const ticket = await prisma.ticket.create({
       data: {
@@ -128,6 +162,7 @@ const seedHistoricalTickets = async (userId: number) => {
         firstResponseAt: new Date(firstResponseAt),
         resolvedAt: resolvedAt ? new Date(resolvedAt) : null,
         closedAt: closedAt ? new Date(closedAt) : null,
+        siteId: siteCode ? (siteIds.get(siteCode) ?? null) : null,
         createdById: userId,
         assigneeId: userId,
         createdAt: new Date(reportedAt),

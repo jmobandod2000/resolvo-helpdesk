@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import useCatalogs from 'src/modules/shared/composables/useCatalogs';
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useSites } from 'src/modules/organization/composables/useSites';
 import { useDashboardManageStore } from '../composables/useDashboardManageStore';
 
-const { catalogs } = useCatalogs();
+const { t } = useI18n();
+const { allSiteOptions } = useSites();
 const { filters, setFilters, resetFilters } = useDashboardManageStore();
 
-const weekOptions = [
-  { value: 8, label: '8 semanas' },
-  { value: 12, label: '12 semanas' },
-  { value: 26, label: '26 semanas' },
-];
+const weekOptions = computed(() =>
+  [8, 12, 26].map((weeks) => ({ value: weeks, label: t('dashboard.filters.weeks', { n: weeks }) })),
+);
 </script>
 
 <template>
@@ -17,21 +18,21 @@ const weekOptions = [
     <div class="row q-col-gutter-sm items-center">
       <div class="col-12 col-sm-3">
         <q-select
-          :model-value="filters.company"
-          :options="catalogs.companies"
-          label="Sede"
+          :model-value="filters.siteId"
+          :options="allSiteOptions"
+          :label="t('dashboard.filters.site')"
           outlined
           dense
           emit-value
           map-options
           clearable
-          @update:model-value="(value) => setFilters({ company: value })"
+          @update:model-value="(value) => setFilters({ siteId: value })"
         />
       </div>
       <div class="col-6 col-sm-3">
         <q-input
           :model-value="filters.from"
-          label="Reportado desde"
+          :label="t('dashboard.filters.from')"
           type="date"
           outlined
           dense
@@ -43,7 +44,7 @@ const weekOptions = [
       <div class="col-6 col-sm-3">
         <q-input
           :model-value="filters.to"
-          label="Reportado hasta"
+          :label="t('dashboard.filters.to')"
           type="date"
           outlined
           dense
@@ -56,7 +57,7 @@ const weekOptions = [
         <q-select
           :model-value="filters.weeks"
           :options="weekOptions"
-          label="Tendencia"
+          :label="t('dashboard.filters.trend')"
           outlined
           dense
           emit-value
@@ -66,7 +67,7 @@ const weekOptions = [
       </div>
       <div class="col-6 col-sm-1 text-right">
         <q-btn flat round color="primary" icon="sym_r_filter_alt_off" @click="resetFilters">
-          <q-tooltip>Limpiar filtros</q-tooltip>
+          <q-tooltip>{{ t('common.clearFilters') }}</q-tooltip>
         </q-btn>
       </div>
     </div>

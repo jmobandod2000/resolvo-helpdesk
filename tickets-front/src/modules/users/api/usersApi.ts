@@ -1,9 +1,10 @@
 import { api } from 'src/boot/axios';
+import { i18n } from 'src/i18n';
 import type { User, UserPayload } from '../interfaces/user';
 
 const REQUEST_OPTIONS = {
   timeout: 1000 * 10,
-  timeoutErrorMessage: 'Tiempo de espera agotado al consultar los usuarios',
+  timeoutErrorMessage: i18n.global.t('errors.timeout.users'),
 };
 
 export const getUsers = async () => {

@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 
 import { META_ROLES } from '../decorators/role-protected.decorator';
 import { UserLogged, ValidRoles } from '../interfaces';
+import { i18nMessage } from '../../i18n';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
@@ -24,11 +25,14 @@ export class UserRoleGuard implements CanActivate {
 
     const user = context.switchToHttp().getRequest().user as UserLogged;
 
-    if (!user) throw new BadRequestException('User is not logged in');
+    if (!user) throw new BadRequestException(i18nMessage('errors.notLoggedIn'));
     if (validRoles.includes(user.roles as ValidRoles)) return true;
 
     throw new ForbiddenException(
-      `User ${user.name} does not have the required roles: ${validRoles.join(', ')}`,
+      i18nMessage('errors.forbiddenRole', {
+        name: user.name,
+        roles: validRoles.join(', '),
+      }),
     );
   }
 }

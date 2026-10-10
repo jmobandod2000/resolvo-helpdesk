@@ -3,7 +3,7 @@ import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class LoginUserDto {
   @ApiProperty({ description: 'Correo electrónico del usuario' })
-  @IsEmail({}, { message: 'El correo no es válido' })
+  @IsEmail()
   email: string;
 
   @ApiProperty({ description: 'Contraseña del usuario' })

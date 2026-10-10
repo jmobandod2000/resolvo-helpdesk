@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, TicketStatus } from '@prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
+import { siteLabel } from '../../organization/helpers';
 import {
   CATEGORY_LABELS,
-  COMPANY_LABELS,
   DONE_STATUSES,
   OPEN_STATUSES,
   PRIORITY_LABELS,
@@ -21,8 +21,7 @@ import {
   WeeklyTrendItem,
 } from '../interfaces';
 
-type GroupableField =
-  'status' | 'category' | 'company' | 'priority' | 'rootCause';
+type GroupableField = 'status' | 'category' | 'priority' | 'rootCause';
 
 const AGING_BUCKETS = [
   { key: '0-2', label: '0 a 2 días', min: 0, max: 2 },
@@ -49,7 +48,7 @@ export class MetricsService {
       times,
       byStatus,
       byCategory,
-      byCompany,
+      bySite,
       byPriority,
       byRootCause,
       byAssignee,
@@ -61,7 +60,7 @@ export class MetricsService {
       this.getTimes(sqlWhere),
       this.countBy('status', where, STATUS_LABELS),
       this.countBy('category', where, CATEGORY_LABELS),
-      this.countBy('company', where, COMPANY_LABELS),
+      this.countBySite(where),
       this.countBy('priority', where, PRIORITY_LABELS),
       this.countBy('rootCause', where, ROOT_CAUSE_LABELS),
       this.countByAssignee(where),
@@ -75,7 +74,7 @@ export class MetricsService {
       times,
       byStatus,
       byCategory,
-      byCompany,
+      bySite,
       byPriority,
       byRootCause,
       byAssignee,
@@ -88,21 +87,20 @@ export class MetricsService {
   private buildWhere({
     from,
     to,
-    company,
+    siteId,
   }: FilterMetricsDto): Prisma.TicketWhereInput {
     return {
       isDeleted: false,
-      ...(company && { company }),
+      ...(siteId && { siteId }),
       ...((from || to) && {
         reportedAt: { ...(from && { gte: from }), ...(to && { lte: to }) },
       }),
     };
   }
 
-  private buildSqlWhere({ from, to, company }: FilterMetricsDto): Prisma.Sql {
+  private buildSqlWhere({ from, to, siteId }: FilterMetricsDto): Prisma.Sql {
     const conditions: Prisma.Sql[] = [Prisma.sql`t."isDeleted" = false`];
-    if (company)
-      conditions.push(Prisma.sql`t."company" = ${company}::"Company"`);
+    if (siteId) conditions.push(Prisma.sql`t."siteId" = ${siteId}`);
     if (from) conditions.push(Prisma.sql`t."reportedAt" >= ${from}`);
     if (to) conditions.push(Prisma.sql`t."reportedAt" <= ${to}`);
     return Prisma.join(conditions, ' AND ');
@@ -183,6 +181,32 @@ export class MetricsService {
         return {
           key,
           label: labels[key] ?? 'Sin definir',
+          count: row._count._all,
+        };
+      })
+      .sort((a, b) => b.count - a.count);
+  }
+
+  private async countBySite(
+    where: Prisma.TicketWhereInput,
+  ): Promise<CountByKey[]> {
+    const rows = await this.prismaService.ticket.groupBy({
+      by: ['siteId'],
+      where,
+      _count: { _all: true },
+    });
+
+    const sites = await this.prismaService.site.findMany({
+      where: { id: { in: rows.map((row) => row.siteId).filter(Boolean) } },
+      select: { id: true, code: true, name: true },
+    });
+
+    return rows
+      .map((row) => {
+        const site = sites.find((item) => item.id === row.siteId);
+        return {
+          key: String(row.siteId ?? 'NONE'),
+          label: site ? siteLabel(site) : '',
           count: row._count._all,
         };
       })

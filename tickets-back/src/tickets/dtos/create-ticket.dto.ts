@@ -11,12 +11,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import {
-  Company,
-  TicketCategory,
-  TicketChannel,
-  TicketPriority,
-} from '@prisma/client';
+import { TicketCategory, TicketChannel, TicketPriority } from '@prisma/client';
 
 export class CreateTicketDto {
   @ApiProperty({ description: 'Título corto del ticket' })
@@ -42,9 +37,16 @@ export class CreateTicketDto {
   @MaxLength(80)
   requesterArea?: string;
 
-  @ApiProperty({ enum: Company })
-  @IsEnum(Company)
-  company: Company;
+  @ApiProperty({
+    description: 'Sede o sucursal; vacío si aplica a todas',
+    required: false,
+    nullable: true,
+  })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  siteId?: number | null;
 
   @ApiProperty({ enum: TicketChannel, required: false })
   @IsOptional()

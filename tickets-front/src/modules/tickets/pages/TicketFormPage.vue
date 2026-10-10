@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import useLocaleAwareForm from 'src/modules/shared/composables/useLocaleAwareForm';
 
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import { useUsersQuery } from 'src/modules/users/composables/useUsersQuery';
+import { useSites } from 'src/modules/organization/composables/useSites';
 import useAuth from 'src/modules/auth/composables/useAuth';
 import TagsInput from '../components/TagsInput.vue';
 import { useTicketForm } from '../composables/useTicketForm';
@@ -13,8 +16,11 @@ import { TicketRoutes } from '../interfaces/ticket-routes';
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
+const formRef = useLocaleAwareForm();
 const { catalogs } = useCatalogs();
 const { userOptions } = useUsersQuery();
+const { siteOptions } = useSites();
 const { user } = useAuth();
 const { form, loadTicket, buildPayload } = useTicketForm();
 const { createMutation, updateMutation } = useTicketMutations();
@@ -22,6 +28,15 @@ const { createMutation, updateMutation } = useTicketMutations();
 const ticketId = computed(() => route.params.id as string | undefined);
 const isEditing = computed(() => !!ticketId.value);
 const { ticket } = useTicketQuery(ticketId);
+
+watch(
+  siteOptions,
+  (options) => {
+    if (!isEditing.value && !form.value.siteId && options.length === 1)
+      form.value.siteId = options[0]!.value;
+  },
+  { immediate: true },
+);
 
 watch(
   ticket,
@@ -41,8 +56,9 @@ watch(
 
 const isSaving = computed(() => createMutation.isPending.value || updateMutation.isPending.value);
 
-const requiredRule = (value: unknown) => !!value || 'Campo requerido';
-const minLengthRule = (value: string) => (value?.trim().length ?? 0) >= 5 || 'Mínimo 5 caracteres';
+const requiredRule = (value: unknown) => !!value || t('common.requiredField');
+const minLengthRule = (value: string) =>
+  (value?.trim().length ?? 0) >= 5 || t('common.minLength', { min: 5 });
 
 const save = async () => {
   const payload = buildPayload();
@@ -58,20 +74,20 @@ const save = async () => {
     <div class="row items-center q-mb-md">
       <q-btn flat round dense icon="sym_r_arrow_back" class="q-mr-sm" @click="router.back()" />
       <div class="page-title col">
-        {{ isEditing ? `Editar ${ticket?.code ?? ''}` : 'Nuevo ticket' }}
+        {{ isEditing ? t('tickets.editTicket', { code: ticket?.code ?? '' }) : t('tickets.newTicket') }}
       </div>
     </div>
 
-    <q-form @submit.prevent="save">
+    <q-form ref="formRef" @submit.prevent="save">
       <div class="row q-col-gutter-md">
         <div class="col-12 col-lg-8">
           <q-card flat bordered>
-            <q-card-section class="section-title">Solicitud</q-card-section>
+            <q-card-section class="section-title">{{ t('tickets.sections.request') }}</q-card-section>
             <q-card-section class="row q-col-gutter-sm">
               <div class="col-12">
                 <q-input
                   v-model="form.title"
-                  label="Título"
+                  :label="t('tickets.fields.title')"
                   outlined
                   dense
                   counter
@@ -82,7 +98,7 @@ const save = async () => {
               <div class="col-12">
                 <q-input
                   v-model="form.description"
-                  label="Mensaje original del solicitante"
+                  :label="t('tickets.fields.description')"
                   type="textarea"
                   outlined
                   autogrow
@@ -92,29 +108,29 @@ const save = async () => {
               <div class="col-12 col-sm-6">
                 <q-input
                   v-model="form.requesterName"
-                  label="Solicitante"
+                  :label="t('tickets.fields.requester')"
                   outlined
                   dense
                   :rules="[requiredRule]"
                 />
               </div>
               <div class="col-12 col-sm-6">
-                <q-input v-model="form.requesterArea" label="Área" outlined dense />
+                <q-input v-model="form.requesterArea" :label="t('tickets.fields.area')" outlined dense />
               </div>
               <div class="col-12 col-sm-6">
-                <TagsInput v-model="form.productCodes" label="Códigos de producto" />
+                <TagsInput v-model="form.productCodes" :label="t('tickets.fields.productCodes')" />
               </div>
               <div class="col-12 col-sm-6">
-                <TagsInput v-model="form.documents" label="Pedidos, facturas o documentos" />
+                <TagsInput v-model="form.documents" :label="t('tickets.fields.documents')" />
               </div>
             </q-card-section>
 
-            <q-card-section class="section-title">Diagnóstico</q-card-section>
+            <q-card-section class="section-title">{{ t('tickets.sections.diagnosis') }}</q-card-section>
             <q-card-section class="row q-col-gutter-sm">
               <div class="col-12">
                 <q-input
                   v-model="form.diagnosis"
-                  label="Diagnóstico técnico"
+                  :label="t('tickets.fields.diagnosis')"
                   type="textarea"
                   outlined
                   autogrow
@@ -123,7 +139,7 @@ const save = async () => {
               <div class="col-12 col-sm-4">
                 <q-input
                   v-model.number="form.affectedUnits"
-                  label="Unidades involucradas"
+                  :label="t('tickets.fields.affectedUnits')"
                   type="number"
                   outlined
                   dense
@@ -132,7 +148,7 @@ const save = async () => {
               <div class="col-12 col-sm-8">
                 <q-input
                   v-model="form.devRequestRef"
-                  label="Referencia de solicitud a desarrollo"
+                  :label="t('tickets.fields.devRequestRef')"
                   outlined
                   dense
                 />
@@ -140,7 +156,7 @@ const save = async () => {
               <div class="col-12">
                 <TagsInput
                   v-model="form.evidencePaths"
-                  label="Evidencias (rutas de informes, scripts o archivos)"
+                  :label="t('tickets.fields.evidencePaths')"
                 />
               </div>
               <template v-if="isEditing">
@@ -148,7 +164,7 @@ const save = async () => {
                   <q-select
                     v-model="form.rootCause"
                     :options="catalogs.rootCauses"
-                    label="Causa raíz"
+                    :label="t('tickets.fields.rootCause')"
                     outlined
                     dense
                     emit-value
@@ -159,7 +175,7 @@ const save = async () => {
                 <div class="col-12 col-sm-8">
                   <q-input
                     v-model="form.closureComment"
-                    label="Comentario de cierre"
+                    :label="t('tickets.fields.closureComment')"
                     type="textarea"
                     outlined
                     autogrow
@@ -172,22 +188,25 @@ const save = async () => {
 
         <div class="col-12 col-lg-4">
           <q-card flat bordered>
-            <q-card-section class="section-title">Clasificación</q-card-section>
+            <q-card-section class="section-title">{{ t('tickets.sections.classification') }}</q-card-section>
             <q-card-section class="q-gutter-sm">
               <q-select
-                v-model="form.company"
-                :options="catalogs.companies"
-                label="Sede"
+                v-model="form.siteId"
+                :options="siteOptions"
+                :label="t('tickets.fields.site')"
+                :placeholder="form.siteId ? undefined : t('sites.general')"
+                :hint="t('tickets.hints.site')"
                 outlined
                 dense
                 emit-value
                 map-options
-                :rules="[requiredRule]"
+                clearable
+                bottom-slots
               />
               <q-select
                 v-model="form.category"
                 :options="catalogs.categories"
-                label="Categoría"
+                :label="t('tickets.fields.category')"
                 outlined
                 dense
                 emit-value
@@ -197,7 +216,7 @@ const save = async () => {
               <q-select
                 v-model="form.priority"
                 :options="catalogs.priorities"
-                label="Prioridad"
+                :label="t('tickets.fields.priority')"
                 outlined
                 dense
                 emit-value
@@ -206,7 +225,7 @@ const save = async () => {
               <q-select
                 v-model="form.channel"
                 :options="catalogs.channels"
-                label="Canal"
+                :label="t('tickets.fields.channel')"
                 outlined
                 dense
                 emit-value
@@ -215,7 +234,7 @@ const save = async () => {
               <q-select
                 v-model="form.assigneeId"
                 :options="userOptions"
-                label="Asignado a"
+                :label="t('tickets.fields.assignee')"
                 outlined
                 dense
                 emit-value
@@ -224,7 +243,7 @@ const save = async () => {
               />
               <q-input
                 v-model="form.reportedAt"
-                label="Fecha y hora del reporte"
+                :label="t('tickets.fields.reportedAt')"
                 type="datetime-local"
                 outlined
                 dense
@@ -232,8 +251,8 @@ const save = async () => {
               />
             </q-card-section>
             <q-card-actions align="right" class="q-pa-md">
-              <q-btn flat label="Cancelar" @click="router.back()" />
-              <q-btn type="submit" color="primary" unelevated label="Guardar" :loading="isSaving" />
+              <q-btn flat :label="t('common.cancel')" @click="router.back()" />
+              <q-btn type="submit" color="primary" unelevated :label="t('common.save')" :loading="isSaving" />
             </q-card-actions>
           </q-card>
         </div>

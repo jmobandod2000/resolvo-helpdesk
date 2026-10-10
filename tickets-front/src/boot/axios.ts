@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers';
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 import { LocalStorage } from 'quasar';
+import { i18n } from 'src/i18n';
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -17,6 +18,7 @@ const api = axios.create({ baseURL: baseURL || 'http://localhost:3010/api' });
 api.interceptors.request.use((config) => {
   const jwt = LocalStorage.getItem<string>('jwt');
   if (jwt) config.headers.Authorization = `Bearer ${jwt}`;
+  config.headers['x-lang'] = i18n.global.locale.value;
   return config;
 });
 

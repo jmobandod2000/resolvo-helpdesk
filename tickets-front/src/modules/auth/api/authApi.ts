@@ -1,4 +1,5 @@
 import { api } from 'src/boot/axios';
+import { i18n } from 'src/i18n';
 import type { AuthUser, LoginForm } from '../interfaces/auth';
 
 export const signIn = async ({ email, password }: LoginForm) => {
@@ -7,7 +8,7 @@ export const signIn = async ({ email, password }: LoginForm) => {
     { email, password },
     {
       timeout: 1000 * 10,
-      timeoutErrorMessage: 'Tiempo de espera agotado para iniciar sesión',
+      timeoutErrorMessage: i18n.global.t('errors.timeout.login'),
     },
   );
   return resp.data;
@@ -16,7 +17,7 @@ export const signIn = async ({ email, password }: LoginForm) => {
 export const validateJwt = async () => {
   const resp = await api.get<AuthUser>('auth/check-auth-token', {
     timeout: 1000 * 10,
-    timeoutErrorMessage: 'Tiempo de espera agotado para validar la sesión',
+    timeoutErrorMessage: i18n.global.t('errors.timeout.session'),
   });
   return resp.data;
 };

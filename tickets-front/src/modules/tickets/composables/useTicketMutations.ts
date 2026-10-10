@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/vue-query';
+import { useI18n } from 'vue-i18n';
 
 import useNotify from 'src/modules/shared/composables/useNotify';
 import useHandlerErrors from 'src/modules/shared/composables/useHandlerErrors';
@@ -13,6 +14,7 @@ import {
 import type { ChangeStatusPayload, TicketPayload } from '../interfaces/ticket';
 
 export const useTicketMutations = () => {
+  const { t } = useI18n();
   const { successNotify } = useNotify();
   const { handleApiResponseError } = useHandlerErrors();
   const { invalidQuery } = useVueQuery();
@@ -26,7 +28,7 @@ export const useTicketMutations = () => {
   const createMutation = useMutation({
     mutationFn: (payload: TicketPayload) => createTicket(payload),
     onSuccess: (ticket) => {
-      successNotify(`Ticket ${ticket.code} registrado`);
+      successNotify(t('tickets.notify.created', { code: ticket.code }));
       invalidateTicketQueries();
     },
     onError: handleApiResponseError,
@@ -36,7 +38,7 @@ export const useTicketMutations = () => {
     mutationFn: ({ id, payload }: { id: number; payload: Partial<TicketPayload> }) =>
       updateTicket(id, payload),
     onSuccess: (ticket) => {
-      successNotify(`Ticket ${ticket.code} actualizado`);
+      successNotify(t('tickets.notify.updated', { code: ticket.code }));
       invalidateTicketQueries();
     },
     onError: handleApiResponseError,
@@ -46,7 +48,7 @@ export const useTicketMutations = () => {
     mutationFn: ({ id, payload }: { id: number; payload: ChangeStatusPayload }) =>
       changeTicketStatus(id, payload),
     onSuccess: (ticket) => {
-      successNotify(`Estado del ticket ${ticket.code} actualizado`);
+      successNotify(t('tickets.notify.statusChanged', { code: ticket.code }));
       invalidateTicketQueries();
     },
     onError: handleApiResponseError,
@@ -55,7 +57,7 @@ export const useTicketMutations = () => {
   const addNoteMutation = useMutation({
     mutationFn: ({ id, note }: { id: number; note: string }) => addTicketNote(id, note),
     onSuccess: () => {
-      successNotify('Nota agregada');
+      successNotify(t('tickets.notify.noteAdded'));
       invalidateTicketQueries();
     },
     onError: handleApiResponseError,
@@ -64,7 +66,7 @@ export const useTicketMutations = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteTicket(id),
     onSuccess: (ticket) => {
-      successNotify(`Ticket ${ticket.code} eliminado`);
+      successNotify(t('tickets.notify.deleted', { code: ticket.code }));
       invalidateTicketQueries();
     },
     onError: handleApiResponseError,

@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
 import handlersDbError from './utils/handlers-error.util';
+import { resolveLanguage, translate } from '../i18n';
 
 @Catch(
   Prisma.PrismaClientKnownRequestError,
@@ -24,10 +25,18 @@ export class PrismaExceptionFilter implements ExceptionFilter {
 
     this.logger.error(exception);
     const errorResponse = handlersDbError(exception);
+    const language = resolveLanguage(
+      request.headers['x-lang'],
+      request.headers['accept-language'],
+    );
 
     response.status(errorResponse.status).json({
       statusCode: errorResponse.status,
-      message: errorResponse.message,
+      message: translate(
+        language,
+        errorResponse.message.key,
+        errorResponse.message.args,
+      ),
       timestamp: new Date().toISOString(),
       path: request.url,
     });

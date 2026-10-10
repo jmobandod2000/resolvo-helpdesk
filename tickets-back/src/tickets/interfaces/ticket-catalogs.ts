@@ -1,5 +1,4 @@
 import {
-  Company,
   RootCause,
   TicketCategory,
   TicketChannel,
@@ -34,12 +33,6 @@ export const PRIORITY_LABELS: Record<TicketPriority, string> = {
   MEDIUM: 'Media',
   HIGH: 'Alta',
   CRITICAL: 'Crítica',
-};
-
-export const COMPANY_LABELS: Record<Company, string> = {
-  MATURIN: '00 Maturín',
-  BARQUISIMETO: '01 Barquisimeto',
-  BOTH: 'Ambas sedes',
 };
 
 export const CHANNEL_LABELS: Record<TicketChannel, string> = {

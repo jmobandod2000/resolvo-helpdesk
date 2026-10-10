@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 defineProps<{ isSaving?: boolean }>();
 const emit = defineEmits<{ save: [note: string] }>();
 
+const { t } = useI18n();
 const note = ref('');
 
 const save = () => {
@@ -19,7 +21,7 @@ const save = () => {
     <div class="col">
       <q-input
         v-model="note"
-        placeholder="Agregar nota de seguimiento"
+        :placeholder="t('tickets.note.placeholder')"
         type="textarea"
         outlined
         dense

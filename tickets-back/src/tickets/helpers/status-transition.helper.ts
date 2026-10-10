@@ -3,6 +3,7 @@ import { Prisma, Ticket, TicketStatus } from '@prisma/client';
 
 import { ChangeStatusDto } from '../dtos';
 import { DONE_STATUSES } from '../interfaces';
+import { i18nMessage, translatedArg } from '../../i18n';
 
 const isReopening = (from: TicketStatus, to: TicketStatus) =>
   (DONE_STATUSES.includes(from) || from === TicketStatus.CANCELLED) &&
@@ -14,13 +15,9 @@ const assertClosable = (ticket: Ticket, dto: ChangeStatusDto) => {
   const rootCause = dto.rootCause ?? ticket.rootCause;
 
   if (!closureComment?.trim())
-    throw new BadRequestException(
-      'Para cerrar el ticket se requiere el comentario de cierre',
-    );
+    throw new BadRequestException(i18nMessage('errors.closureCommentRequired'));
   if (!rootCause)
-    throw new BadRequestException(
-      'Para cerrar el ticket se requiere la causa raíz',
-    );
+    throw new BadRequestException(i18nMessage('errors.rootCauseRequired'));
 };
 
 export const buildStatusChangeData = (
@@ -32,7 +29,11 @@ export const buildStatusChangeData = (
   const from = ticket.status;
 
   if (from === to)
-    throw new BadRequestException(`El ticket ya está en estado ${to}`);
+    throw new BadRequestException(
+      i18nMessage('errors.sameStatus', {
+        status: translatedArg(`enums.status.${to}`),
+      }),
+    );
 
   if (to === TicketStatus.CLOSED) assertClosable(ticket, dto);
 

@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import type { MetricsFilters } from '../interfaces/metrics';
 
-const initialFilters: MetricsFilters = { company: null, from: null, to: null, weeks: 12 };
+const initialFilters: MetricsFilters = { siteId: null, from: null, to: null, weeks: 12 };
 
 export const useDashboardStore = defineStore('dashboard', () => {
   const filters = ref<MetricsFilters>({ ...initialFilters });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { copyToClipboard } from 'quasar';
+import { useI18n } from 'vue-i18n';
 import useNotify from 'src/modules/shared/composables/useNotify';
 
 interface Props {
@@ -9,16 +10,18 @@ interface Props {
   copyable?: boolean;
 }
 
-withDefaults(defineProps<Props>(), { emptyText: 'Sin información', copyable: false });
+withDefaults(defineProps<Props>(), { copyable: false });
+
+const { t } = useI18n();
 
 const { successNotify, errorNotify } = useNotify();
 
 const copy = async (text: string) => {
   try {
     await copyToClipboard(text);
-    successNotify('Texto copiado');
+    successNotify(t('common.copied'));
   } catch {
-    errorNotify('No se pudo copiar el texto');
+    errorNotify(t('common.copyFailed'));
   }
 };
 </script>
@@ -35,12 +38,12 @@ const copy = async (text: string) => {
         icon="sym_r_content_copy"
         @click="copy(text)"
       >
-        <q-tooltip>Copiar</q-tooltip>
+        <q-tooltip>{{ t('common.copy') }}</q-tooltip>
       </q-btn>
     </q-card-section>
     <q-card-section>
       <div v-if="text" class="text-pre-line text-body2">{{ text }}</div>
-      <div v-else class="text-grey-6 text-italic">{{ emptyText }}</div>
+      <div v-else class="text-grey-6 text-italic">{{ emptyText ?? t('common.noInformation') }}</div>
     </q-card-section>
   </q-card>
 </template>

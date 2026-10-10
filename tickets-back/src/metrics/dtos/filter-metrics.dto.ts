@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { Company } from '@prisma/client';
+import {
+  IsDate,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class FilterMetricsDto {
   @ApiProperty({ description: 'Reportado desde', required: false })
@@ -16,10 +22,12 @@ export class FilterMetricsDto {
   @Type(() => Date)
   to?: Date;
 
-  @ApiProperty({ enum: Company, required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsEnum(Company)
-  company?: Company;
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  siteId?: number;
 
   @ApiProperty({ description: 'Semanas de la tendencia', required: false })
   @IsOptional()

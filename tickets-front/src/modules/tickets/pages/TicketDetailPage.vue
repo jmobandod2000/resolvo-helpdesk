@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import { useI18n } from 'vue-i18n';
 
 import useAuth from 'src/modules/auth/composables/useAuth';
 import TicketStatusBadge from '../components/TicketStatusBadge.vue';
@@ -18,6 +19,7 @@ import { TicketRoutes } from '../interfaces/ticket-routes';
 const route = useRoute();
 const router = useRouter();
 const $q = useQuasar();
+const { t } = useI18n();
 const { isAdmin } = useAuth();
 
 const term = computed(() => route.params.term as string | undefined);
@@ -40,10 +42,10 @@ const confirmDelete = () => {
   if (!ticket.value) return;
   const { id, code } = ticket.value;
   $q.dialog({
-    title: 'Eliminar ticket',
-    message: `¿Eliminar el ticket ${code}? Quedará oculto del listado y de las métricas.`,
-    cancel: { flat: true, label: 'Cancelar' },
-    ok: { color: 'negative', unelevated: true, label: 'Eliminar' },
+    title: t('tickets.actions.deleteTitle'),
+    message: t('tickets.actions.deleteMessage', { code }),
+    cancel: { flat: true, label: t('common.cancel') },
+    ok: { color: 'negative', unelevated: true, label: t('common.delete') },
     persistent: true,
   }).onOk(async () => {
     await deleteMutation.mutateAsync(id);
@@ -59,9 +61,9 @@ const confirmDelete = () => {
     </div>
 
     <div v-else-if="isError || !ticket" class="text-center q-pa-xl text-grey-7">
-      No se encontró el ticket.
+      {{ t('tickets.notFound') }}
       <div class="q-mt-md">
-        <q-btn flat color="primary" label="Volver al listado" :to="{ name: TicketRoutes.LIST }" />
+        <q-btn flat color="primary" :label="t('tickets.backToList')" :to="{ name: TicketRoutes.LIST }" />
       </div>
     </div>
 
@@ -80,40 +82,49 @@ const confirmDelete = () => {
             color="primary"
             unelevated
             icon="sym_r_swap_horiz"
-            label="Cambiar estado"
+            :label="t('tickets.actions.changeStatus')"
             @click="isStatusDialogOpen = true"
           />
           <q-btn
             outline
             color="primary"
             icon="sym_r_edit"
-            label="Editar"
+            :label="t('common.edit')"
             :to="{ name: TicketRoutes.EDIT, params: { id: ticket.id } }"
           />
           <q-btn v-if="isAdmin" flat color="negative" icon="sym_r_delete" @click="confirmDelete">
-            <q-tooltip>Eliminar</q-tooltip>
+            <q-tooltip>{{ t('common.delete') }}</q-tooltip>
           </q-btn>
         </div>
       </div>
 
       <div class="row q-col-gutter-md">
         <div class="col-12 col-lg-8 q-gutter-y-md">
-          <TextBlockCard title="Mensaje del solicitante" :text="ticket.description" />
-          <TextBlockCard title="Diagnóstico" :text="ticket.diagnosis" empty-text="Sin diagnóstico aún" />
           <TextBlockCard
-            title="Comentario de cierre"
+            :title="t('tickets.sections.requesterMessage')"
+            :text="ticket.description"
+          />
+          <TextBlockCard
+            :title="t('tickets.sections.diagnosis')"
+            :text="ticket.diagnosis"
+            :empty-text="t('tickets.empty.diagnosis')"
+          />
+          <TextBlockCard
+            :title="t('tickets.sections.closureComment')"
             :text="ticket.closureComment"
-            empty-text="Se completa al cerrar el ticket"
+            :empty-text="t('tickets.empty.closureComment')"
             copyable
           />
 
           <q-card v-if="ticket.devRequestRef || ticket.evidencePaths.length" flat bordered>
-            <q-card-section class="section-title q-pb-none">Evidencias y seguimiento</q-card-section>
+            <q-card-section class="section-title q-pb-none">
+              {{ t('tickets.sections.evidence') }}
+            </q-card-section>
             <q-list dense>
               <q-item v-if="ticket.devRequestRef">
                 <q-item-section avatar><q-icon name="sym_r_code" color="accent" /></q-item-section>
                 <q-item-section>
-                  <q-item-label caption>Solicitud a desarrollo</q-item-label>
+                  <q-item-label caption>{{ t('tickets.sections.devRequest') }}</q-item-label>
                   <q-item-label>{{ ticket.devRequestRef }}</q-item-label>
                 </q-item-section>
               </q-item>
@@ -125,7 +136,7 @@ const confirmDelete = () => {
           </q-card>
 
           <q-card flat bordered>
-            <q-card-section class="section-title q-pb-none">Historial</q-card-section>
+            <q-card-section class="section-title q-pb-none">{{ t('tickets.sections.history') }}</q-card-section>
             <q-card-section>
               <AddNoteForm :is-saving="addNoteMutation.isPending.value" @save="addNote" />
             </q-card-section>

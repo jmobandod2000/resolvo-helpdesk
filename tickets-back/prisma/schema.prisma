@@ -29,12 +29,6 @@ enum TicketPriority {
   CRITICAL
 }
 
-enum Company {
-  MATURIN
-  BARQUISIMETO
-  BOTH
-}
-
 enum TicketChannel {
   WHATSAPP
   EMAIL
@@ -91,6 +85,32 @@ model User {
   @@index([isDeleted])
 }
 
+model Organization {
+  id        Int      @id @default(1)
+  name      String
+  taxId     String?
+  email     String?
+  phone     String?
+  address   String?
+  website   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Site {
+  id        Int      @id @default(autoincrement())
+  code      String?
+  name      String
+  isActive  Boolean  @default(true)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Tickets Ticket[]
+
+  @@index([isDeleted])
+}
+
 model Ticket {
   id              Int            @id @default(autoincrement())
   code            String?        @unique
@@ -98,7 +118,7 @@ model Ticket {
   description     String
   requesterName   String
   requesterArea   String?
-  company         Company
+  siteId          Int?
   channel         TicketChannel  @default(WHATSAPP)
   category        TicketCategory
   priority        TicketPriority @default(MEDIUM)
@@ -119,6 +139,7 @@ model Ticket {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
+  Site        Site? @relation(fields: [siteId], references: [id])
   assigneeId  Int?
   Assignee    User? @relation("TicketAssignee", fields: [assigneeId], references: [id])
   createdById Int
@@ -127,7 +148,7 @@ model Ticket {
   Events TicketEvent[]
 
   @@index([status])
-  @@index([company])
+  @@index([siteId])
   @@index([category])
   @@index([reportedAt])
   @@index([isDeleted])

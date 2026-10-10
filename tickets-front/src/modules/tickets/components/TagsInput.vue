@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+
 interface Props {
   label: string;
   hint?: string;
@@ -6,13 +8,14 @@ interface Props {
 
 defineProps<Props>();
 const tags = defineModel<string[]>({ required: true });
+const { t } = useI18n();
 </script>
 
 <template>
   <q-select
     v-model="tags"
     :label="label"
-    :hint="hint ?? 'Escribe y presiona Enter para agregar'"
+    :hint="hint ?? t('common.tagsHint')"
     outlined
     dense
     multiple

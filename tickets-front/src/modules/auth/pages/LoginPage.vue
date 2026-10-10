@@ -1,29 +1,38 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import useLocaleAwareForm from 'src/modules/shared/composables/useLocaleAwareForm';
+import LanguageSelector from 'src/modules/shared/components/LanguageSelector.vue';
+import AppFooterLinks from 'src/modules/shared/components/AppFooterLinks.vue';
+import { usePublicProfile } from 'src/modules/organization/composables/useOrganization';
 import useAuth from '../composables/useAuth';
 
+const { t } = useI18n();
+const formRef = useLocaleAwareForm();
 const { loginForm, login, loadRememberedEmail } = useAuth();
 const isPasswordVisible = ref(false);
+const { organizationName } = usePublicProfile();
 
-const requiredRule = (value: string) => !!value || 'Campo requerido';
-const emailRule = (value: string) => /.+@.+\..+/.test(value) || 'Correo no válido';
+const requiredRule = (value: string) => !!value || t('common.requiredField');
+const emailRule = (value: string) => /.+@.+\..+/.test(value) || t('auth.invalidEmail');
 
 onMounted(loadRememberedEmail);
 </script>
 
 <template>
   <q-page class="row flex-center bg-primary q-pa-md">
+    <LanguageSelector dark class="language-corner" />
     <q-card class="login-card q-pa-md" flat>
       <q-card-section class="text-center">
         <q-icon name="sym_r_confirmation_number" size="48px" color="primary" />
-        <div class="text-h6 text-primary q-mt-sm">Tickets WMS</div>
-        <div class="text-caption text-grey-7">Seguimiento interno de soporte</div>
+        <div class="text-h6 text-primary q-mt-sm">{{ t('app.name') }}</div>
+        <div class="text-caption text-grey-7">{{ organizationName ?? t('app.subtitle') }}</div>
       </q-card-section>
 
-      <q-form class="q-gutter-md" @submit.prevent="login">
+      <q-form ref="formRef" class="q-gutter-md" @submit.prevent="login">
         <q-input
           v-model="loginForm.email"
-          label="Correo"
+          :label="t('auth.email')"
           type="email"
           outlined
           autofocus
@@ -34,7 +43,7 @@ onMounted(loadRememberedEmail);
 
         <q-input
           v-model="loginForm.password"
-          label="Contraseña"
+          :label="t('auth.password')"
           :type="isPasswordVisible ? 'text' : 'password'"
           outlined
           :rules="[requiredRule]"
@@ -49,11 +58,12 @@ onMounted(loadRememberedEmail);
           </template>
         </q-input>
 
-        <q-checkbox v-model="loginForm.remember" label="Recordar correo" />
+        <q-checkbox v-model="loginForm.remember" :label="t('auth.rememberEmail')" />
 
-        <q-btn type="submit" color="primary" label="Ingresar" class="full-width" unelevated />
+        <q-btn type="submit" color="primary" :label="t('auth.signIn')" class="full-width" unelevated />
       </q-form>
     </q-card>
+    <AppFooterLinks dark class="login-footer" />
   </q-page>
 </template>
 
@@ -61,5 +71,16 @@ onMounted(loadRememberedEmail);
 .login-card {
   width: 100%;
   max-width: 380px;
+}
+.login-footer {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+}
+.language-corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
 }
 </style>

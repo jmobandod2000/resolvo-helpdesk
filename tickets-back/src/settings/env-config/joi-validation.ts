@@ -18,4 +18,6 @@ export const JoiValidationSchema = Joi.object({
   DB_PS_PORT: Joi.number().required(),
   DB_PS_DOCKER_PORT: Joi.number().required(),
   DB_PS_DOCKER_VOLUME: Joi.string().required(),
+
+  SEED_EXAMPLE_TICKETS: Joi.boolean().default(false),
 });

@@ -1,5 +1,3 @@
-import type { Company } from 'src/modules/tickets/interfaces/ticket';
-
 export interface CountByKey {
   key: string;
   label: string;
@@ -37,7 +35,7 @@ export interface MetricsSummary {
   times: MetricsTimes;
   byStatus: CountByKey[];
   byCategory: CountByKey[];
-  byCompany: CountByKey[];
+  bySite: CountByKey[];
   byPriority: CountByKey[];
   byRootCause: CountByKey[];
   byAssignee: CountByKey[];
@@ -47,7 +45,7 @@ export interface MetricsSummary {
 }
 
 export interface MetricsFilters {
-  company: Company | null;
+  siteId: number | null;
   from: string | null;
   to: string | null;
   weeks: number;

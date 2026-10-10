@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import useLocaleAwareForm from 'src/modules/shared/composables/useLocaleAwareForm';
 
 import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import type { ChangeStatusPayload, RootCause, Ticket, TicketStatus } from '../interfaces/ticket';
@@ -13,6 +15,8 @@ const props = withDefaults(defineProps<Props>(), { isSaving: false });
 const isOpen = defineModel<boolean>({ required: true });
 const emit = defineEmits<{ save: [payload: ChangeStatusPayload] }>();
 
+const { t } = useI18n();
+const formRef = useLocaleAwareForm();
 const { catalogs } = useCatalogs();
 
 const status = ref<TicketStatus | null>(null);
@@ -35,7 +39,7 @@ const statusOptions = computed(() =>
 const isClosing = computed(() => status.value === 'CLOSED' || status.value === 'RESOLVED');
 const requiresClosureData = computed(() => status.value === 'CLOSED');
 
-const requiredRule = (value: unknown) => !!value || 'Campo requerido';
+const requiredRule = (value: unknown) => !!value || t('common.requiredField');
 
 const save = () => {
   if (!status.value) return;
@@ -51,27 +55,29 @@ const save = () => {
 <template>
   <q-dialog v-model="isOpen" persistent>
     <q-card style="width: 560px; max-width: 95vw">
-      <q-card-section class="section-title">Cambiar estado de {{ ticket.code }}</q-card-section>
+      <q-card-section class="section-title">
+        {{ t('tickets.statusDialog.title', { code: ticket.code }) }}
+      </q-card-section>
 
-      <q-form @submit.prevent="save">
+      <q-form ref="formRef" @submit.prevent="save">
         <q-card-section class="q-gutter-sm">
           <q-select
             v-model="status"
             :options="statusOptions"
-            label="Nuevo estado"
+            :label="t('tickets.statusDialog.newStatus')"
             outlined
             dense
             emit-value
             map-options
             :rules="[requiredRule]"
           />
-          <q-input v-model="note" label="Nota del cambio" type="textarea" outlined autogrow />
+          <q-input v-model="note" :label="t('tickets.statusDialog.note')" type="textarea" outlined autogrow />
 
           <template v-if="isClosing">
             <q-select
               v-model="rootCause"
               :options="catalogs.rootCauses"
-              label="Causa raíz"
+              :label="t('tickets.fields.rootCause')"
               outlined
               dense
               emit-value
@@ -80,7 +86,7 @@ const save = () => {
             />
             <q-input
               v-model="closureComment"
-              label="Comentario de cierre (se envía al solicitante)"
+              :label="t('tickets.statusDialog.closureComment')"
               type="textarea"
               outlined
               autogrow
@@ -90,8 +96,8 @@ const save = () => {
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn v-close-popup flat label="Cancelar" />
-          <q-btn type="submit" color="primary" unelevated label="Guardar" :loading="isSaving" />
+          <q-btn v-close-popup flat :label="t('common.cancel')" />
+          <q-btn type="submit" color="primary" unelevated :label="t('common.save')" :loading="isSaving" />
         </q-card-actions>
       </q-form>
     </q-card>

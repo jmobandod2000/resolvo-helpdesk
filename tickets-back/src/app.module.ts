@@ -12,6 +12,9 @@ import { AuthModule } from './auth/auth.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { DropDownsModule } from './drop-downs/drop-downs.module';
+import { ReportsModule } from './reports/reports.module';
+import { OrganizationModule } from './organization/organization.module';
+import { I18nExceptionFilter } from './i18n';
 
 @Module({
   imports: [
@@ -26,7 +29,12 @@ import { DropDownsModule } from './drop-downs/drop-downs.module';
     TicketsModule,
     MetricsModule,
     DropDownsModule,
+    ReportsModule,
+    OrganizationModule,
   ],
-  providers: [{ provide: APP_FILTER, useClass: PrismaExceptionFilter }],
+  providers: [
+    { provide: APP_FILTER, useClass: I18nExceptionFilter },
+    { provide: APP_FILTER, useClass: PrismaExceptionFilter },
+  ],
 })
 export class AppModule {}

@@ -18,17 +18,14 @@ export class CreateUserDto {
   name: string;
 
   @ApiProperty({ description: 'Correo electrónico del usuario' })
-  @IsEmail({}, { message: 'El correo no es válido' })
+  @IsEmail()
   email: string;
 
   @ApiProperty({ description: 'Contraseña del usuario', minLength: 6 })
   @IsString()
   @MinLength(6)
   @MaxLength(50)
-  @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message:
-      'La contraseña debe tener una mayúscula, una minúscula y un número',
-  })
+  @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/)
   password: string;
 
   @ApiProperty({ enum: ValidRoles, required: false })

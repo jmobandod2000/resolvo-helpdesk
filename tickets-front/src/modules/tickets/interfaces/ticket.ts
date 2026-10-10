@@ -1,3 +1,5 @@
+import type { SiteSummary } from 'src/modules/organization/interfaces/organization';
+
 export type TicketStatus =
   | 'OPEN'
   | 'IN_ANALYSIS'
@@ -9,7 +11,6 @@ export type TicketStatus =
 
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
-export type Company = 'MATURIN' | 'BARQUISIMETO' | 'BOTH';
 
 export type TicketChannel = 'WHATSAPP' | 'EMAIL' | 'CALL' | 'IN_PERSON' | 'OTHER';
 
@@ -48,7 +49,8 @@ export interface Ticket {
   description: string;
   requesterName: string;
   requesterArea: string | null;
-  company: Company;
+  siteId: number | null;
+  Site: SiteSummary | null;
   channel: TicketChannel;
   category: TicketCategory;
   priority: TicketPriority;
@@ -89,7 +91,7 @@ export interface TicketDetail extends Ticket {
 export interface TicketFilters {
   search: string;
   status: TicketStatus[];
-  company: Company | null;
+  siteId: number | null;
   category: TicketCategory | null;
   priority: TicketPriority | null;
   rootCause: RootCause | null;
@@ -102,7 +104,7 @@ export interface TicketPayload {
   description: string;
   requesterName: string;
   requesterArea?: string | undefined;
-  company: Company;
+  siteId: number | null;
   channel: TicketChannel;
   category: TicketCategory;
   priority: TicketPriority;

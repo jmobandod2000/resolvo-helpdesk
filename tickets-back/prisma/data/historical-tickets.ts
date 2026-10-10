@@ -1,5 +1,4 @@
 import {
-  Company,
   RootCause,
   TicketCategory,
   TicketChannel,
@@ -12,7 +11,7 @@ export interface HistoricalTicket {
   description: string;
   requesterName: string;
   requesterArea?: string;
-  company: Company;
+  siteCode?: string | null;
   channel: TicketChannel;
   category: TicketCategory;
   priority: TicketPriority;
@@ -36,6 +35,16 @@ export interface HistoricalTicket {
   Para cargar tickets reales, cree prisma/data/historical-tickets.local.ts con la misma
   estructura: el seed lo usa en lugar de este archivo y git lo ignora.
 */
+export interface HistoricalSite {
+  code: string;
+  name: string;
+}
+
+export const HISTORICAL_SITES: HistoricalSite[] = [
+  { code: 'A', name: 'Sede A' },
+  { code: 'B', name: 'Sede B' },
+];
+
 export const HISTORICAL_TICKETS: HistoricalTicket[] = [
   {
     title:
@@ -43,7 +52,7 @@ export const HISTORICAL_TICKETS: HistoricalTicket[] = [
     description:
       'El reporte de movimientos por artículo muestra un saldo menor al de la consulta de inventario.',
     requesterName: 'Inventario Sede A',
-    company: Company.MATURIN,
+    siteCode: 'A',
     channel: TicketChannel.WHATSAPP,
     category: TicketCategory.REPORTS,
     priority: TicketPriority.MEDIUM,
@@ -66,7 +75,7 @@ export const HISTORICAL_TICKETS: HistoricalTicket[] = [
     description:
       'El conteo físico da menos unidades de las que muestra el sistema.',
     requesterName: 'Inventario Sede B',
-    company: Company.BARQUISIMETO,
+    siteCode: 'B',
     channel: TicketChannel.EMAIL,
     category: TicketCategory.INVENTORY,
     priority: TicketPriority.HIGH,

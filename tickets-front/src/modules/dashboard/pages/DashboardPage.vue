@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
 import useDates from 'src/modules/shared/composables/useDates';
+import useCatalogs from 'src/modules/shared/composables/useCatalogs';
 import { useTicketsManageStore } from 'src/modules/tickets/composables/useTicketsManageStore';
 import { TicketRoutes } from 'src/modules/tickets/interfaces/ticket-routes';
 import type { TicketFilters } from 'src/modules/tickets/interfaces/ticket';
@@ -15,7 +17,9 @@ import { useDashboardManageStore } from '../composables/useDashboardManageStore'
 import type { CountByKey } from '../interfaces/metrics';
 
 const router = useRouter();
-const { formatHours } = useDates();
+const { t, te } = useI18n();
+const { formatHours, formatNumber } = useDates();
+const { statusLabel, categoryLabel, priorityLabel, rootCauseLabel } = useCatalogs();
 const { metrics, isFetching } = useMetricsQuery();
 const { filters: dashboardFilters } = useDashboardManageStore();
 const { resetFilters, setFilters } = useTicketsManageStore();
@@ -25,32 +29,57 @@ const kpis = computed(() => {
   const times = metrics.value?.times;
   if (!totals || !times) return [];
   return [
-    { label: 'Tickets', value: totals.total, icon: 'sym_r_confirmation_number' },
-    { label: 'Abiertos', value: totals.open, icon: 'sym_r_pending_actions' },
+    { label: t('dashboard.kpi.tickets'), value: totals.total, icon: 'sym_r_confirmation_number' },
+    { label: t('dashboard.kpi.open'), value: totals.open, icon: 'sym_r_pending_actions' },
     {
-      label: 'Resueltos',
+      label: t('dashboard.kpi.resolved'),
       value: totals.resolved,
       icon: 'sym_r_task_alt',
-      caption: `${totals.resolutionRate}% de resolución`,
+      caption: t('dashboard.kpi.resolutionRate', { rate: formatNumber(totals.resolutionRate) }),
     },
-    { label: 'Escalados a desarrollo', value: totals.escalatedToDev, icon: 'sym_r_code' },
+    { label: t('dashboard.kpi.escalated'), value: totals.escalatedToDev, icon: 'sym_r_code' },
     {
-      label: 'Primera respuesta promedio',
+      label: t('dashboard.kpi.firstResponse'),
       value: formatHours(times.avgFirstResponseHours),
       icon: 'sym_r_timer',
     },
     {
-      label: 'Resolución promedio',
+      label: t('dashboard.kpi.resolution'),
       value: formatHours(times.avgResolutionHours),
       icon: 'sym_r_schedule',
-      caption: `Mediana ${formatHours(times.medianResolutionHours)}`,
+      caption: t('dashboard.kpi.median', { value: formatHours(times.medianResolutionHours) }),
     },
   ];
 });
 
+const relabel = (items: CountByKey[] | undefined, labelOf: (key: string) => string) =>
+  (items ?? []).map((item) => ({ ...item, label: item.key === 'NONE' ? t('enums.notDefined') : labelOf(item.key) }));
+
+const byStatus = computed(() => relabel(metrics.value?.byStatus, statusLabel));
+const bySite = computed(() =>
+  (metrics.value?.bySite ?? []).map((item) => ({
+    ...item,
+    label: item.key === 'NONE' ? t('sites.general') : item.label,
+  })),
+);
+const byCategory = computed(() => relabel(metrics.value?.byCategory, categoryLabel));
+const byPriority = computed(() => relabel(metrics.value?.byPriority, priorityLabel));
+const byRootCause = computed(() => relabel(metrics.value?.byRootCause, rootCauseLabel));
+const backlogAging = computed(() =>
+  relabel(metrics.value?.backlogAging, (key) =>
+    te(`enums.aging.${key}`) ? t(`enums.aging.${key}`) : key,
+  ),
+);
+const byAssignee = computed(() =>
+  (metrics.value?.byAssignee ?? []).map((item) => ({
+    ...item,
+    label: item.key === 'NONE' ? t('enums.unassigned') : item.label,
+  })),
+);
+
 const openFilteredTickets = (partial: Partial<TicketFilters>) => {
   resetFilters();
-  setFilters({ company: dashboardFilters.value.company, ...partial });
+  setFilters({ siteId: dashboardFilters.value.siteId, ...partial });
   void router.push({ name: TicketRoutes.LIST });
 };
 
@@ -60,8 +89,8 @@ const selectStatus = (item: CountByKey) =>
   openFilteredTickets({ status: [item.key as TicketFilters['status'][number]] });
 const selectCategory = (item: CountByKey) =>
   openFilteredTickets({ category: item.key as TicketFilters['category'] });
-const selectCompany = (item: CountByKey) =>
-  openFilteredTickets({ company: item.key as TicketFilters['company'] });
+const selectSite = (item: CountByKey) =>
+  hasKey(item) && openFilteredTickets({ siteId: Number(item.key) });
 const selectPriority = (item: CountByKey) =>
   openFilteredTickets({ priority: item.key as TicketFilters['priority'] });
 const selectRootCause = (item: CountByKey) =>
@@ -83,7 +112,7 @@ const selectProduct = (item: CountByKey) => openFilteredTickets({ search: item.k
 <template>
   <q-page padding>
     <div class="row items-center q-mb-md">
-      <div class="page-title col">Métricas de soporte</div>
+      <div class="page-title col">{{ t('dashboard.title') }}</div>
       <q-spinner v-if="isFetching" color="primary" size="20px" />
     </div>
 
@@ -91,7 +120,7 @@ const selectProduct = (item: CountByKey) => openFilteredTickets({ search: item.k
 
     <template v-if="metrics">
       <div class="row q-col-gutter-md q-mb-md">
-        <div v-for="kpi in kpis" :key="kpi.label" class="col-6 col-md-4 col-lg-2">
+        <div v-for="kpi in kpis" :key="kpi.icon" class="col-6 col-md-4 col-lg-2">
           <KpiCard v-bind="kpi" />
         </div>
       </div>
@@ -102,51 +131,51 @@ const selectProduct = (item: CountByKey) => openFilteredTickets({ search: item.k
 
       <div class="row q-col-gutter-md">
         <div class="col-12 col-md-6 col-lg-4">
-          <BarListCard title="Por estado" :items="metrics.byStatus" @select="selectStatus" />
+          <BarListCard :title="t('dashboard.cards.byStatus')" :items="byStatus" @select="selectStatus" />
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+          <BarListCard :title="t('dashboard.cards.aging')" :items="backlogAging" @select="selectAging" />
         </div>
         <div class="col-12 col-md-6 col-lg-4">
           <BarListCard
-            title="Antigüedad de abiertos"
-            :items="metrics.backlogAging"
-            @select="selectAging"
+            :title="t('dashboard.cards.bySite')"
+            :items="bySite"
+            @select="selectSite"
           />
         </div>
         <div class="col-12 col-md-6 col-lg-4">
-          <BarListCard title="Por sede" :items="metrics.byCompany" @select="selectCompany" />
-        </div>
-        <div class="col-12 col-md-6 col-lg-4">
           <BarListCard
-            title="Por categoría"
-            :items="metrics.byCategory"
+            :title="t('dashboard.cards.byCategory')"
+            :items="byCategory"
             @select="selectCategory"
           />
         </div>
         <div class="col-12 col-md-6 col-lg-4">
           <BarListCard
-            title="Por causa raíz"
-            :items="metrics.byRootCause"
+            :title="t('dashboard.cards.byRootCause')"
+            :items="byRootCause"
             @select="selectRootCause"
           />
         </div>
         <div class="col-12 col-md-6 col-lg-4">
           <BarListCard
-            title="Por prioridad"
-            :items="metrics.byPriority"
+            :title="t('dashboard.cards.byPriority')"
+            :items="byPriority"
             @select="selectPriority"
           />
         </div>
         <div class="col-12 col-md-6 col-lg-4">
           <BarListCard
-            title="Por responsable"
-            :items="metrics.byAssignee"
+            :title="t('dashboard.cards.byAssignee')"
+            :items="byAssignee"
             @select="selectAssignee"
           />
         </div>
         <div class="col-12 col-md-6 col-lg-4">
           <BarListCard
-            title="Productos más reportados"
+            :title="t('dashboard.cards.topProducts')"
             :items="topProducts"
-            empty-text="Sin productos registrados"
+            :empty-text="t('dashboard.cards.noProducts')"
             @select="selectProduct"
           />
         </div>

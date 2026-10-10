@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { CountByKey } from '../interfaces/metrics';
 
 interface Props {
@@ -8,7 +9,8 @@ interface Props {
   emptyText?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), { emptyText: 'Sin datos en el periodo' });
+const props = defineProps<Props>();
+const { t } = useI18n();
 const emit = defineEmits<{ select: [item: CountByKey] }>();
 
 const maxCount = computed(() => Math.max(1, ...props.items.map((item) => item.count)));
@@ -23,7 +25,9 @@ const shareOf = (count: number) =>
   <q-card flat bordered class="full-height">
     <q-card-section class="section-title q-pb-sm">{{ title }}</q-card-section>
     <q-card-section class="q-pt-none">
-      <div v-if="!items.length" class="text-grey-6 text-italic">{{ emptyText }}</div>
+      <div v-if="!items.length" class="text-grey-6 text-italic">
+        {{ emptyText ?? t('common.noData') }}
+      </div>
       <div
         v-for="item in items"
         :key="item.key"
@@ -39,7 +43,13 @@ const shareOf = (count: number) =>
           <div class="bar-fill" :style="{ width: widthOf(item.count) }" />
         </div>
         <q-tooltip anchor="top middle" self="bottom middle">
-          {{ item.label }}: {{ item.count }} tickets ({{ shareOf(item.count) }})
+          {{
+            t('dashboard.cards.tooltip', {
+              label: item.label,
+              count: item.count,
+              share: shareOf(item.count),
+            })
+          }}
         </q-tooltip>
       </div>
     </q-card-section>

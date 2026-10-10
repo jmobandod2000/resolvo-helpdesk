@@ -1,6 +1,7 @@
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { Loading, LocalStorage } from 'quasar';
+import { useI18n } from 'vue-i18n';
 
 import useNotify from 'src/modules/shared/composables/useNotify';
 import useVueQuery from 'src/modules/shared/composables/useVueQuery';
@@ -13,6 +14,7 @@ const REMEMBERED_EMAIL_KEY = 'rememberedEmail';
 
 const useAuth = () => {
   const router = useRouter();
+  const { t } = useI18n();
   const { errorNotify } = useNotify();
   const { removeAllQueries } = useVueQuery();
   const authStore = useAuthStore();
@@ -30,14 +32,14 @@ const useAuth = () => {
   };
 
   const login = async () => {
-    Loading.show({ message: 'Comprobando credenciales, por favor espere...' });
+    Loading.show({ message: t('auth.checkingCredentials') });
     try {
       authStore.setUser(await signIn(loginForm.value));
       rememberEmail(loginForm.value);
       loginForm.value.password = '';
       void router.push('/');
     } catch {
-      errorNotify('Correo o contraseña inválidos');
+      errorNotify(t('auth.invalidCredentials'));
     } finally {
       Loading.hide();
     }

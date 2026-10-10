@@ -1,39 +1,69 @@
 import { computed } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
+import { useI18n } from 'vue-i18n';
 
 import { getCatalogs } from '../api/dropDownsApi';
 import type { Catalogs, SelectOption } from '../interfaces/catalogs';
 
+type CatalogKey = keyof Catalogs;
+
 const EMPTY_CATALOGS: Catalogs = {
   statuses: [],
   priorities: [],
-  companies: [],
   channels: [],
   categories: [],
   rootCauses: [],
 };
 
-const findLabel = (options: SelectOption[], value?: string | null) =>
-  options.find((option) => option.value === value)?.label ?? value ?? '—';
+const ENUM_KEYS: Record<CatalogKey, string> = {
+  statuses: 'enums.status',
+  priorities: 'enums.priority',
+  channels: 'enums.channel',
+  categories: 'enums.category',
+  rootCauses: 'enums.rootCause',
+};
 
 const useCatalogs = () => {
+  const { t, te } = useI18n();
+
   const { data, isLoading } = useQuery({
     queryKey: ['catalogs'],
     queryFn: getCatalogs,
     staleTime: Infinity,
   });
 
-  const catalogs = computed(() => data.value ?? EMPTY_CATALOGS);
+  const translate = (catalog: CatalogKey, value: string, fallback?: string) => {
+    const key = `${ENUM_KEYS[catalog]}.${value}`;
+    return te(key) ? t(key) : (fallback ?? value);
+  };
+
+  const catalogs = computed<Catalogs>(() => {
+    const source = data.value ?? EMPTY_CATALOGS;
+    const translateOptions = (catalog: CatalogKey): SelectOption[] =>
+      source[catalog].map((option) => ({
+        value: option.value,
+        label: translate(catalog, option.value, option.label),
+      }));
+    return {
+      statuses: translateOptions('statuses'),
+      priorities: translateOptions('priorities'),
+      channels: translateOptions('channels'),
+      categories: translateOptions('categories'),
+      rootCauses: translateOptions('rootCauses'),
+    };
+  });
+
+  const labelOf = (catalog: CatalogKey) => (value?: string | null) =>
+    value ? translate(catalog, value) : '—';
 
   return {
     catalogs,
     isLoading,
-    statusLabel: (value?: string | null) => findLabel(catalogs.value.statuses, value),
-    priorityLabel: (value?: string | null) => findLabel(catalogs.value.priorities, value),
-    companyLabel: (value?: string | null) => findLabel(catalogs.value.companies, value),
-    channelLabel: (value?: string | null) => findLabel(catalogs.value.channels, value),
-    categoryLabel: (value?: string | null) => findLabel(catalogs.value.categories, value),
-    rootCauseLabel: (value?: string | null) => findLabel(catalogs.value.rootCauses, value),
+    statusLabel: labelOf('statuses'),
+    priorityLabel: labelOf('priorities'),
+    channelLabel: labelOf('channels'),
+    categoryLabel: labelOf('categories'),
+    rootCauseLabel: labelOf('rootCauses'),
   };
 };
 

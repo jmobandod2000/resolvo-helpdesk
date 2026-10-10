@@ -1,8 +1,11 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from '#q-app/wrappers';
+
+const { version } = JSON.parse(readFileSync('./package.json', 'utf-8')) as { version: string };
 
 export default defineConfig(() => {
   return {
-    boot: ['axios', 'vue-query'],
+    boot: ['i18n', 'axios', 'vue-query'],
 
     css: ['app.scss'],
 
@@ -20,6 +23,10 @@ export default defineConfig(() => {
       },
 
       vueRouterMode: 'hash',
+
+      env: {
+        APP_VERSION: version,
+      },
 
       vitePlugins: [
         [

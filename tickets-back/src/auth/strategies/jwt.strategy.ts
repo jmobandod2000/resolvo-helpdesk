@@ -5,6 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { JwtPayload, UserLogged } from '../interfaces';
+import { i18nMessage } from '../../i18n';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -26,8 +27,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
 
     if (!user || user.isDeleted)
-      throw new UnauthorizedException('Credentials invalid');
-    if (!user.isActive) throw new UnauthorizedException('User is not active');
+      throw new UnauthorizedException(i18nMessage('errors.invalidCredentials'));
+    if (!user.isActive)
+      throw new UnauthorizedException(i18nMessage('errors.userInactive'));
 
     return user;
   }

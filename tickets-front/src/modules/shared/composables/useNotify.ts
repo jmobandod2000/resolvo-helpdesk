@@ -1,4 +1,5 @@
 import { Notify } from 'quasar';
+import { i18n } from 'src/i18n';
 
 const useNotify = () => {
   const successNotify = (message: string, timeout = 2500) => {
@@ -15,7 +16,7 @@ const useNotify = () => {
       color: 'negative',
       position: 'bottom',
       timeout,
-      actions: [{ label: 'Cerrar', color: 'white' }],
+      actions: [{ label: i18n.global.t('common.close'), color: 'white' }],
     });
   };
 

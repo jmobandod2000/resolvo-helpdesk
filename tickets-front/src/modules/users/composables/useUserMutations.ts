@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/vue-query';
+import { useI18n } from 'vue-i18n';
 
 import useNotify from 'src/modules/shared/composables/useNotify';
 import useHandlerErrors from 'src/modules/shared/composables/useHandlerErrors';
@@ -7,6 +8,7 @@ import { createUser, deleteUser, updateUser } from '../api/usersApi';
 import type { UserPayload } from '../interfaces/user';
 
 export const useUserMutations = () => {
+  const { t } = useI18n();
   const { successNotify } = useNotify();
   const { handleApiResponseError } = useHandlerErrors();
   const { invalidQuery } = useVueQuery();
@@ -16,7 +18,7 @@ export const useUserMutations = () => {
   const createMutation = useMutation({
     mutationFn: (payload: UserPayload) => createUser(payload),
     onSuccess: (user) => {
-      successNotify(`Usuario ${user.name} creado`);
+      successNotify(t('users.notify.created', { name: user.name }));
       invalidateUsers();
     },
     onError: handleApiResponseError,
@@ -26,7 +28,7 @@ export const useUserMutations = () => {
     mutationFn: ({ id, payload }: { id: number; payload: Partial<UserPayload> }) =>
       updateUser(id, payload),
     onSuccess: (user) => {
-      successNotify(`Usuario ${user.name} actualizado`);
+      successNotify(t('users.notify.updated', { name: user.name }));
       invalidateUsers();
     },
     onError: handleApiResponseError,
@@ -35,7 +37,7 @@ export const useUserMutations = () => {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteUser(id),
     onSuccess: (user) => {
-      successNotify(`Usuario ${user.name} eliminado`);
+      successNotify(t('users.notify.deleted', { name: user.name }));
       invalidateUsers();
     },
     onError: handleApiResponseError,

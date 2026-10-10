@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { compareData } from '../../common/utils/encrypt-data';
 import { LoginUserDto } from '../dtos';
 import { JwtPayload, UserLogged } from '../interfaces';
+import { i18nMessage } from '../../i18n';
 
 @Injectable()
 export class AuthService {
@@ -19,13 +20,13 @@ export class AuthService {
     });
 
     if (!user || user.isDeleted || !user.isActive)
-      throw new UnauthorizedException('Credentials invalid');
+      throw new UnauthorizedException(i18nMessage('errors.invalidCredentials'));
 
     const { password: hashedPassword, ...userLogged } = user;
 
     const isCorrectPassword = await compareData(password, hashedPassword);
     if (!isCorrectPassword)
-      throw new UnauthorizedException('Credentials invalid');
+      throw new UnauthorizedException(i18nMessage('errors.invalidCredentials'));
 
     return this.buildAuthResponse(userLogged);
   }

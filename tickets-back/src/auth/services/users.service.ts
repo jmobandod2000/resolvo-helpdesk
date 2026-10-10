@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { encryptData } from '../../common/utils/encrypt-data';
 import { CreateUserDto, UpdateUserDto } from '../dtos';
+import { i18nMessage } from '../../i18n';
 
 @Injectable()
 export class UsersService {
@@ -55,7 +56,8 @@ export class UsersService {
     const user = await this.prismaService.user.findFirst({
       where: { id, isDeleted: false },
     });
-    if (!user) throw new NotFoundException(`User with id ${id} not found`);
+    if (!user)
+      throw new NotFoundException(i18nMessage('errors.userNotFound', { id }));
     return user;
   }
 }

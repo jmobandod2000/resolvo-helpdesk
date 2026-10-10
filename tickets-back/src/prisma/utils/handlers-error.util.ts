@@ -1,8 +1,10 @@
 import { Prisma } from '@prisma/client';
 
+import { i18nMessage, TranslatableMessage } from '../../i18n';
+
 interface DbErrorResponse {
   status: number;
-  message: string;
+  message: TranslatableMessage;
 }
 
 const handleKnownRequestError = (
@@ -12,14 +14,16 @@ const handleKnownRequestError = (
     case 'P2002':
       return {
         status: 409,
-        message: `Duplicate entry, unique constraint failed on field(s): ${error.meta?.target}`,
+        message: i18nMessage('errors.db.duplicate', {
+          fields: String(error.meta?.target ?? ''),
+        }),
       };
     case 'P2003':
-      return { status: 400, message: 'Foreign key constraint failed.' };
+      return { status: 400, message: i18nMessage('errors.db.foreignKey') };
     case 'P2025':
-      return { status: 404, message: 'Record not found.' };
+      return { status: 404, message: i18nMessage('errors.db.recordNotFound') };
     default:
-      return { status: 500, message: 'An unknown database error occurred.' };
+      return { status: 500, message: i18nMessage('errors.db.unknown') };
   }
 };
 
@@ -28,18 +32,12 @@ const handlersDbError = (error: unknown): DbErrorResponse => {
     return handleKnownRequestError(error);
 
   if (error instanceof Prisma.PrismaClientInitializationError)
-    return {
-      status: 500,
-      message: 'Failed to initialize the database connection.',
-    };
+    return { status: 500, message: i18nMessage('errors.db.connection') };
 
   if (error instanceof Prisma.PrismaClientRustPanicError)
-    return {
-      status: 500,
-      message: 'A critical error occurred in the database engine.',
-    };
+    return { status: 500, message: i18nMessage('errors.db.critical') };
 
-  return { status: 500, message: 'An unexpected error occurred.' };
+  return { status: 500, message: i18nMessage('errors.unexpected') };
 };
 
 export default handlersDbError;

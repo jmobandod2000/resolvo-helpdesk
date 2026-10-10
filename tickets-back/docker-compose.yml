@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PS_PASSWORD}
       TZ: America/Caracas
     ports:
-      - ${DB_PS_PORT}:${DB_PS_DOCKER_PORT}
+      - 127.0.0.1:${DB_PS_PORT}:${DB_PS_DOCKER_PORT}
     volumes:
       - ${DB_PS_DOCKER_VOLUME}:/var/lib/postgresql/data:rw
     healthcheck:

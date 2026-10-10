@@ -21,3 +21,19 @@ body {
 .cursor-pointer {
   cursor: pointer;
 }
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .q-header,
+  .q-drawer-container,
+  .print-hide {
+    display: none !important;
+  }
+
+  .q-page-container {
+    padding: 0 !important;
+  }
+}
