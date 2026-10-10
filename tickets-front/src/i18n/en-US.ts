@@ -791,6 +791,41 @@ const messages: MessageSchema = {
       TICKET_ASSIGNED: '{actor} assigned {code} to you',
     },
   },
+  landing: {
+    title: 'What do you need today?',
+    subtitle: 'Report a problem in a minute or sign in to manage the IT team’s tickets.',
+    backToStart: 'Home',
+    user: {
+      eyebrow: 'For all staff',
+      title: 'I need help',
+      text: 'Tell us what happened and follow your request without a username or password.',
+      report: 'Report a problem',
+      track: 'Check my request',
+      mine: 'See my requests ({n})',
+      disabled: 'The request portal is not enabled. Please contact the IT team.',
+    },
+    team: {
+      eyebrow: 'IT team',
+      title: 'I am on the IT team',
+      text: 'Handle tickets, answer requesters and review metrics and reports.',
+      signIn: 'Sign in',
+      continue: 'Go to dashboard',
+    },
+    features: {
+      fast: {
+        title: 'Fast',
+        text: 'A guided three-step form anyone can use.',
+      },
+      tracking: {
+        title: 'Clear follow-up',
+        text: 'See the status and chat with IT from your private link.',
+      },
+      private: {
+        title: 'Your data stays home',
+        text: 'Resolvo runs on your company’s own servers.',
+      },
+    },
+  },
   enums: {
     status: {
       OPEN: 'Open',

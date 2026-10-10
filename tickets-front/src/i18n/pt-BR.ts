@@ -793,6 +793,41 @@ const messages: MessageSchema = {
       TICKET_ASSIGNED: '{actor} atribuiu {code} a você',
     },
   },
+  landing: {
+    title: 'Do que você precisa hoje?',
+    subtitle: 'Reporte um problema em um minuto ou entre para gerenciar os tickets da equipe de TI.',
+    backToStart: 'Início',
+    user: {
+      eyebrow: 'Para todos os colaboradores',
+      title: 'Preciso de ajuda',
+      text: 'Conte o que aconteceu e acompanhe sua solicitação sem usuário nem senha.',
+      report: 'Reportar um problema',
+      track: 'Ver minha solicitação',
+      mine: 'Ver minhas solicitações ({n})',
+      disabled: 'O portal de solicitações não está ativo. Fale com a equipe de TI.',
+    },
+    team: {
+      eyebrow: 'Equipe de TI',
+      title: 'Sou da equipe de TI',
+      text: 'Atenda tickets, responda aos solicitantes e acompanhe métricas e relatórios.',
+      signIn: 'Entrar',
+      continue: 'Ir para o painel',
+    },
+    features: {
+      fast: {
+        title: 'Rápido',
+        text: 'Um formulário guiado de três passos, pensado para qualquer pessoa.',
+      },
+      tracking: {
+        title: 'Acompanhamento claro',
+        text: 'Veja o status e converse com a TI pelo seu link privado.',
+      },
+      private: {
+        title: 'Seus dados em casa',
+        text: 'O Resolvo roda nos servidores da sua empresa.',
+      },
+    },
+  },
   enums: {
     status: {
       OPEN: 'Aberto',

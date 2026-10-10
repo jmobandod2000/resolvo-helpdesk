@@ -22,6 +22,16 @@ onMounted(loadRememberedEmail);
 
 <template>
   <q-page class="row flex-center bg-brand-gradient q-pa-md">
+    <q-btn
+      flat
+      no-caps
+      dense
+      color="white"
+      icon="sym_r_arrow_back"
+      :label="t('landing.backToStart')"
+      :to="{ name: 'landing' }"
+      class="back-corner"
+    />
     <LanguageSelector dark class="language-corner" />
     <q-card class="login-card q-pa-md" flat>
       <q-card-section class="text-center">
@@ -89,6 +99,11 @@ onMounted(loadRememberedEmail);
   bottom: 12px;
   left: 0;
   right: 0;
+}
+.back-corner {
+  position: absolute;
+  top: 16px;
+  left: 16px;
 }
 .language-corner {
   position: absolute;

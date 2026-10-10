@@ -5,15 +5,17 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { isJwtExpired } from '../../helpers/jwt';
 import { AuthRoutes } from '../../interfaces/auth';
 
-const isAuthenticatedGuard: NavigationGuard = async () => {
+const isAuthenticatedGuard: NavigationGuard = async (to) => {
   const authStore = useAuthStore();
   const jwt = LocalStorage.getItem<string>('jwt');
 
-  if (!jwt || isJwtExpired(jwt)) return { name: AuthRoutes.LOGIN };
+  const fallback = { name: to.name === 'dashboard' ? 'landing' : AuthRoutes.LOGIN };
+
+  if (!jwt || isJwtExpired(jwt)) return fallback;
   if (authStore.user.id) return true;
 
   const isAuthenticated = await authStore.checkUserJwt();
-  return isAuthenticated ? true : { name: AuthRoutes.LOGIN };
+  return isAuthenticated ? true : fallback;
 };
 
 export default isAuthenticatedGuard;

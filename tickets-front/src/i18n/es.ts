@@ -793,6 +793,41 @@ export default {
       TICKET_ASSIGNED: '{actor} te asignó {code}',
     },
   },
+  landing: {
+    title: '¿Qué necesitas hoy?',
+    subtitle: 'Reporta un problema en un minuto o entra a gestionar los tickets del equipo de TI.',
+    backToStart: 'Inicio',
+    user: {
+      eyebrow: 'Para todo el personal',
+      title: 'Necesito ayuda',
+      text: 'Cuéntanos qué pasó y sigue tu solicitud sin usuario ni contraseña.',
+      report: 'Reportar un problema',
+      track: 'Ver mi solicitud',
+      mine: 'Ver mis solicitudes ({n})',
+      disabled: 'El portal de solicitudes no está activo. Comunícate con el equipo de TI.',
+    },
+    team: {
+      eyebrow: 'Equipo de TI',
+      title: 'Soy del equipo de TI',
+      text: 'Atiende tickets, responde a los solicitantes y revisa métricas y reportes.',
+      signIn: 'Iniciar sesión',
+      continue: 'Ir al panel',
+    },
+    features: {
+      fast: {
+        title: 'Rápido',
+        text: 'Un formulario guiado de tres pasos, pensado para cualquiera.',
+      },
+      tracking: {
+        title: 'Seguimiento claro',
+        text: 'Mira el estado y conversa con TI desde tu enlace privado.',
+      },
+      private: {
+        title: 'Tus datos, en casa',
+        text: 'Resolvo corre en los servidores de tu empresa.',
+      },
+    },
+  },
   enums: {
     status: {
       OPEN: 'Abierto',
