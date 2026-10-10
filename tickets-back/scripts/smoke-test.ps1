@@ -1,16 +1,23 @@
+param(
+  [string]$BaseUrl
+)
+
 $ErrorActionPreference = 'Stop'
 $envFile = Join-Path $PSScriptRoot '..\.env'
 $vars = @{}
 Get-Content $envFile | Where-Object { $_ -match '^\s*([A-Z_]+)=(.*)$' } | ForEach-Object {
   $vars[$Matches[1]] = $Matches[2].Trim('"')
 }
-$base = "http://localhost:$($vars['PORT'])/api"
+if (-not $BaseUrl) { $BaseUrl = "http://localhost:$($vars['PORT'])/api" }
+
+$script:failures = 0
+$script:checks = 0
 
 function Invoke-Api($method, $path, $body = $null, $token = $null) {
-  $headers = @{}
+  $headers = @{ 'x-lang' = 'es' }
   if ($token) { $headers['Authorization'] = "Bearer $token" }
-  $params = @{ Method = $method; Uri = "$base/$path"; Headers = $headers; ContentType = 'application/json' }
-  if ($body) { $params['Body'] = ($body | ConvertTo-Json -Depth 6) }
+  $params = @{ Method = $method; Uri = "$BaseUrl/$path"; Headers = $headers; ContentType = 'application/json; charset=utf-8' }
+  if ($null -ne $body) { $params['Body'] = [Text.Encoding]::UTF8.GetBytes(($body | ConvertTo-Json -Depth 6)) }
   try { Invoke-RestMethod @params }
   catch {
     $status = $_.Exception.Response.StatusCode.value__
@@ -18,60 +25,127 @@ function Invoke-Api($method, $path, $body = $null, $token = $null) {
   }
 }
 
+function Check($label, [bool]$condition, $detail = '') {
+  $script:checks++
+  if ($condition) { Write-Host "OK    $label $detail" -ForegroundColor Green }
+  else { $script:failures++; Write-Host "FALLA $label $detail" -ForegroundColor Red }
+}
+
+Write-Host "Prueba de humo contra $BaseUrl`n"
+
 $login = Invoke-Api 'POST' 'auth/login' @{ email = $vars['LOGIN_EMAIL']; password = $vars['LOGIN_PASSWORD'] }
 $token = $login.jwt
-"1. Login: usuario=$($login.name) rol=$($login.roles) token=$([bool]$token)"
+Check 'Login del administrador' ([bool]$token)
 
 $badLogin = Invoke-Api 'POST' 'auth/login' @{ email = $vars['LOGIN_EMAIL']; password = 'Incorrecta1' }
-"2. Login con clave errada: HTTP $($badLogin.error)"
+Check 'Login con clave errada rechazado' ($badLogin.error -eq 401) "HTTP $($badLogin.error)"
 
 $noAuth = Invoke-Api 'GET' 'tickets'
-"3. Tickets sin token: HTTP $($noAuth.error)"
+Check 'Tickets sin token rechazado' ($noAuth.error -eq 401) "HTTP $($noAuth.error)"
 
 $list = Invoke-Api 'GET' 'tickets?limit=5' $null $token
-"4. Listado: total=$($list.total) primeros=" + (($list.data | ForEach-Object { $_.code }) -join ', ')
+Check 'Listado de tickets' ($null -ne $list.total) "total=$($list.total)"
 
 $open = Invoke-Api 'GET' 'tickets?onlyOpen=true&limit=50' $null $token
-"5. Abiertos: $($open.total)"
+Check 'Filtro de abiertos' ($null -ne $open.total) "abiertos=$($open.total)"
 
-$search = Invoke-Api 'GET' 'tickets?search=000885' $null $token
-"6. Busqueda 000885: $($search.total) -> $($search.data[0].code)"
+$catalogs = Invoke-Api 'GET' 'drop-downs/catalogs' $null $token
+Check 'Catalogos' ($catalogs.statuses.Count -eq 7 -and $catalogs.priorities.Count -eq 4)
 
-$detail = Invoke-Api 'GET' 'tickets/TK-00007' $null $token
-"7. Detalle TK-00007: estado=$($detail.status) eventos=$($detail.Events.Count)"
+$sites = @(Invoke-Api 'GET' 'sites' $null $token | ForEach-Object { $_ })
+$categories = @(Invoke-Api 'GET' 'categories' $null $token | ForEach-Object { $_ })
+Check 'Sedes y categorias' ($null -eq $sites[0].error -and $null -eq $categories[0].error) "sedes=$($sites.Count) categorias=$($categories.Count)"
+$siteId = ($sites | Where-Object { $_.isActive } | Select-Object -First 1).id
+$categoryId = ($categories | Where-Object { $_.isActive } | Select-Object -First 1).id
 
-$new = Invoke-Api 'POST' 'tickets' @{
+$profile = Invoke-Api 'GET' 'organization/public'
+Check 'Perfil publico de la empresa' ($null -ne $profile.configured) "empresa=$($profile.name) portal=$($profile.portalEnabled)"
+
+$payload = @{
   title = 'Prueba de humo del sistema de tickets'
   description = 'Ticket creado por el script de prueba'
   requesterName = 'QA'
   productCodes = @('999999')
-} $token
-"8. Creado: $($new.code) estado=$($new.status)"
+}
+if ($siteId) { $payload['siteId'] = $siteId }
+if ($categoryId) { $payload['categoryId'] = $categoryId }
+$new = Invoke-Api 'POST' 'tickets' $payload $token
+Check 'Crear ticket' ($new.code -match '^TK-\d{5}$') "$($new.code) estado=$($new.status)"
+
+$invalid = Invoke-Api 'POST' 'tickets' @{ title = 'x'; description = 'y'; requesterName = 'QA'; extra = 1 } $token
+Check 'Validacion de datos' ($invalid.error -eq 400) "HTTP $($invalid.error)"
 
 $closeEarly = Invoke-Api 'PATCH' "tickets/$($new.id)/status" @{ status = 'CLOSED' } $token
-"9. Cerrar sin comentario ni causa: HTTP $($closeEarly.error)"
+Check 'Cerrar sin causa ni comentario rechazado' ($closeEarly.error -eq 400) "HTTP $($closeEarly.error)"
 
-$note = Invoke-Api 'POST' "tickets/$($new.id)/notes" @{ note = 'Revisando en base de datos' } $token
-"10. Nota agregada: tipo=$($note.type)"
+$internal = Invoke-Api 'POST' "tickets/$($new.id)/notes" @{ note = 'Nota interna de la prueba' } $token
+Check 'Nota interna' ($internal.type -eq 'NOTE' -and -not $internal.isPublic)
+
+$public = Invoke-Api 'POST' "tickets/$($new.id)/notes" @{ note = 'Respuesta publica de la prueba'; isPublic = $true } $token
+Check 'Nota publica' ($public.isPublic -eq $true)
+
+$link = Invoke-Api 'POST' "tickets/$($new.id)/public-link" @{} $token
+$link2 = Invoke-Api 'POST' "tickets/$($new.id)/public-link" @{} $token
+Check 'Enlace de seguimiento estable' ($link.token.Length -eq 43 -and $link.token -eq $link2.token)
 
 $resolved = Invoke-Api 'PATCH' "tickets/$($new.id)/status" @{ status = 'RESOLVED'; note = 'Diagnostico listo' } $token
-"11. Resuelto: resolvedAt=$([bool]$resolved.resolvedAt)"
+Check 'Resolver' ([bool]$resolved.resolvedAt)
 
 $closed = Invoke-Api 'PATCH' "tickets/$($new.id)/status" @{ status = 'CLOSED'; rootCause = 'NO_ISSUE'; closureComment = 'Prueba cerrada' } $token
-"12. Cerrado: estado=$($closed.status) closedAt=$([bool]$closed.closedAt)"
+Check 'Cerrar con causa y comentario' ($closed.status -eq 'CLOSED' -and [bool]$closed.closedAt)
 
 $reopened = Invoke-Api 'PATCH' "tickets/$($new.id)/status" @{ status = 'IN_ANALYSIS'; note = 'Reapertura de prueba' } $token
-"13. Reabierto: estado=$($reopened.status) resolvedAt=$($reopened.resolvedAt) closedAt=$($reopened.closedAt)"
+Check 'Reabrir limpia fechas' ($reopened.status -eq 'IN_ANALYSIS' -and -not $reopened.resolvedAt -and -not $reopened.closedAt)
+
+$detail = Invoke-Api 'GET' "tickets/$($new.code)" $null $token
+Check 'Detalle por codigo con historial' ($detail.Events.Count -ge 6) "eventos=$($detail.Events.Count)"
 
 $deleted = Invoke-Api 'DELETE' "tickets/$($new.id)" $null $token
-"14. Borrado logico: isDeleted=$($deleted.isDeleted)"
+Check 'Borrado logico' ($deleted.isDeleted -eq $true)
 
 $metrics = Invoke-Api 'GET' 'metrics/summary' $null $token
-"15. Metricas: total=$($metrics.totals.total) abiertos=$($metrics.totals.open) resueltos=$($metrics.totals.resolved) tasa=$($metrics.totals.resolutionRate)% escalados=$($metrics.totals.escalatedToDev)"
-"    Tiempos: 1ra respuesta=$($metrics.times.avgFirstResponseHours)h resolucion=$($metrics.times.avgResolutionHours)h mediana=$($metrics.times.medianResolutionHours)h"
-"    Por sede: " + (($metrics.bySite | ForEach-Object { "$($_.label)=$($_.count)" }) -join ', ')
-"    Antiguedad backlog: " + (($metrics.backlogAging | ForEach-Object { "$($_.label)=$($_.count)" }) -join ', ')
-"    Semanas: $($metrics.weeklyTrend.Count), top producto: $($metrics.topProducts[0].productCode)"
+Check 'Metricas' ($null -ne $metrics.totals.total) "total=$($metrics.totals.total) tasa=$($metrics.totals.resolutionRate)%"
 
-$catalogs = Invoke-Api 'GET' 'drop-downs/catalogs' $null $token
-"16. Catalogos: estados=$($catalogs.statuses.Count) prioridades=$($catalogs.priorities.Count)"
+$from = (Get-Date).AddDays(-90).ToString('yyyy-MM-dd')
+$to = (Get-Date).ToString('yyyy-MM-dd')
+$report = Invoke-Api 'GET' "reports?from=$from&to=$to&groupBy=month&timeZone=UTC" $null $token
+Check 'Reporte del periodo' ($null -ne $report.totals.received) "recibidos=$($report.totals.received) periodos=$($report.periods.Count)"
+
+$notifications = Invoke-Api 'GET' 'notifications' $null $token
+Check 'Notificaciones' ($null -ne $notifications.unread) "sin leer=$($notifications.unread)"
+
+$portal = Invoke-Api 'GET' 'portal/config'
+Check 'Configuracion del portal' ($null -ne $portal.enabled) "activo=$($portal.enabled)"
+
+if ($portal.enabled) {
+  $before = $notifications.unread
+  $created = Invoke-Api 'POST' 'portal/tickets' @{
+    title = 'Prueba de humo del portal'
+    description = 'Solicitud creada por el script de prueba'
+    requesterName = 'QA Portal'
+    elapsedMs = 9000
+  }
+  Check 'Solicitud desde el portal' ($created.token.Length -eq 43) "$($created.code)"
+
+  $bot = Invoke-Api 'POST' 'portal/tickets' @{ title = 'Bot'; description = 'Solicitud de un bot'; requesterName = 'Bot'; elapsedMs = 9000; website = 'spam' }
+  Check 'Campo trampa rechaza bots' ($bot.error -eq 400 -or $bot.error -eq 429) "HTTP $($bot.error)"
+
+  $portalTicket = Invoke-Api 'GET' "tickets/$($created.code)" $null $token
+  $null = Invoke-Api 'POST' "tickets/$($portalTicket.id)/notes" @{ note = 'Nota interna secreta' } $token
+  $null = Invoke-Api 'POST' "tickets/$($portalTicket.id)/notes" @{ note = 'Pregunta para el solicitante'; isPublic = $true } $token
+  $null = Invoke-Api 'PATCH' "tickets/$($portalTicket.id)/status" @{ status = 'WAITING_INFO' } $token
+  $view = Invoke-Api 'GET' "portal/tickets/$($created.token)"
+  $leaked = @($view.events | Where-Object { $_.message -eq 'Nota interna secreta' }).Count
+  Check 'El portal oculta notas internas' ($leaked -eq 0 -and @($view.events | Where-Object { $_.message -eq 'Pregunta para el solicitante' }).Count -eq 1)
+
+  $reply = Invoke-Api 'POST' "portal/tickets/$($created.token)/replies" @{ message = 'Respuesta del solicitante' }
+  Check 'Respuesta del solicitante reabre el analisis' ($reply.status -eq 'IN_ANALYSIS')
+
+  $after = (Invoke-Api 'GET' 'notifications' $null $token).unread
+  Check 'Notificaciones del portal' ($after -ge $before + 1) "antes=$before despues=$after"
+
+  $null = Invoke-Api 'DELETE' "tickets/$($portalTicket.id)" $null $token
+}
+
+Write-Host "`n$($script:checks - $script:failures) de $($script:checks) comprobaciones OK"
+if ($script:failures -gt 0) { exit 1 }
