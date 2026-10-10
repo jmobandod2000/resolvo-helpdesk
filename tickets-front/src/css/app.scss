@@ -5,7 +5,15 @@ body {
 .page-title {
   font-size: 1.35rem;
   font-weight: 600;
-  color: $primary;
+  color: $brand-navy;
+}
+
+.bg-brand {
+  background: $brand-navy;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(135deg, $brand-navy 0%, $brand-navy-light 55%, $primary 100%);
 }
 
 .section-title {

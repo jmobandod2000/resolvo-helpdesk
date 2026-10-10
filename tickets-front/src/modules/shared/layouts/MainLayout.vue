@@ -55,7 +55,7 @@ const visibleLinks = computed(() => links.filter((link) => !link.adminOnly || is
 
 <template>
   <q-layout view="hHh Lpr lFf">
-    <q-header elevated class="bg-primary">
+    <q-header elevated class="bg-brand">
       <q-toolbar>
         <q-btn flat dense round icon="sym_r_menu" @click="isDrawerOpen = !isDrawerOpen" />
         <q-toolbar-title class="text-weight-medium row items-center no-wrap">

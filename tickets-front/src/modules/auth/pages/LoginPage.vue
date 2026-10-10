@@ -21,7 +21,7 @@ onMounted(loadRememberedEmail);
 </script>
 
 <template>
-  <q-page class="row flex-center bg-primary q-pa-md">
+  <q-page class="row flex-center bg-brand-gradient q-pa-md">
     <LanguageSelector dark class="language-corner" />
     <q-card class="login-card q-pa-md" flat>
       <q-card-section class="text-center">

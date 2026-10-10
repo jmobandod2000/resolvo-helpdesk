@@ -3,6 +3,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 
+import resolvoIcon from 'src/assets/brand/resolvo-icon.png';
 import SupportCard from 'src/modules/shared/components/SupportCard.vue';
 import { APP_INFO } from 'src/modules/shared/config/app';
 import { SUPPORT_METHODS } from 'src/modules/shared/config/support';
@@ -46,7 +47,7 @@ watch(() => route.query.section, scrollToSection);
       <q-card flat bordered>
         <q-card-section class="row items-center q-col-gutter-md">
           <div class="col-auto">
-            <q-avatar size="64px" color="primary" text-color="white" icon="sym_r_confirmation_number" />
+            <img :src="resolvoIcon" :alt="t('app.name')" style="width: 72px; height: 72px" />
           </div>
           <div class="col">
             <div class="row items-center q-gutter-sm">
