@@ -22,11 +22,11 @@
   <a href="#apoya-el-proyecto">Apoyar</a>
 </p>
 
-**Resolvo** es un *help desk* y sistema de tickets para equipos de TI de pequeñas y medianas empresas: solicitudes con historial completo, flujo de estados, sedes y categorías configurables, métricas, reportes en Excel y un asistente de configuración inicial. Es una alternativa ligera a herramientas como osTicket, GLPI o Zendesk que se instala en tu propio servidor en minutos; tus datos no salen de tu red.
+**Resolvo** es un *help desk* y sistema de tickets para equipos de TI de pequeñas y medianas empresas: solicitudes con historial completo, flujo de estados, sedes y categorías configurables, métricas, reportes en Excel, un portal de solicitudes sin login, notificaciones, un asistente de configuración inicial e integración con IA (Claude, Gemini, Codex) mediante MCP. Es una alternativa ligera a herramientas como osTicket, GLPI o Zendesk que se instala en tu propio servidor en minutos; tus datos no salen de tu red.
 
 Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo encuentran.
 
-> 🇺🇸 **English:** Resolvo is an open-source, self-hosted IT help desk and ticketing system for small and mid-sized teams (NestJS + PostgreSQL + Vue/Quasar). It covers ticket tracking, configurable sites and categories, metrics, Excel reports and a setup wizard, in English, Spanish and Portuguese. A lightweight alternative to osTicket, GLPI or Zendesk. The setup commands below are the same in any language.
+> 🇺🇸 **English:** Resolvo is an open-source, self-hosted IT help desk and ticketing system for small and mid-sized teams (NestJS + PostgreSQL + Vue/Quasar). It covers ticket tracking, a no-login requester portal, notifications, configurable sites and categories, metrics, Excel reports, a setup wizard and an MCP server so AI assistants (Claude, Gemini, Codex, Copilot) can work tickets, in English, Spanish and Portuguese. A lightweight alternative to osTicket, GLPI or Zendesk. The setup commands below are the same in any language.
 >
 > 🇧🇷 **Português:** Resolvo é uma central de ajuda (help desk) de TI de código aberto e auto-hospedada, com controle de tickets, unidades e categorias configuráveis, métricas, relatórios em Excel e assistente de configuração, em português, espanhol e inglês. Os comandos de instalação abaixo valem para qualquer idioma.
 
@@ -41,6 +41,7 @@ Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo
 - [Respaldos](#respaldos)
 - [Actualizar a una nueva versión](#actualizar-a-una-nueva-versión)
 - [Solución de problemas](#solución-de-problemas)
+- [Usa tu IA con Resolvo](#usa-tu-ia-con-resolvo)
 - [API](#api)
 - [Contribuir](#contribuir)
 - [Licencia](#licencia)
@@ -56,6 +57,10 @@ Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo
 - **Reportes:** resumen por mes o por semana y vista por responsable (tickets resueltos y acciones registradas). Desglose por sede, categoría, prioridad, causa raíz y solicitante. Pendientes con días sin movimiento, detalle completo y descarga a Excel con todas las hojas.
 - **Usuarios y roles:** administradores y analistas.
 - **Idiomas:** español, inglés y portugués, tanto en la interfaz como en los mensajes del API.
+- **Portal de solicitudes sin login:** cualquier persona de la empresa reporta un problema en 3 pasos guiados y sigue su caso con un enlace privado: ve el estado, lee las respuestas y contesta. Protegido con límite de envíos, filtro contra bots y detección de duplicados.
+- **Notas internas y públicas:** el equipo decide qué ve el solicitante. Enlace de seguimiento para cualquier ticket, también para compartir por WhatsApp.
+- **Notificaciones:** campanita con contador, sonido y avisos del sistema para el equipo de TI (tickets nuevos del portal, respuestas, asignaciones), y avisos al solicitante cuando TI le responde.
+- **Integración con IA:** servidor MCP incluido para que Claude, Gemini, Codex, Copilot o Cursor busquen, atiendan y reporten tickets. Ver [Usa tu IA con Resolvo](#usa-tu-ia-con-resolvo).
 - **Guía de uso:** tutorial integrado y bienvenida para usuarios nuevos.
 
 ## Tecnología
@@ -250,6 +255,17 @@ Haz un respaldo antes de actualizar. Las notas de cada versión están en [Relea
 | Los reportes muestran fechas corridas un día | El servidor y los usuarios están en zonas horarias distintas. Los reportes usan la zona horaria del navegador; revisa la del equipo del usuario. |
 | `EADDRINUSE: 3010` | Otro proceso usa el puerto; cambia `PORT` o detén el proceso. |
 
+## Usa tu IA con Resolvo
+
+Resolvo trae un servidor **MCP** ([`resolvo-mcp`](resolvo-mcp)) para que el asistente de IA de tu equipo trabaje los tickets como un analista más: buscar, leer el historial, clasificar, redactar respuestas, cambiar estados y sacar reportes. Funciona con **Claude** (Code y Desktop), **Gemini CLI**, **Codex CLI**, **GitHub Copilot**, **Cursor** y cualquier cliente MCP.
+
+```bash
+cd resolvo-mcp && pnpm install && pnpm build
+claude mcp add resolvo -e RESOLVO_API_URL=https://tickets.tuempresa.com/api -e RESOLVO_EMAIL=ia@tuempresa.com -e RESOLVO_PASSWORD=... -- node /ruta/resolvo-mcp/dist/index.js
+```
+
+La [guía de integración con IA](docs/ai/README.md) explica la configuración para cada herramienta, la seguridad y la privacidad, y trae un [archivo de contexto](docs/ai/CONTEXTO_IA.md) para que tu IA conozca las reglas de trabajo de Resolvo.
+
 ## API
 
 Documentación interactiva completa en `/docs` (Swagger). Endpoints principales:
@@ -271,6 +287,12 @@ Documentación interactiva completa en `/docs` (Swagger). Endpoints principales:
 | GET/PUT | `/api/organization` | Datos de la empresa (editar: administrador) |
 | GET/POST/PATCH/DELETE | `/api/sites` | Sedes o sucursales (editar: administrador) |
 | GET/POST/PATCH/DELETE | `/api/categories` | Categorías de los tickets (editar: administrador) |
+| PATCH | `/api/organization/portal` | Activar el portal y su mensaje (administrador) |
+| POST | `/api/tickets/:id/public-link` | Enlace de seguimiento del ticket |
+| GET/PATCH | `/api/notifications` | Notificaciones del usuario (`/:id/read`, `/read-all`) |
+| GET | `/api/portal/config` | Configuración pública del portal (sin sesión) |
+| POST | `/api/portal/tickets` | Crear una solicitud desde el portal (sin sesión, con límite) |
+| GET/POST | `/api/portal/tickets/:token` | Seguimiento y respuestas del solicitante (sin sesión) |
 | GET/POST/PATCH/DELETE | `/api/users` | Usuarios |
 
 El API responde en el idioma indicado en el encabezado `x-lang` (`es`, `en-US`, `pt-BR`) o, en su defecto, en el de `Accept-Language`.

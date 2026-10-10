@@ -1,0 +1,27 @@
+{
+  "name": "resolvo-mcp",
+  "version": "1.0.0",
+  "description": "Servidor MCP de Resolvo: conecta Claude, Gemini, Codex u otra IA con tu mesa de ayuda",
+  "author": "Juan M. Obando",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "resolvo-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.1",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.10",
+    "typescript": "5.7.3"
+  }
+}
