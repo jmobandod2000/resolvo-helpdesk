@@ -332,6 +332,16 @@ export default {
     about: 'Acerca de',
     support: 'Apoyar el proyecto',
   },
+  updates: {
+    available: 'Nueva versión {version} disponible',
+    current: 'tienes la {version}',
+    whatsNew: 'Ver novedades',
+    how: 'Cómo actualizar',
+    howTo: 'En el servidor donde está instalado Resolvo, dentro de su carpeta, ejecuta:',
+    safe: 'Hace un respaldo de la base antes de actualizar y conserva todos los datos.',
+    dismiss: 'Ocultar',
+    upToDate: 'Al día',
+  },
   about: {
     description:
       'Sistema para registrar, dar seguimiento y medir los tickets de soporte del equipo de TI.',

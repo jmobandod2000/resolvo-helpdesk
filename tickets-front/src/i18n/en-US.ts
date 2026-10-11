@@ -333,6 +333,16 @@ const messages: MessageSchema = {
     about: 'About',
     support: 'Support the project',
   },
+  updates: {
+    available: 'New version {version} available',
+    current: 'you have {version}',
+    whatsNew: "What's new",
+    how: 'How to update',
+    howTo: 'On the server where Resolvo is installed, inside its folder, run:',
+    safe: 'It backs up the database before updating and keeps all data.',
+    dismiss: 'Hide',
+    upToDate: 'Up to date',
+  },
   about: {
     description: 'A system to log, track and measure the IT team’s support tickets.',
     viewSource: 'Source code',

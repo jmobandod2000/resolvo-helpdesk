@@ -7,10 +7,14 @@ import resolvoIcon from 'src/assets/brand/resolvo-icon.png';
 import SupportCard from 'src/modules/shared/components/SupportCard.vue';
 import { APP_INFO } from 'src/modules/shared/config/app';
 import { SUPPORT_METHODS } from 'src/modules/shared/config/support';
+import useAuth from 'src/modules/auth/composables/useAuth';
+import useUpdateStatus from 'src/modules/system/composables/useUpdateStatus';
 
 const { t } = useI18n();
 const route = useRoute();
 const supportSection = ref<HTMLElement | null>(null);
+const { isAdmin } = useAuth();
+const { status: updateStatus, hasUpdate } = useUpdateStatus();
 
 const details = computed(() => [
   { icon: 'sym_r_tag', label: t('about.version'), value: `v${APP_INFO.version}` },
@@ -34,7 +38,10 @@ const details = computed(() => [
 const scrollToSection = async () => {
   if (route.query.section !== 'support') return;
   await nextTick();
-  setTimeout(() => supportSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+  setTimeout(
+    () => supportSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    200,
+  );
 };
 
 onMounted(scrollToSection);
@@ -53,6 +60,22 @@ watch(() => route.query.section, scrollToSection);
             <div class="row items-center q-gutter-sm">
               <div class="text-h6 text-weight-medium">{{ t('app.name') }}</div>
               <q-badge outline color="primary">v{{ APP_INFO.version }}</q-badge>
+              <template v-if="isAdmin && updateStatus?.enabled && updateStatus.checkedAt">
+                <a
+                  v-if="hasUpdate && updateStatus.url"
+                  :href="updateStatus.url"
+                  target="_blank"
+                  rel="noopener"
+                  class="text-no-decoration"
+                >
+                  <q-badge color="orange-9">
+                    {{ t('updates.available', { version: updateStatus.latest }) }}
+                  </q-badge>
+                </a>
+                <q-badge v-else-if="!hasUpdate && updateStatus.latest" color="positive">{{
+                  t('updates.upToDate')
+                }}</q-badge>
+              </template>
             </div>
             <div class="text-body2 text-grey-8">{{ t('about.description') }}</div>
           </div>

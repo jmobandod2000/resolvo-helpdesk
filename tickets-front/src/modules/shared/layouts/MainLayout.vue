@@ -7,6 +7,7 @@ import { usePublicProfile } from 'src/modules/organization/composables/useOrgani
 import { OrganizationRoutes } from 'src/modules/organization/interfaces/organization';
 import WelcomeDialog from 'src/modules/guide/components/WelcomeDialog.vue';
 import NotificationBell from 'src/modules/notifications/components/NotificationBell.vue';
+import UpdateBanner from 'src/modules/system/components/UpdateBanner.vue';
 import LanguageSelector from '../components/LanguageSelector.vue';
 import AppFooterLinks from '../components/AppFooterLinks.vue';
 import resolvoIcon from 'src/assets/brand/resolvo-icon.png';
@@ -103,6 +104,7 @@ const visibleLinks = computed(() => links.filter((link) => !link.adminOnly || is
         <template #avatar><q-icon name="sym_r_info" /></template>
         {{ t('setup.pendingForUsers') }}
       </q-banner>
+      <UpdateBanner v-if="isAdmin" />
       <router-view />
     </q-page-container>
 

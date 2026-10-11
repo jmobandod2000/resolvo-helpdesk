@@ -334,6 +334,16 @@ const messages: MessageSchema = {
     about: 'Sobre',
     support: 'Apoiar o projeto',
   },
+  updates: {
+    available: 'Nova versão {version} disponível',
+    current: 'você tem a {version}',
+    whatsNew: 'Ver novidades',
+    how: 'Como atualizar',
+    howTo: 'No servidor onde o Resolvo está instalado, dentro da pasta dele, execute:',
+    safe: 'Faz um backup do banco antes de atualizar e mantém todos os dados.',
+    dismiss: 'Ocultar',
+    upToDate: 'Atualizado',
+  },
   about: {
     description: 'Sistema para registrar, acompanhar e medir os tickets de suporte da equipe de TI.',
     viewSource: 'Código-fonte',
