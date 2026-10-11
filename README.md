@@ -9,24 +9,24 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" /></a>
-  <img alt="Node 20+" src="https://img.shields.io/badge/node-%3E%3D20-339933" />
+  <img alt="Docker" src="https://img.shields.io/badge/deploy-docker%20compose-2496ED" />
   <img alt="PostgreSQL 17" src="https://img.shields.io/badge/PostgreSQL-17-336791" />
   <img alt="i18n" src="https://img.shields.io/badge/i18n-es%20%7C%20en--US%20%7C%20pt--BR-informational" />
   <a href="https://github.com/jmobandod2000/resolvo-helpdesk/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/jmobandod2000/resolvo-helpdesk?style=social" /></a>
 </p>
 
 <p align="center">
-  <a href="#instalación-para-desarrollo">Instalar</a> ·
-  <a href="#despliegue-en-producción">Desplegar</a> ·
+  <a href="#instalación-rápida">Instalar</a> ·
+  <a href="#desarrollo">Desarrollar</a> ·
   <a href="#funcionalidades">Funcionalidades</a> ·
   <a href="#apoya-el-proyecto">Apoyar</a>
 </p>
 
-**Resolvo** es un *help desk* y sistema de tickets para equipos de TI de pequeñas y medianas empresas: solicitudes con historial completo, flujo de estados, sedes y categorías configurables, métricas, reportes en Excel, un portal de solicitudes sin login, notificaciones, un asistente de configuración inicial e integración con IA (Claude, Gemini, Codex) mediante MCP. Es una alternativa ligera a herramientas como osTicket, GLPI o Zendesk que se instala en tu propio servidor en minutos; tus datos no salen de tu red.
+**Resolvo** es un *help desk* y sistema de tickets para equipos de TI de pequeñas y medianas empresas: solicitudes con historial completo, flujo de estados, sedes y categorías configurables, métricas, reportes en Excel, un portal de solicitudes sin login, notificaciones, un asistente de configuración inicial e integración con IA (Claude, Gemini, Codex) mediante MCP. Es una alternativa ligera a herramientas como osTicket, GLPI o Zendesk que se instala en tu propio servidor con un solo comando; tus datos no salen de tu red.
 
 Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo encuentran.
 
-> 🇺🇸 **English:** Resolvo is an open-source, self-hosted IT help desk and ticketing system for small and mid-sized teams (NestJS + PostgreSQL + Vue/Quasar). It covers ticket tracking, a no-login requester portal, notifications, configurable sites and categories, metrics, Excel reports, a setup wizard and an MCP server so AI assistants (Claude, Gemini, Codex, Copilot) can work tickets, in English, Spanish and Portuguese. A lightweight alternative to osTicket, GLPI or Zendesk. The setup commands below are the same in any language.
+> 🇺🇸 **English:** Resolvo is an open-source, self-hosted IT help desk and ticketing system for small and mid-sized teams (NestJS + PostgreSQL + Vue/Quasar). It covers ticket tracking, a no-login requester portal, notifications, configurable sites and categories, metrics, Excel reports, a setup wizard and an MCP server so AI assistants (Claude, Gemini, Codex, Copilot) can work tickets, in English, Spanish and Portuguese. A lightweight alternative to osTicket, GLPI or Zendesk. Install with one command, `./resolvo install` (Docker is the only requirement). The commands below are the same in any language.
 >
 > 🇧🇷 **Português:** Resolvo é uma central de ajuda (help desk) de TI de código aberto e auto-hospedada, com controle de tickets, unidades e categorias configuráveis, métricas, relatórios em Excel e assistente de configuração, em português, espanhol e inglês. Os comandos de instalação abaixo valem para qualquer idioma.
 
@@ -34,12 +34,10 @@ Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo
 
 - [Funcionalidades](#funcionalidades)
 - [Tecnología](#tecnología)
-- [Requisitos](#requisitos)
-- [Instalación para desarrollo](#instalación-para-desarrollo)
-- [Variables de entorno](#variables-de-entorno)
-- [Despliegue en producción](#despliegue-en-producción)
+- [Instalación rápida](#instalación-rápida)
 - [Respaldos](#respaldos)
 - [Actualizar a una nueva versión](#actualizar-a-una-nueva-versión)
+- [Desarrollo](#desarrollo)
 - [Solución de problemas](#solución-de-problemas)
 - [Usa tu IA con Resolvo](#usa-tu-ia-con-resolvo)
 - [API](#api)
@@ -72,188 +70,183 @@ Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo
 
 La base de datos oficial es **PostgreSQL**: viene lista en `docker-compose.yml` y el esquema usa funciones propias de PostgreSQL. No se soportan otros motores.
 
-## Requisitos
+## Instalación rápida
 
-- [Node.js](https://nodejs.org) 20 o superior
-- [pnpm](https://pnpm.io) 10 (`npm install -g pnpm`)
-- [Docker](https://www.docker.com) con Docker Compose, para PostgreSQL. También sirve un PostgreSQL 15+ ya instalado; en ese caso ajusta `DATABASE_URL`.
-- Git
-
-## Instalación para desarrollo
+Solo necesitas **[Docker](https://docs.docker.com/get-docker/)**: Docker Desktop en Windows o macOS, o Docker Engine en Linux. Resolvo trae su propia base PostgreSQL, aplica las migraciones y crea el administrador automáticamente.
 
 ```bash
 git clone https://github.com/jmobandod2000/resolvo-helpdesk.git
 cd resolvo-helpdesk
+./resolvo install        # Linux / macOS
+resolvo install          # Windows (en PowerShell: .\resolvo install)
 ```
 
-### Backend
+El asistente pregunta en la terminal lo esencial: puerto, dirección de la app, zona horaria, administrador inicial y, si quieres, el correo para avisar a los solicitantes. Genera las contraseñas internas, guarda todo en `.env`, descarga la imagen y deja Resolvo funcionando:
 
-```bash
-cd tickets-back
-pnpm install
-cp .env.example .env        # edita las contraseñas y el JWT_SECRET
-docker compose up -d        # levanta PostgreSQL
-npx prisma migrate dev      # crea las tablas
-pnpm db:seed                # crea el usuario administrador
-pnpm start:dev
+```
+✔ Resolvo está listo
+
+  Abre  http://servidor:8080
+  Entra con admin@tuempresa.com
 ```
 
-- API: `http://localhost:3010/api`
-- Documentación Swagger: `http://localhost:3010/docs`
-- El seed crea el administrador definido en `LOGIN_EMAIL` / `LOGIN_PASSWORD`. Con `SEED_EXAMPLE_TICKETS=true` carga además dos sedes y tickets ficticios para explorar la app (solo si la tabla está vacía).
+Al entrar por primera vez, el **asistente de configuración** de la app pide los datos de la empresa, sus sedes y las categorías de los tickets. Después crea a los analistas en **Usuarios**.
 
-### Frontend
+> Si el equipo no tiene Node.js, `resolvo` ejecuta el asistente dentro de un contenedor: Docker sigue siendo el único requisito.
 
-```bash
-cd tickets-front
-pnpm install
-cp .env.example .env
-pnpm dev
-```
+### Comandos
 
-- App: `http://localhost:9010`
-- Inicia sesión con el administrador del seed. La primera vez se abre el **asistente de configuración inicial**: registra el nombre de tu empresa, sus sedes y las categorías de los tickets. Después crea a los analistas en **Usuarios**.
-
-## Variables de entorno
-
-### `tickets-back/.env`
-
-| Variable | Descripción |
+| Comando | Qué hace |
 |---|---|
-| `APP_MODE` | `dev` o `prod` |
-| `HOST`, `PORT` | URL pública del API y puerto en el que escucha (por defecto `3010`) |
-| `JWT_SECRET` | Secreto para firmar las sesiones. Mínimo 16 caracteres; usa uno largo y aleatorio. |
-| `JWT_EXPIRES_IN` | Duración de la sesión (por ejemplo `12h`) |
-| `LOGIN_NAME`, `LOGIN_EMAIL`, `LOGIN_PASSWORD` | Administrador inicial que crea el seed |
-| `SEED_EXAMPLE_TICKETS` | `true` para cargar tickets de ejemplo; `false` en producción |
-| `DATABASE_URL` | Cadena de conexión de Prisma a PostgreSQL |
-| `DB_PS_*` | Base, usuario, contraseña, puertos y carpeta de datos del contenedor PostgreSQL |
+| `resolvo install` | Asistente inicial: crea `.env` y levanta Resolvo |
+| `resolvo config` | Cambia puerto, administrador o correo y reinicia |
+| `resolvo start` / `stop` / `restart` | Inicia, detiene o reinicia. Al detener, los datos se conservan. |
+| `resolvo status` | Estado de los servicios y de la app |
+| `resolvo logs` | Registros en vivo |
+| `resolvo backup` | Respaldo de la base en `./backups` |
+| `resolvo restore <archivo>` | Restaura un respaldo (pide confirmación) |
+| `resolvo update` | Respaldo, última versión y reinicio, sin perder datos |
+| `resolvo dev` | Modo desarrollo: API y web locales con recarga automática |
 
-El API valida estas variables al arrancar y se detiene con un mensaje claro si falta alguna.
+Resolvo se inicia solo cuando arranca el servidor (`restart: unless-stopped`).
 
-### `tickets-front/.env`
-
-| Variable | Descripción |
-|---|---|
-| `BASE_URL` | URL del API en desarrollo (`pnpm dev`) |
-| `BASE_URL_PROD` | URL del API en el build de producción. Si publicas front y API en el mismo dominio con el proxy de abajo, usa `/api`. |
-
-Las variables del front se incrustan al compilar: si cambias `BASE_URL_PROD`, vuelve a ejecutar `pnpm build`.
-
-## Despliegue en producción
-
-Esquema recomendado: PostgreSQL en Docker, el API con PM2 y el front como archivos estáticos detrás de Nginx, que además hace de proxy hacia el API. Todo en un mismo servidor (Linux o Windows).
+### Qué queda instalado
 
 ```
-Navegador ──HTTPS──▶ Nginx ──┬── /        → tickets-front/dist/spa (archivos estáticos)
-                             └── /api/    → http://127.0.0.1:3010 (NestJS + PM2) ──▶ PostgreSQL (Docker, 127.0.0.1:5437)
+Navegador ──▶ :8080  app (API + web, una sola imagen) ──▶ db (PostgreSQL 17, red interna de Docker)
 ```
 
-### 1. Base de datos
+- **Una sola imagen** con la API y la web compiladas, sin dependencias de desarrollo. Al iniciar aplica las migraciones pendientes (`prisma migrate deploy`) y, si la base está vacía, crea el administrador de `LOGIN_*`.
+- **PostgreSQL** no se publica fuera de Docker; los datos viven en el volumen `resolvo_db-data`.
+- La imagen se publica en `ghcr.io/jmobandod2000/resolvo-helpdesk`. Si prefieres compilarla en tu servidor, responde *no* a "¿Descargar la imagen lista?" o usa `docker compose build`.
+
+### Sin el asistente
 
 ```bash
-cd tickets-back
-cp .env.example .env    # APP_MODE=prod, SEED_EXAMPLE_TICKETS=false y contraseñas propias
+cp .env.example .env     # cambia contraseñas, JWT_SECRET y administrador
 docker compose up -d
 ```
 
-El contenedor publica PostgreSQL solo en `127.0.0.1`, así que no queda expuesto a la red. Los datos se guardan en la carpeta de `DB_PS_DOCKER_VOLUME`.
+| Variable (`.env` de la raíz) | Descripción |
+|---|---|
+| `RESOLVO_PORT` | Puerto web (por defecto `8080`) |
+| `RESOLVO_BIND` | `0.0.0.0` para toda la red; `127.0.0.1` si pones un proxy con HTTPS delante |
+| `RESOLVO_VERSION` | `latest` o una versión fija, por ejemplo `1.0.0` |
+| `APP_URL` | Dirección pública; se usa en los enlaces de los correos |
+| `TZ` | Zona horaria, por ejemplo `America/Caracas` |
+| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Base PostgreSQL interna |
+| `JWT_SECRET`, `JWT_EXPIRES_IN` | Firma y duración de las sesiones |
+| `LOGIN_NAME`, `LOGIN_EMAIL`, `LOGIN_PASSWORD` | Administrador inicial (solo se usa con la base vacía) |
+| `SMTP_*`, `MAIL_FROM` | Correo opcional para avisar al solicitante del portal |
 
-### 2. API
+### HTTPS
 
-```bash
-cd tickets-back
-pnpm install --frozen-lockfile
-pnpm build
-npx prisma migrate deploy   # aplica las migraciones sin borrar datos
-pnpm db:seed                # solo la primera vez: crea el administrador
-npm install -g pm2
-pm2 start dist/main.js --name tickets-api
-pm2 save
-```
-
-- **Linux:** `pm2 startup` deja el API iniciando con el sistema.
-- **Windows:** `pm2 startup` no está disponible. Registra el API como servicio con [NSSM](https://nssm.cc) (`nssm install tickets-api "C:\Program Files\nodejs\node.exe" dist\main.js`, con la carpeta `tickets-back` como directorio de inicio) o con [pm2-installer](https://github.com/jessety/pm2-installer).
-
-### 3. Frontend
-
-```bash
-cd tickets-front
-pnpm install --frozen-lockfile
-# en .env: BASE_URL_PROD=/api
-pnpm build
-```
-
-El resultado queda en `tickets-front/dist/spa`. Cópialo a la carpeta que servirá Nginx, por ejemplo `/var/www/tickets`. La app usa rutas con `#`, así que no necesita reglas especiales de reescritura.
-
-Al entrar por primera vez con el administrador, la app abre el asistente de configuración inicial para registrar la empresa, sus sedes y las categorías.
-
-### 4. Nginx
+Para publicar con certificado, pon `RESOLVO_BIND=127.0.0.1` y un proxy delante. Con Nginx:
 
 ```nginx
 server {
-    listen 80;
+    listen 443 ssl;
     server_name tickets.tuempresa.com;
-
-    root /var/www/tickets;
-    index index.html;
+    # ssl_certificate ... (certificado de tu empresa o Certbot)
 
     location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location /api/ {
-        proxy_pass http://127.0.0.1:3010;
+        proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
-Activa HTTPS con el certificado de tu empresa o con [Certbot](https://certbot.eff.org) (`certbot --nginx -d tickets.tuempresa.com`). En Windows puedes usar Nginx para Windows o IIS con *URL Rewrite* y *Application Request Routing* siguiendo el mismo esquema.
+Caddy lo hace con certificado automático: `tickets.tuempresa.com { reverse_proxy 127.0.0.1:8080 }`.
 
 ### Lista de seguridad
 
-- [ ] `JWT_SECRET` largo y aleatorio, por ejemplo con `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`.
-- [ ] Contraseñas propias para PostgreSQL y para el administrador inicial. Cambia la del administrador desde la app después del primer ingreso.
-- [ ] `.env` fuera del control de versiones (ya está en `.gitignore`) y con permisos solo para el usuario del servicio.
-- [ ] HTTPS habilitado.
-- [ ] Puertos `3010` y `5437` cerrados en el firewall; solo Nginx (80/443) queda expuesto.
-- [ ] Si no necesitas Swagger en producción, no publiques `/docs` en el proxy.
+- [ ] `.env` fuera del control de versiones (ya está en `.gitignore`) y solo legible por el administrador del servidor.
+- [ ] Cambia la contraseña del administrador desde la app después del primer ingreso.
+- [ ] HTTPS si Resolvo se usa fuera de la red local.
+- [ ] Solo el puerto de Resolvo (o el del proxy) abierto en el firewall.
+- [ ] Respaldos programados y guardados fuera del servidor.
 
 ## Respaldos
 
 ```bash
-# respaldo comprimido
-docker exec tickets_db pg_dump -U tickets -d tickets_db -Fc > tickets_$(date +%F).dump
-
-# restaurar sobre una base vacía
-docker exec -i tickets_db pg_restore -U tickets -d tickets_db --clean --if-exists < tickets_2026-10-10.dump
+resolvo backup                                       # crea backups/resolvo_AAAAMMDD_HHMM.dump
+resolvo restore backups/resolvo_20261010_2300.dump
 ```
 
-Programa el respaldo diario con `cron` (Linux) o con el Programador de tareas (Windows) y guarda las copias fuera del servidor.
+Para respaldar todos los días, programa `resolvo backup` con `cron` en Linux (`0 2 * * * cd /opt/resolvo-helpdesk && ./resolvo backup`) o con el Programador de tareas en Windows, y copia la carpeta `backups` fuera del servidor.
 
 ## Actualizar a una nueva versión
 
 ```bash
-git pull
-cd tickets-back && pnpm install --frozen-lockfile && pnpm build && npx prisma migrate deploy && pm2 restart tickets-api
-cd ../tickets-front && pnpm install --frozen-lockfile && pnpm build   # copia dist/spa al servidor web
+resolvo update
 ```
 
-Haz un respaldo antes de actualizar. Las notas de cada versión están en [Releases](https://github.com/jmobandod2000/resolvo-helpdesk/releases).
+Hace un respaldo, descarga la nueva versión, aplica las migraciones y reinicia. Los datos se conservan. Las novedades de cada versión están en [Releases](https://github.com/jmobandod2000/resolvo-helpdesk/releases).
+
+## Desarrollo
+
+Requisitos: [Node.js](https://nodejs.org) 22.22 o superior (recomendado 24 LTS), [pnpm](https://pnpm.io) 10 (`npm install -g pnpm`), Docker y Git.
+
+```bash
+git clone https://github.com/jmobandod2000/resolvo-helpdesk.git
+cd resolvo-helpdesk
+./resolvo dev            # Windows: resolvo dev
+```
+
+`resolvo dev` crea los `.env` de desarrollo si faltan, instala dependencias, levanta PostgreSQL en Docker, aplica las migraciones y arranca la API y la web con recarga automática, con la salida de ambas en la misma terminal.
+
+- App: `http://localhost:9010`
+- API: `http://localhost:3010/api` · Swagger: `http://localhost:3010/docs`
+- Datos de prueba: `pnpm demo:setup` y `pnpm demo:start` en `tickets-back` crean una base aparte con 60 tickets ficticios.
+
+Si prefieres levantar cada parte por separado:
+
+```bash
+cd tickets-back
+pnpm install
+cp .env.example .env        # edita las contraseñas y el JWT_SECRET
+docker compose up -d        # PostgreSQL en 127.0.0.1:5437
+npx prisma migrate dev
+pnpm start:dev              # crea el administrador de LOGIN_* si la base está vacía
+
+cd ../tickets-front
+pnpm install
+cp .env.example .env
+pnpm dev
+```
+
+Para conectarte a la base de desarrollo con un cliente como TablePlus, DBeaver o pgAdmin usa `127.0.0.1:5437` y el usuario y la contraseña de `tickets-back/.env`.
+
+### Variables de desarrollo
+
+| `tickets-back/.env` | Descripción |
+|---|---|
+| `PORT` | Puerto del API (por defecto `3010`) |
+| `JWT_SECRET`, `JWT_EXPIRES_IN` | Firma y duración de las sesiones (mínimo 16 caracteres) |
+| `LOGIN_NAME`, `LOGIN_EMAIL`, `LOGIN_PASSWORD` | Administrador inicial |
+| `SEED_EXAMPLE_TICKETS` | `true` para que `pnpm db:seed` cargue tickets de ejemplo |
+| `DATABASE_URL` | Conexión de Prisma a PostgreSQL |
+| `DB_PS_*` | Base, usuario, contraseña, puertos y carpeta del contenedor PostgreSQL de desarrollo |
+| `WEB_DIR` | Opcional: carpeta del front compilado para que la API también sirva la web |
+| `APP_URL`, `SMTP_*`, `MAIL_FROM` | Correo opcional (para pruebas: `docker compose --profile mail up -d`, buzón en `http://localhost:8025`) |
+
+| `tickets-front/.env` | Descripción |
+|---|---|
+| `BASE_URL` | URL del API en desarrollo |
+| `BASE_URL_PROD` | URL del API al compilar. Vacía = `/api` en la misma dirección de la web. |
 
 ## Solución de problemas
 
 | Síntoma | Causa probable |
 |---|---|
-| El API no arranca y muestra `Config validation error` | Falta una variable en `tickets-back/.env` o tiene un formato inválido (por ejemplo, `JWT_SECRET` muy corto). |
-| `Can't reach database server` | El contenedor no está corriendo (`docker compose ps`) o `DATABASE_URL` no coincide con `DB_PS_*`. |
-| El front carga pero no inicia sesión | `BASE_URL_PROD` no apunta al API o el proxy `/api/` de Nginx no está configurado; revisa la pestaña Red del navegador. |
-| Los reportes muestran fechas corridas un día | El servidor y los usuarios están en zonas horarias distintas. Los reportes usan la zona horaria del navegador; revisa la del equipo del usuario. |
-| `EADDRINUSE: 3010` | Otro proceso usa el puerto; cambia `PORT` o detén el proceso. |
+| `resolvo` dice que Docker no responde | Abre Docker Desktop (Windows/macOS) o inicia el servicio: `sudo systemctl start docker`. |
+| "Resolvo no respondió a tiempo" | Revisa `resolvo logs`. Lo más común: una variable inválida en `.env` (`Config validation error`). |
+| `port is already allocated` | Otro programa usa el puerto; cámbialo con `resolvo config`. |
+| La app abre pero no inicia sesión | Si usas proxy, verifica que reenvíe todas las rutas (incluida `/api/`) a Resolvo. |
+| Los reportes muestran fechas corridas un día | El servidor y los usuarios están en zonas horarias distintas; ajusta `TZ` y la hora del equipo del usuario. |
+| En desarrollo: `EADDRINUSE: 3010` | Otro proceso usa el puerto; cambia `PORT` o detén el proceso. |
 
 ## Usa tu IA con Resolvo
 
