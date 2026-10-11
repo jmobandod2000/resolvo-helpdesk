@@ -659,6 +659,9 @@ export default {
     enabled: 'Portal activo',
     disabled: 'Portal desactivado',
     toggleHint: 'Al desactivarlo, el formulario y los enlaces de seguimiento dejan de funcionar.',
+    email: 'Avisar por correo al solicitante',
+    emailHint:
+      'Se envían solo si el servidor tiene configurado el correo (SMTP) y el solicitante dejó su correo.',
     message: 'Mensaje de bienvenida',
     messageHint: 'Opcional. Por ejemplo: horario de atención o qué datos incluir.',
     linkTitle: 'Enlace del portal',

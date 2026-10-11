@@ -660,6 +660,9 @@ const messages: MessageSchema = {
     enabled: 'Portal ativo',
     disabled: 'Portal desativado',
     toggleHint: 'Ao desativá-lo, o formulário e os links de acompanhamento deixam de funcionar.',
+    email: 'Avisar o solicitante por e-mail',
+    emailHint:
+      'Enviados apenas se o servidor tiver e-mail (SMTP) configurado e o solicitante informar o e-mail.',
     message: 'Mensagem de boas-vindas',
     messageHint: 'Opcional. Por exemplo: horário de atendimento ou quais dados incluir.',
     linkTitle: 'Link do portal',

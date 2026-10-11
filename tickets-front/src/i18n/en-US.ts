@@ -658,6 +658,9 @@ const messages: MessageSchema = {
     enabled: 'Portal enabled',
     disabled: 'Portal disabled',
     toggleHint: 'When disabled, the form and follow-up links stop working.',
+    email: 'Email the requester',
+    emailHint:
+      'Sent only when the server has email (SMTP) configured and the requester left an email.',
     message: 'Welcome message',
     messageHint: 'Optional. For example: support hours or what details to include.',
     linkTitle: 'Portal link',

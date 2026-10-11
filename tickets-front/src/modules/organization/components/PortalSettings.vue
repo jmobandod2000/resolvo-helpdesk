@@ -15,6 +15,7 @@ const { organization, savePortalMutation } = useOrganization();
 
 const enabled = ref(false);
 const message = ref('');
+const emailEnabled = ref(true);
 const portalUrl = computed(() => buildPortalUrl());
 
 watch(
@@ -22,6 +23,7 @@ watch(
   (value) => {
     enabled.value = value?.portalEnabled ?? false;
     message.value = value?.portalMessage ?? '';
+    emailEnabled.value = value?.portalEmailEnabled ?? true;
   },
   { immediate: true },
 );
@@ -30,6 +32,7 @@ const save = () =>
   savePortalMutation.mutate({
     portalEnabled: enabled.value,
     portalMessage: message.value.trim() || null,
+    portalEmailEnabled: emailEnabled.value,
   });
 
 const copyLink = async () => {
@@ -59,6 +62,16 @@ const copyLink = async () => {
               {{ enabled ? t('portalSettings.enabled') : t('portalSettings.disabled') }}
             </div>
             <div class="text-caption text-grey-7">{{ t('portalSettings.toggleHint') }}</div>
+          </div>
+        </q-card-section>
+      </q-card>
+
+      <q-card flat bordered>
+        <q-card-section class="row items-center no-wrap q-gutter-md">
+          <q-toggle v-model="emailEnabled" color="primary" />
+          <div>
+            <div class="text-subtitle2">{{ t('portalSettings.email') }}</div>
+            <div class="text-caption text-grey-7">{{ t('portalSettings.emailHint') }}</div>
           </div>
         </q-card-section>
       </q-card>
