@@ -1,0 +1,38 @@
+name: Paquete de instalación
+
+# Adjunta a cada Release el paquete listo para usar (sin código fuente): resolvo, compose y .env.example
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Armar paquete
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${TAG#v}"
+          node cli/package.mjs "$VERSION"
+          cd release
+          zip -qr "resolvo-$VERSION.zip" "resolvo-$VERSION"
+          tar -czf "resolvo-$VERSION.tar.gz" "resolvo-$VERSION"
+          sha256sum "resolvo-$VERSION.zip" "resolvo-$VERSION.tar.gz" > "resolvo-$VERSION.sha256"
+
+      - name: Subir al Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${TAG#v}"
+          gh release upload "$TAG" release/resolvo-$VERSION.zip release/resolvo-$VERSION.tar.gz release/resolvo-$VERSION.sha256 --clobber
