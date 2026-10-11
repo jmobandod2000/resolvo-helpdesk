@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useQuasar } from 'quasar';
 import type { QTableColumn, QTableProps } from 'quasar';
 
 import { useSites } from 'src/modules/organization/composables/useSites';
@@ -14,6 +15,7 @@ import { useTicketsManageStore } from '../composables/useTicketsManageStore';
 import type { Ticket } from '../interfaces/ticket';
 import { TicketRoutes } from '../interfaces/ticket-routes';
 
+const $q = useQuasar();
 const router = useRouter();
 const { t } = useI18n();
 const { categoryLabel } = useCategories();
@@ -54,6 +56,16 @@ const columns = computed<QTableColumn<Ticket>[]>(() => [
   { name: 'reportedAt', label: t('tickets.fields.reported'), field: 'reportedAt', align: 'left' },
 ]);
 
+// En pantallas medianas, sede y categoría pasan bajo el título para que la tabla no se corte
+const isWide = computed(() => $q.screen.gt.lg);
+const visibleColumns = computed(() => {
+  if (isWide.value) return columns.value.map((column) => column.name);
+  const hidden = $q.screen.gt.sm
+    ? ['site', 'category']
+    : ['site', 'category', 'requesterName', 'priority'];
+  return columns.value.map((column) => column.name).filter((name) => !hidden.includes(name));
+});
+
 const onRequest: QTableProps['onRequest'] = ({ pagination: next }) => {
   setPagination(next.page ?? 1, next.rowsPerPage ?? 15);
 };
@@ -67,6 +79,7 @@ const openTicket = (_event: Event, ticket: Ticket) => {
   <q-table
     :rows="tickets"
     :columns="columns"
+    :visible-columns="visibleColumns"
     row-key="id"
     :loading="isFetching"
     :pagination="pagination"
@@ -83,8 +96,19 @@ const openTicket = (_event: Event, ticket: Ticket) => {
     <template #body-cell-code="{ value }">
       <q-td class="text-weight-medium text-primary">{{ value }}</q-td>
     </template>
-    <template #body-cell-title="{ value }">
-      <q-td style="max-width: 260px" class="ellipsis">
+    <template #body-cell-title="{ value, row }">
+      <q-td class="title-cell">
+        <div class="ellipsis">
+          {{ value }}
+          <q-tooltip>{{ value }}</q-tooltip>
+        </div>
+        <div v-if="!isWide" class="text-caption text-grey-7 ellipsis">
+          {{ siteLabel(row.Site) }} · {{ categoryLabel(row.Category) }}
+        </div>
+      </q-td>
+    </template>
+    <template #body-cell-requesterName="{ value }">
+      <q-td class="requester-cell ellipsis">
         {{ value }}
         <q-tooltip>{{ value }}</q-tooltip>
       </q-td>
@@ -103,3 +127,12 @@ const openTicket = (_event: Event, ticket: Ticket) => {
     </template>
   </q-table>
 </template>
+
+<style scoped>
+.title-cell {
+  max-width: 280px;
+}
+.requester-cell {
+  max-width: 190px;
+}
+</style>
