@@ -18,6 +18,7 @@ import { PortalModule } from './portal/portal.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MailModule } from './mail/mail.module';
 import { HealthModule } from './health/health.module';
+import { SystemModule } from './system/system.module';
 import { I18nExceptionFilter } from './i18n';
 
 @Module({
@@ -39,6 +40,7 @@ import { I18nExceptionFilter } from './i18n';
     PortalModule,
     NotificationsModule,
     HealthModule,
+    SystemModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: I18nExceptionFilter },

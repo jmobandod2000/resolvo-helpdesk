@@ -22,6 +22,9 @@ export const JoiValidationSchema = Joi.object({
   // Carpeta con la web compilada; si existe, la API también sirve el front (despliegue de un solo servicio)
   WEB_DIR: Joi.string().optional().allow(''),
 
+  // Aviso de nuevas versiones (consulta GitHub cada 12 h). false en redes sin Internet
+  UPDATE_CHECK: Joi.boolean().default(true),
+
   SEED_EXAMPLE_TICKETS: Joi.boolean().default(false),
 
   APP_URL: Joi.string().uri().optional().allow(''),
