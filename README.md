@@ -149,6 +149,7 @@ docker compose up -d
 | `JWT_SECRET`, `JWT_EXPIRES_IN` | Firma y duración de las sesiones |
 | `LOGIN_NAME`, `LOGIN_EMAIL`, `LOGIN_PASSWORD` | Administrador inicial (solo se usa con la base vacía) |
 | `SMTP_*`, `MAIL_FROM` | Correo opcional para avisar al solicitante del portal |
+| `UPDATE_CHECK` | `true` (por defecto): los administradores ven un aviso cuando sale una versión nueva. Resolvo consulta el último Release de GitHub cada 12 horas, sin enviar datos de tu instalación. `false` en redes sin Internet. |
 
 ### HTTPS
 
