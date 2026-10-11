@@ -74,14 +74,24 @@ La base de datos oficial es **PostgreSQL**: viene lista en `docker-compose.yml` 
 
 Solo necesitas **[Docker](https://docs.docker.com/get-docker/)**: Docker Desktop en Windows o macOS, o Docker Engine en Linux. Resolvo trae su propia base PostgreSQL, aplica las migraciones y crea el administrador automáticamente.
 
+**Opción A — Solo quiero usarlo.** Descarga `resolvo-<versión>.zip` (Windows) o `.tar.gz` (Linux/macOS) desde [Releases](https://github.com/jmobandod2000/resolvo-helpdesk/releases/latest), descomprímelo y, dentro de la carpeta:
+
 ```bash
-git clone https://github.com/jmobandod2000/resolvo-helpdesk.git
-cd resolvo-helpdesk
 ./resolvo install        # Linux / macOS
 resolvo install          # Windows (en PowerShell: .\resolvo install)
 ```
 
-El asistente pregunta en la terminal lo esencial: puerto, dirección de la app, zona horaria, administrador inicial y, si quieres, el correo para avisar a los solicitantes. Genera las contraseñas internas, guarda todo en `.env`, descarga la imagen y deja Resolvo funcionando:
+El paquete pesa unos KB: trae el comando `resolvo` y la configuración, y descarga la imagen lista de la app.
+
+**Opción B — Quiero el código** (para seguir los cambios con `git pull`, modificarlo o contribuir):
+
+```bash
+git clone https://github.com/jmobandod2000/resolvo-helpdesk.git
+cd resolvo-helpdesk
+./resolvo install        # o resolvo install en Windows
+```
+
+En ambos casos el asistente pregunta en la terminal lo esencial: puerto, dirección de la app, zona horaria, administrador inicial y, si quieres, el correo para avisar a los solicitantes. Genera las contraseñas internas, guarda todo en `.env`, descarga la imagen y deja Resolvo funcionando:
 
 ```
 ✔ Resolvo está listo
@@ -106,6 +116,7 @@ Al entrar por primera vez, el **asistente de configuración** de la app pide los
 | `resolvo backup` | Respaldo de la base en `./backups` |
 | `resolvo restore <archivo>` | Restaura un respaldo (pide confirmación) |
 | `resolvo update` | Respaldo, última versión y reinicio, sin perder datos |
+| `resolvo db` | Datos de conexión a PostgreSQL para TablePlus, DBeaver o pgAdmin |
 | `resolvo dev` | Modo desarrollo: API y web locales con recarga automática |
 
 Resolvo se inicia solo cuando arranca el servidor (`restart: unless-stopped`).
@@ -117,7 +128,7 @@ Navegador ──▶ :8080  app (API + web, una sola imagen) ──▶ db (Postgr
 ```
 
 - **Una sola imagen** con la API y la web compiladas, sin dependencias de desarrollo. Al iniciar aplica las migraciones pendientes (`prisma migrate deploy`) y, si la base está vacía, crea el administrador de `LOGIN_*`.
-- **PostgreSQL** no se publica fuera de Docker; los datos viven en el volumen `resolvo_db-data`.
+- **PostgreSQL** no se publica fuera de Docker; los datos viven en el volumen `resolvo_db-data`. Para consultarla con un cliente como **TablePlus**, DBeaver o pgAdmin, responde *sí* a "Acceso a la base de datos" en el asistente (o en `resolvo config`): se publica solo en `127.0.0.1` del servidor, y `resolvo db` muestra host, puerto, usuario y contraseña. Desde otro equipo, conéctate con el túnel SSH que trae TablePlus.
 - La imagen se publica en `ghcr.io/jmobandod2000/resolvo-helpdesk`. Si prefieres compilarla en tu servidor, responde *no* a "¿Descargar la imagen lista?" o usa `docker compose build`.
 
 ### Sin el asistente
