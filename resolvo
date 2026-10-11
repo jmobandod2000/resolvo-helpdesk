@@ -1,0 +1,34 @@
+#!/bin/sh
+# Resolvo: ./resolvo <comando>   (./resolvo help para ver todos)
+# Usa Node si está instalado; si no, solo hace falta Docker.
+set -e
+cd "$(dirname "$0")"
+
+if command -v node >/dev/null 2>&1; then
+  exec node cli/resolvo.mjs "$@"
+fi
+
+NODE_IMAGE=node:24.13.1-alpine
+cmd="${1:-help}"
+case "$cmd" in
+  install|config)
+    docker run --rm -it -v "$PWD:/work" -w /work -e LANG="$LANG" "$NODE_IMAGE" node cli/resolvo.mjs "$cmd" --env-only
+    if grep -q '^RESOLVO_BUILD=true' .env; then docker compose build app; else docker compose pull app || docker compose build app; fi
+    docker compose up -d db app
+    echo "Resolvo iniciado: $(grep '^APP_URL=' .env | cut -d= -f2-)"
+    ;;
+  start) docker compose up -d db app ;;
+  stop) docker compose stop ;;
+  restart) docker compose restart app ;;
+  status) docker compose ps ;;
+  logs) docker compose logs -f --tail 200 app ;;
+  update)
+    git pull --ff-only 2>/dev/null || true
+    docker compose pull app || docker compose build app
+    docker compose up -d db app
+    ;;
+  *)
+    echo "Comandos sin Node: install, config, start, stop, restart, status, logs, update"
+    echo "Para backup, restore y dev instala Node 18+ (https://nodejs.org)."
+    ;;
+esac
