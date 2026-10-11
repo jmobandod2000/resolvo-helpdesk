@@ -39,6 +39,9 @@ const messages: MessageSchema = {
     portalBusy:
       'O portal está recebendo muitas solicitações. Tente novamente em alguns minutos',
     notificationNotFound: 'A notificação {id} não foi encontrada',
+    portalEmailUnavailable: 'Os avisos por e-mail não estão disponíveis',
+    portalAccessExpired:
+      'O link expirou ou não é válido. Peça um novo pelo portal',
     unexpected: 'Ocorreu um erro inesperado',
     db: {
       duplicate: 'Já existe um registro com o mesmo valor em: {fields}',
@@ -68,6 +71,66 @@ const messages: MessageSchema = {
       'A senha deve ter uma letra maiúscula, uma minúscula e um número',
     whitelistValidation: 'O campo {field} não é permitido',
     default: '{field} não é válido',
+  },
+  emails: {
+    common: {
+      cta: 'Ver minha solicitação',
+      messageTitle: 'Mensagem da equipe de TI',
+      solutionTitle: 'Solução',
+      footer:
+        'Você recebe este e-mail porque reportou uma solicitação à equipe de TI. Responda pelo link; não responda a este e-mail.',
+    },
+    received: {
+      subject: 'Recebemos sua solicitação {code}',
+      heading: 'Recebemos sua solicitação {code}',
+      intro:
+        '"{title}" já está com a equipe de TI. Avisaremos por aqui quando houver novidades.',
+    },
+    reply: {
+      subject: 'Você tem uma resposta em {code}',
+      heading: 'A equipe de TI respondeu',
+      intro: 'Há uma nova mensagem na sua solicitação "{title}".',
+    },
+    status: {
+      WAITING_INFO: {
+        subject: 'Precisamos da sua resposta em {code}',
+        heading: 'Precisamos de algo de você',
+        intro:
+          'Para continuar com "{title}" a equipe de TI precisa da sua resposta. Abra o link e responda.',
+      },
+      RESOLVED: {
+        subject: 'Sua solicitação {code} foi resolvida',
+        heading: 'Pronto! Resolvemos sua solicitação',
+        intro:
+          '"{title}" foi resolvida. Se o problema continuar, avise pelo link.',
+      },
+      CLOSED: {
+        subject: 'Fechamos sua solicitação {code}',
+        heading: 'Sua solicitação está fechada',
+        intro: 'Fechamos "{title}". Obrigado por avisar.',
+      },
+      CANCELLED: {
+        subject: 'Sua solicitação {code} foi cancelada',
+        heading: 'Sua solicitação foi cancelada',
+        intro:
+          '"{title}" foi cancelada pela equipe de TI. Se achar que é um erro, crie uma nova solicitação.',
+      },
+    },
+    access: {
+      subject: 'Suas solicitações à equipe de TI',
+      heading: 'Aqui estão suas solicitações',
+      intro:
+        'Use este link para ver todas as suas solicitações e o status. Ele expira em 7 dias.',
+      cta: 'Ver minhas solicitações',
+      footer: 'Se você não pediu este link, pode ignorar este e-mail.',
+    },
+    test: {
+      subject: 'E-mail de teste do Resolvo',
+      heading: 'O e-mail está funcionando',
+      intro:
+        'Se você recebeu esta mensagem, os avisos por e-mail do portal estão configurados corretamente.',
+      cta: 'Abrir o portal',
+    },
   },
   fields: {
     title: 'Título',

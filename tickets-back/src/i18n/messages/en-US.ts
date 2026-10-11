@@ -36,6 +36,9 @@ const messages: MessageSchema = {
     portalBusy:
       'The portal is receiving many requests. Try again in a few minutes',
     notificationNotFound: 'Notification {id} was not found',
+    portalEmailUnavailable: 'Email notifications are not available',
+    portalAccessExpired:
+      'The link expired or is not valid. Request a new one from the portal',
     unexpected: 'An unexpected error occurred',
     db: {
       duplicate: 'A record with the same value already exists in: {fields}',
@@ -65,6 +68,66 @@ const messages: MessageSchema = {
       'The password must contain an uppercase letter, a lowercase letter and a number',
     whitelistValidation: 'The field {field} is not allowed',
     default: '{field} is not valid',
+  },
+  emails: {
+    common: {
+      cta: 'View my request',
+      messageTitle: 'Message from the IT team',
+      solutionTitle: 'Solution',
+      footer:
+        'You are receiving this email because you reported a request to the IT team. Reply from the link; do not reply to this email.',
+    },
+    received: {
+      subject: 'We received your request {code}',
+      heading: 'We received your request {code}',
+      intro:
+        '"{title}" is now with the IT team. We will let you know here when there are updates.',
+    },
+    reply: {
+      subject: 'You have a reply on {code}',
+      heading: 'The IT team replied',
+      intro: 'There is a new message on your request "{title}".',
+    },
+    status: {
+      WAITING_INFO: {
+        subject: 'We need your reply on {code}',
+        heading: 'We need something from you',
+        intro:
+          'To continue with "{title}" the IT team needs your reply. Open the link and answer them.',
+      },
+      RESOLVED: {
+        subject: 'Your request {code} was resolved',
+        heading: 'Done! We resolved your request',
+        intro:
+          '"{title}" is resolved. If the problem continues, let us know from the link.',
+      },
+      CLOSED: {
+        subject: 'We closed your request {code}',
+        heading: 'Your request is closed',
+        intro: 'We closed "{title}". Thanks for letting us know.',
+      },
+      CANCELLED: {
+        subject: 'Your request {code} was cancelled',
+        heading: 'Your request was cancelled',
+        intro:
+          '"{title}" was cancelled by the IT team. If you think this is a mistake, create a new request.',
+      },
+    },
+    access: {
+      subject: 'Your requests to the IT team',
+      heading: 'Here are your requests',
+      intro:
+        'Use this link to see all your requests and their status. It expires in 7 days.',
+      cta: 'View my requests',
+      footer: 'If you did not ask for this link, you can ignore this email.',
+    },
+    test: {
+      subject: 'Resolvo test email',
+      heading: 'Email is working',
+      intro:
+        'If you receive this message, portal email notifications are set up correctly.',
+      cta: 'Open the portal',
+    },
   },
   fields: {
     title: 'Title',

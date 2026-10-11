@@ -34,6 +34,10 @@ const demoEnv = {
   PORT: port,
   HOST: `http://localhost:${port}/api`,
   SEED_EXAMPLE_TICKETS: 'false',
+  APP_URL: env.APP_URL || 'http://localhost:9010',
+  SMTP_HOST: env.SMTP_HOST || '127.0.0.1',
+  SMTP_PORT: env.SMTP_HOST ? env.SMTP_PORT || '587' : '1025',
+  MAIL_FROM: env.MAIL_FROM || 'Resolvo Demo <soporte@demo.local>',
 };
 
 const run = (cmd, cmdArgs) => {

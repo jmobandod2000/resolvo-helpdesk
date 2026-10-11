@@ -37,6 +37,9 @@ export default {
     portalBusy:
       'El portal está recibiendo muchas solicitudes. Intenta de nuevo en unos minutos',
     notificationNotFound: 'No se encontró la notificación {id}',
+    portalEmailUnavailable: 'Los avisos por correo no están disponibles',
+    portalAccessExpired:
+      'El enlace venció o no es válido. Pide uno nuevo desde el portal',
     unexpected: 'Ocurrió un error inesperado',
     db: {
       duplicate: 'Ya existe un registro con el mismo valor en: {fields}',
@@ -66,6 +69,66 @@ export default {
       'La contraseña debe tener una mayúscula, una minúscula y un número',
     whitelistValidation: 'El campo {field} no está permitido',
     default: '{field} no es válido',
+  },
+  emails: {
+    common: {
+      cta: 'Ver mi solicitud',
+      messageTitle: 'Mensaje del equipo de TI',
+      solutionTitle: 'Solución',
+      footer:
+        'Recibes este correo porque reportaste una solicitud al equipo de TI. Puedes responder desde el enlace; no respondas a este correo.',
+    },
+    received: {
+      subject: 'Recibimos tu solicitud {code}',
+      heading: 'Recibimos tu solicitud {code}',
+      intro:
+        '"{title}" ya está en manos del equipo de TI. Te avisaremos por aquí cuando haya novedades.',
+    },
+    reply: {
+      subject: 'Tienes una respuesta en {code}',
+      heading: 'El equipo de TI te respondió',
+      intro: 'Hay un mensaje nuevo en tu solicitud "{title}".',
+    },
+    status: {
+      WAITING_INFO: {
+        subject: 'Necesitamos tu respuesta en {code}',
+        heading: 'Necesitamos algo de ti',
+        intro:
+          'Para seguir con "{title}" el equipo de TI necesita tu respuesta. Entra al enlace y contéstale.',
+      },
+      RESOLVED: {
+        subject: 'Tu solicitud {code} fue resuelta',
+        heading: '¡Listo! Resolvimos tu solicitud',
+        intro:
+          '"{title}" quedó resuelta. Si el problema continúa, avísanos desde el enlace.',
+      },
+      CLOSED: {
+        subject: 'Cerramos tu solicitud {code}',
+        heading: 'Tu solicitud está cerrada',
+        intro: 'Cerramos "{title}". Gracias por avisarnos.',
+      },
+      CANCELLED: {
+        subject: 'Tu solicitud {code} fue cancelada',
+        heading: 'Tu solicitud fue cancelada',
+        intro:
+          '"{title}" fue cancelada por el equipo de TI. Si crees que es un error, crea una nueva solicitud.',
+      },
+    },
+    access: {
+      subject: 'Tus solicitudes al equipo de TI',
+      heading: 'Aquí están tus solicitudes',
+      intro:
+        'Usa este enlace para ver todas tus solicitudes y su estado. Vence en 7 días.',
+      cta: 'Ver mis solicitudes',
+      footer: 'Si no pediste este enlace, puedes ignorar este correo.',
+    },
+    test: {
+      subject: 'Correo de prueba de Resolvo',
+      heading: 'El correo funciona',
+      intro:
+        'Si recibes este mensaje, los avisos por correo del portal están bien configurados.',
+      cta: 'Abrir el portal',
+    },
   },
   fields: {
     title: 'Título',

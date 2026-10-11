@@ -36,6 +36,9 @@ export class OrganizationService {
       where: { id: ORGANIZATION_ID },
       data: {
         portalEnabled: dto.portalEnabled,
+        ...(dto.portalEmailEnabled !== undefined && {
+          portalEmailEnabled: dto.portalEmailEnabled,
+        }),
         ...(dto.portalMessage !== undefined && {
           portalMessage: emptyToNull(dto.portalMessage),
         }),

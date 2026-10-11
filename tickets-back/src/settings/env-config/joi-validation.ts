@@ -20,4 +20,12 @@ export const JoiValidationSchema = Joi.object({
   DB_PS_DOCKER_VOLUME: Joi.string().required(),
 
   SEED_EXAMPLE_TICKETS: Joi.boolean().default(false),
+
+  APP_URL: Joi.string().uri().optional().allow(''),
+  SMTP_HOST: Joi.string().optional().allow(''),
+  SMTP_PORT: Joi.number().default(587),
+  SMTP_SECURE: Joi.boolean().default(false),
+  SMTP_USER: Joi.string().optional().allow(''),
+  SMTP_PASS: Joi.string().optional().allow(''),
+  MAIL_FROM: Joi.string().optional().allow(''),
 });

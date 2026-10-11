@@ -82,17 +82,18 @@ model User {
 }
 
 model Organization {
-  id            Int      @id @default(1)
-  name          String
-  taxId         String?
-  email         String?
-  phone         String?
-  address       String?
-  website       String?
-  portalEnabled Boolean  @default(false)
-  portalMessage String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                 Int      @id @default(1)
+  name               String
+  taxId              String?
+  email              String?
+  phone              String?
+  address            String?
+  website            String?
+  portalEnabled      Boolean  @default(false)
+  portalMessage      String?
+  portalEmailEnabled Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 }
 
 model Site {
@@ -124,34 +125,35 @@ model Category {
 }
 
 model Ticket {
-  id              Int            @id @default(autoincrement())
-  code            String?        @unique
-  title           String
-  description     String
-  requesterName   String
-  requesterArea   String?
-  requesterEmail  String?
-  publicToken     String?        @unique
-  siteId          Int?
-  channel         TicketChannel  @default(WHATSAPP)
-  categoryId      Int?
-  priority        TicketPriority @default(MEDIUM)
-  status          TicketStatus   @default(OPEN)
-  rootCause       RootCause?
-  productCodes    String[]       @default([])
-  documents       String[]       @default([])
-  affectedUnits   Int?
-  diagnosis       String?
-  closureComment  String?
-  devRequestRef   String?
-  evidencePaths   String[]       @default([])
-  reportedAt      DateTime       @default(now())
-  firstResponseAt DateTime?
-  resolvedAt      DateTime?
-  closedAt        DateTime?
-  isDeleted       Boolean        @default(false)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id                Int            @id @default(autoincrement())
+  code              String?        @unique
+  title             String
+  description       String
+  requesterName     String
+  requesterArea     String?
+  requesterEmail    String?
+  requesterLanguage String?
+  publicToken       String?        @unique
+  siteId            Int?
+  channel           TicketChannel  @default(WHATSAPP)
+  categoryId        Int?
+  priority          TicketPriority @default(MEDIUM)
+  status            TicketStatus   @default(OPEN)
+  rootCause         RootCause?
+  productCodes      String[]       @default([])
+  documents         String[]       @default([])
+  affectedUnits     Int?
+  diagnosis         String?
+  closureComment    String?
+  devRequestRef     String?
+  evidencePaths     String[]       @default([])
+  reportedAt        DateTime       @default(now())
+  firstResponseAt   DateTime?
+  resolvedAt        DateTime?
+  closedAt          DateTime?
+  isDeleted         Boolean        @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
   Site        Site?     @relation(fields: [siteId], references: [id])
   Category    Category? @relation(fields: [categoryId], references: [id])
@@ -202,4 +204,14 @@ model Notification {
 
   @@index([userId, readAt])
   @@index([userId, createdAt])
+}
+
+model PortalAccess {
+  id        Int      @id @default(autoincrement())
+  email     String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }

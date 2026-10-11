@@ -14,4 +14,12 @@ export class UpdatePortalDto {
   @IsString()
   @MaxLength(500)
   portalMessage?: string | null;
+
+  @ApiProperty({
+    description: 'Avisos por correo al solicitante',
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  portalEmailEnabled?: boolean;
 }

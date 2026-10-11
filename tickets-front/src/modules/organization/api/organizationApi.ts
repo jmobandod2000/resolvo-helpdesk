@@ -3,6 +3,7 @@ import { i18n } from 'src/i18n';
 import type {
   Category,
   CategoryPayload,
+  MailStatus,
   Organization,
   OrganizationPayload,
   PortalSettingsPayload,
@@ -73,5 +74,19 @@ export const updateCategory = async (id: number, payload: Partial<CategoryPayloa
 
 export const deleteCategory = async (id: number) => {
   const resp = await api.delete<Category>(`categories/${id}`, requestOptions());
+  return resp.data;
+};
+
+export const getMailStatus = async () => {
+  const resp = await api.get<MailStatus>('organization/portal/mail-status', requestOptions());
+  return resp.data;
+};
+
+export const sendTestEmail = async (email: string) => {
+  const resp = await api.post<{ sent: boolean }>(
+    'organization/portal/test-email',
+    { email },
+    requestOptions(),
+  );
   return resp.data;
 };

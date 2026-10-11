@@ -23,10 +23,14 @@ import {
   OrganizationService,
   SitesService,
 } from '../../organization/services';
+import { TicketsService } from '../../tickets/services/tickets.service';
 import {
   generatePublicToken,
-  TicketsService,
-} from '../../tickets/services/tickets.service';
+  hashToken,
+  TOKEN_FORMAT,
+} from '../../common/utils/public-token';
+import { RequesterMailService } from '../../mail/services';
+import { AppLanguage } from '../../i18n';
 import { NotificationsService } from '../../notifications/services';
 import { CreatePortalTicketDto, PortalReplyDto } from '../dtos';
 
@@ -35,7 +39,7 @@ const MIN_FILL_TIME_MS = 4000;
 const DUPLICATE_WINDOW_MS = 10 * 60_000;
 const MAX_PORTAL_TICKETS_PER_HOUR = 200;
 const MAX_REPLIES_PER_TICKET = 50;
-const TOKEN_FORMAT = /^[A-Za-z0-9_-]{43}$/;
+const ACCESS_TTL_MS = 7 * 86_400_000;
 const CLOSED_STATUSES: TicketStatus[] = [
   TicketStatus.CLOSED,
   TicketStatus.CANCELLED,
@@ -74,6 +78,7 @@ export class PortalService {
     private readonly categoriesService: CategoriesService,
     private readonly ticketsService: TicketsService,
     private readonly notificationsService: NotificationsService,
+    private readonly requesterMailService: RequesterMailService,
   ) {}
 
   async getConfig() {
@@ -99,12 +104,15 @@ export class PortalService {
       organizationName: organization.name,
       message: organization.portalMessage,
       contactEmail: organization.email,
+      emailEnabled:
+        organization.portalEmailEnabled &&
+        this.requesterMailService.isEnabled(),
       sites: sites.map((site) => ({ id: site.id, label: siteLabel(site) })),
       categories,
     };
   }
 
-  async createTicket(dto: CreatePortalTicketDto) {
+  async createTicket(dto: CreatePortalTicketDto, language: AppLanguage) {
     await this.assertEnabled();
 
     if (dto.website?.trim() || dto.elapsedMs < MIN_FILL_TIME_MS)
@@ -162,7 +170,7 @@ export class PortalService {
     await this.prismaService.$transaction([
       this.prismaService.ticket.update({
         where: { id: ticket.id },
-        data: { publicToken: token },
+        data: { publicToken: token, requesterLanguage: language },
       }),
       this.prismaService.ticketEvent.updateMany({
         where: { ticketId: ticket.id, type: TicketEventType.CREATED },
@@ -171,6 +179,7 @@ export class PortalService {
     ]);
 
     await this.notificationsService.newPortalTicket(ticket, dto.requesterName);
+    this.requesterMailService.ticketReceived(ticket.id);
     return { code: ticket.code, token, duplicate: false };
   }
 
@@ -229,6 +238,108 @@ export class PortalService {
       ticket.requesterName,
     );
     return this.getTicket(token);
+  }
+
+  async requestAccess(email: string, language: AppLanguage) {
+    await this.assertEnabled();
+    const organization = await this.organizationService.find();
+    if (
+      !organization?.portalEmailEnabled ||
+      !this.requesterMailService.isEnabled()
+    )
+      throw new BadRequestException(
+        i18nMessage('errors.portalEmailUnavailable'),
+      );
+
+    const normalized = email.trim().toLowerCase();
+    const tickets = await this.prismaService.ticket.count({
+      where: {
+        isDeleted: false,
+        requesterEmail: { equals: normalized, mode: 'insensitive' },
+      },
+    });
+
+    if (tickets > 0) {
+      const token = generatePublicToken();
+      await this.prismaService.portalAccess.create({
+        data: {
+          email: normalized,
+          tokenHash: hashToken(token),
+          expiresAt: new Date(Date.now() + ACCESS_TTL_MS),
+        },
+      });
+      void this.requesterMailService.sendAccessLink(
+        normalized,
+        `${this.requesterMailService.appUrl}/#/portal/mis-solicitudes/${token}`,
+        language,
+      );
+    }
+
+    return { requested: true };
+  }
+
+  async listByAccess(token: string) {
+    await this.assertEnabled();
+    const access = TOKEN_FORMAT.test(token)
+      ? await this.prismaService.portalAccess.findUnique({
+          where: { tokenHash: hashToken(token) },
+        })
+      : null;
+    if (!access || access.expiresAt.getTime() < Date.now())
+      throw new NotFoundException(i18nMessage('errors.portalAccessExpired'));
+
+    const tickets = await this.prismaService.ticket.findMany({
+      where: {
+        isDeleted: false,
+        requesterEmail: { equals: access.email, mode: 'insensitive' },
+      },
+      orderBy: { reportedAt: 'desc' },
+      take: 100,
+      select: {
+        id: true,
+        code: true,
+        title: true,
+        status: true,
+        reportedAt: true,
+        updatedAt: true,
+        publicToken: true,
+      },
+    });
+
+    const withTokens = await Promise.all(
+      tickets.map(async (ticket) =>
+        ticket.publicToken
+          ? ticket
+          : this.prismaService.ticket.update({
+              where: { id: ticket.id },
+              data: { publicToken: generatePublicToken() },
+              select: {
+                id: true,
+                code: true,
+                title: true,
+                status: true,
+                reportedAt: true,
+                updatedAt: true,
+                publicToken: true,
+              },
+            }),
+      ),
+    );
+
+    return {
+      email: access.email,
+      expiresAt: access.expiresAt,
+      tickets: withTokens.map(
+        ({ code, title, status, reportedAt, updatedAt, publicToken }) => ({
+          code,
+          title,
+          status,
+          reportedAt,
+          updatedAt,
+          token: publicToken,
+        }),
+      ),
+    };
   }
 
   private async assertEnabled() {

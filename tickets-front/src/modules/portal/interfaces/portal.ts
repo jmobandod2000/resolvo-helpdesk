@@ -16,6 +16,7 @@ export interface PortalConfig {
   organizationName: string | null;
   message?: string | null;
   contactEmail?: string | null;
+  emailEnabled?: boolean;
   sites?: PortalSite[];
   categories?: PortalCategory[];
 }
@@ -67,6 +68,21 @@ export interface PortalTicket {
   events: PortalEvent[];
 }
 
+export interface MyRequestItem {
+  code: string;
+  title: string;
+  status: TicketStatus;
+  reportedAt: string;
+  updatedAt: string;
+  token: string;
+}
+
+export interface MyRequests {
+  email: string;
+  expiresAt: string;
+  tickets: MyRequestItem[];
+}
+
 export interface SavedPortalTicket {
   code: string;
   title: string;
@@ -85,4 +101,5 @@ export enum PortalRoutes {
   HOME = 'portal',
   NEW = 'portal-new',
   TRACK = 'portal-track',
+  MY_REQUESTS = 'portal-my-requests',
 }

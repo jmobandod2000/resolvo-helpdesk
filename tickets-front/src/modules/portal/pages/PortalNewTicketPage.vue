@@ -21,7 +21,7 @@ const NO_CATEGORY = 0;
 const { t } = useI18n();
 const router = useRouter();
 const { handleApiResponseError } = useHandlerErrors();
-const { isEnabled, sites, categories, isLoading } = usePortalConfig();
+const { config, isEnabled, sites, categories, isLoading } = usePortalConfig();
 const { loadProfile, saveProfile, saveTicket } = usePortalStorage();
 
 const startedAt = Date.now();
@@ -362,7 +362,7 @@ const submit = async () => {
                     v-model="requesterEmail"
                     type="email"
                     :label="t('portal.new.email')"
-                    :hint="t('portal.new.emailHint')"
+                    :hint="config?.emailEnabled ? t('portal.new.emailNotifyHint') : t('portal.new.emailHint')"
                     :rules="[emailRule]"
                     maxlength="120"
                     autocomplete="email"

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 
 import useDates from 'src/modules/shared/composables/useDates';
+import EmailAccessCard from '../components/EmailAccessCard.vue';
 import usePortalConfig from '../composables/usePortalConfig';
 import usePortalStorage from '../composables/usePortalStorage';
 import { extractToken } from '../helpers/portalLinks';
@@ -128,6 +129,8 @@ const lookup = () => {
             </q-card-section>
           </q-card>
         </q-slide-transition>
+
+        <EmailAccessCard v-if="config?.emailEnabled" />
 
         <q-card v-if="savedTickets.length" flat bordered>
           <q-card-section class="row items-center">

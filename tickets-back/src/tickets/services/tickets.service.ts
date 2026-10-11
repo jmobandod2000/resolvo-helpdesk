@@ -1,4 +1,3 @@
-import { randomBytes } from 'crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, TicketEventType } from '@prisma/client';
 
@@ -16,6 +15,8 @@ import { buildStatusChangeData, buildTicketWhere } from '../helpers';
 import { i18nMessage } from '../../i18n';
 import { CategoriesService, SitesService } from '../../organization/services';
 import { NotificationsService } from '../../notifications/services';
+import { RequesterMailService } from '../../mail/services';
+import { generatePublicToken } from '../../common/utils/public-token';
 import {
   CATEGORY_SUMMARY_SELECT,
   SITE_SUMMARY_SELECT,
@@ -40,7 +41,7 @@ const TICKET_DETAIL_INCLUDE = {
 
 const buildTicketCode = (id: number) => `TK-${String(id).padStart(5, '0')}`;
 
-export const generatePublicToken = () => randomBytes(32).toString('base64url');
+export { generatePublicToken } from '../../common/utils/public-token';
 
 @Injectable()
 export class TicketsService {
@@ -49,6 +50,7 @@ export class TicketsService {
     private readonly sitesService: SitesService,
     private readonly categoriesService: CategoriesService,
     private readonly notificationsService: NotificationsService,
+    private readonly requesterMailService: RequesterMailService,
   ) {}
 
   async create(createTicketDto: CreateTicketDto, user: UserLogged) {
@@ -172,7 +174,7 @@ export class TicketsService {
     const ticket = await this.findActiveOrFail(id);
     const data = buildStatusChangeData(ticket, dto);
 
-    return this.prismaService.$transaction(async (tx) => {
+    const result = await this.prismaService.$transaction(async (tx) => {
       const updated = await tx.ticket.update({
         where: { id },
         data,
@@ -192,12 +194,15 @@ export class TicketsService {
 
       return updated;
     });
+
+    this.requesterMailService.statusChanged(id, dto.status);
+    return result;
   }
 
   async addNote(id: number, { note, isPublic }: AddNoteDto, user: UserLogged) {
     const ticket = await this.findActiveOrFail(id);
 
-    return this.prismaService.$transaction(async (tx) => {
+    const event = await this.prismaService.$transaction(async (tx) => {
       if (!ticket.firstResponseAt)
         await tx.ticket.update({
           where: { id },
@@ -215,6 +220,9 @@ export class TicketsService {
         include: { User: USER_SUMMARY },
       });
     });
+
+    if (event.isPublic) this.requesterMailService.publicReply(id, note);
+    return event;
   }
 
   async getPublicLink(id: number) {

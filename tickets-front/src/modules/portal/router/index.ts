@@ -16,6 +16,11 @@ const PortalRouter: RouteRecordRaw = {
       component: () => import('../pages/PortalNewTicketPage.vue'),
     },
     {
+      path: 'mis-solicitudes/:token([A-Za-z0-9_-]{43})',
+      name: PortalRoutes.MY_REQUESTS,
+      component: () => import('../pages/PortalMyRequestsPage.vue'),
+    },
+    {
       path: 't/:token([A-Za-z0-9_-]{43})',
       name: PortalRoutes.TRACK,
       component: () => import('../pages/PortalTrackPage.vue'),

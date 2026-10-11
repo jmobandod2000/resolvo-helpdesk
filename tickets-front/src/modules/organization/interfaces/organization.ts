@@ -8,6 +8,7 @@ export interface Organization {
   website: string | null;
   portalEnabled: boolean;
   portalMessage: string | null;
+  portalEmailEnabled: boolean;
   updatedAt: string;
 }
 
@@ -23,6 +24,13 @@ export interface OrganizationPayload {
 export interface PortalSettingsPayload {
   portalEnabled: boolean;
   portalMessage: string | null;
+  portalEmailEnabled: boolean;
+}
+
+export interface MailStatus {
+  configured: boolean;
+  from: string | null;
+  appUrl: string | null;
 }
 
 export interface PublicProfile {

@@ -16,6 +16,7 @@ import { ReportsModule } from './reports/reports.module';
 import { OrganizationModule } from './organization/organization.module';
 import { PortalModule } from './portal/portal.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MailModule } from './mail/mail.module';
 import { I18nExceptionFilter } from './i18n';
 
 @Module({
@@ -27,6 +28,7 @@ import { I18nExceptionFilter } from './i18n';
       isGlobal: true,
     }),
     PrismaModule,
+    MailModule,
     AuthModule,
     TicketsModule,
     MetricsModule,

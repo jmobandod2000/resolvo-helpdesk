@@ -1,6 +1,7 @@
 import { api } from 'src/boot/axios';
 import { i18n } from 'src/i18n';
 import type {
+  MyRequests,
   PortalConfig,
   PortalTicket,
   PortalTicketCreated,
@@ -34,6 +35,19 @@ export const replyPortalTicket = async (token: string, message: string) => {
   const resp = await api.post<PortalTicket>(
     `portal/tickets/${encodeURIComponent(token)}/replies`,
     { message },
+    requestOptions(),
+  );
+  return resp.data;
+};
+
+export const requestPortalAccess = async (email: string) => {
+  const resp = await api.post<{ requested: boolean }>('portal/access', { email }, requestOptions());
+  return resp.data;
+};
+
+export const getMyRequests = async (token: string) => {
+  const resp = await api.get<MyRequests>(
+    `portal/requests/${encodeURIComponent(token)}`,
     requestOptions(),
   );
   return resp.data;

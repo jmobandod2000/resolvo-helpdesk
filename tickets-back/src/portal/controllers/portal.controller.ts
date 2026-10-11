@@ -1,9 +1,22 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 import { PortalService } from '../services';
-import { CreatePortalTicketDto, PortalReplyDto } from '../dtos';
+import {
+  CreatePortalTicketDto,
+  PortalAccessDto,
+  PortalReplyDto,
+} from '../dtos';
+import { resolveLanguage } from '../../i18n';
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -25,8 +38,37 @@ export class PortalController {
     default: { limit: 5, ttl: 10 * MINUTE },
     hourly: { limit: 15, ttl: HOUR },
   })
-  createTicket(@Body() dto: CreatePortalTicketDto) {
-    return this.portalService.createTicket(dto);
+  createTicket(
+    @Body() dto: CreatePortalTicketDto,
+    @Headers('x-lang') lang?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+  ) {
+    return this.portalService.createTicket(
+      dto,
+      resolveLanguage(lang, acceptLanguage),
+    );
+  }
+
+  @Post('access')
+  @Throttle({
+    default: { limit: 3, ttl: 10 * MINUTE },
+    hourly: { limit: 10, ttl: HOUR },
+  })
+  requestAccess(
+    @Body() dto: PortalAccessDto,
+    @Headers('x-lang') lang?: string,
+    @Headers('accept-language') acceptLanguage?: string,
+  ) {
+    return this.portalService.requestAccess(
+      dto.email,
+      resolveLanguage(lang, acceptLanguage),
+    );
+  }
+
+  @Get('requests/:token')
+  @Throttle({ default: { limit: 30, ttl: MINUTE } })
+  listRequests(@Param('token') token: string) {
+    return this.portalService.listByAccess(token);
   }
 
   @Get('tickets/:token')
