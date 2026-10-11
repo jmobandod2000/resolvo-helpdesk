@@ -1,9 +1,11 @@
 param(
-  [string]$BaseUrl
+  [string]$BaseUrl,
+  # Archivo con LOGIN_EMAIL y LOGIN_PASSWORD (por defecto tickets-back/.env)
+  [string]$EnvFile
 )
 
 $ErrorActionPreference = 'Stop'
-$envFile = Join-Path $PSScriptRoot '..\.env'
+$envFile = if ($EnvFile) { $EnvFile } else { Join-Path $PSScriptRoot '..\.env' }
 $vars = @{}
 Get-Content $envFile | Where-Object { $_ -match '^\s*([A-Z_]+)=(.*)$' } | ForEach-Object {
   $vars[$Matches[1]] = $Matches[2].Trim('"')
