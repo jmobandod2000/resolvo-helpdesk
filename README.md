@@ -30,6 +30,20 @@ Si te resulta útil, **dale una ⭐ al repositorio**: así más equipos de TI lo
 >
 > 🇧🇷 **Português:** Resolvo é uma central de ajuda (help desk) de TI de código aberto e auto-hospedada, com controle de tickets, unidades e categorias configuráveis, métricas, relatórios em Excel e assistente de configuração, em português, espanhol e inglês. Os comandos de instalação abaixo valem para qualquer idioma.
 
+## Capturas
+
+<p align="center">
+  <img src="docs/screenshots/landing.png" alt="Pantalla de bienvenida de Resolvo: reportar un problema o entrar como equipo de TI" width="880" />
+</p>
+
+| Métricas | Tickets |
+|---|---|
+| <img src="docs/screenshots/dashboard.png" alt="Métricas de soporte" /> | <img src="docs/screenshots/tickets.png" alt="Lista de tickets con filtros" /> |
+| **Detalle con historial y notas visibles al solicitante** | **Portal sin login: reportar en 3 pasos** |
+| <img src="docs/screenshots/ticket-detail.png" alt="Detalle de ticket" /> | <img src="docs/screenshots/portal-new.png" alt="Portal de solicitudes" /> |
+| **Reportes por mes, semana y responsable, con Excel** | |
+| <img src="docs/screenshots/reports.png" alt="Reportes de soporte" /> | |
+
 ## Contenido
 
 - [Funcionalidades](#funcionalidades)
