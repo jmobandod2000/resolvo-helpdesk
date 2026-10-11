@@ -11,9 +11,12 @@ declare module 'vue' {
   }
 }
 
-const baseURL = process.env.DEV ? process.env.BASE_URL : process.env.BASE_URL_PROD;
+// En producción, sin BASE_URL_PROD se usa la misma dirección de la web (la API sirve el front en Docker)
+const baseURL = process.env.DEV
+  ? process.env.BASE_URL || 'http://localhost:3010/api'
+  : process.env.BASE_URL_PROD || '/api';
 
-const api = axios.create({ baseURL: baseURL || 'http://localhost:3010/api' });
+const api = axios.create({ baseURL });
 
 api.interceptors.request.use((config) => {
   const jwt = LocalStorage.getItem<string>('jwt');
