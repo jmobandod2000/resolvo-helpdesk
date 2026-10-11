@@ -4,7 +4,7 @@
 
 import { spawn, spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, chmodSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, chmodSync, unlinkSync } from 'node:fs';
 import { hostname } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { createInterface } from 'node:readline/promises';
@@ -15,6 +15,11 @@ const ENV_FILE = join(ROOT, '.env');
 const BACKUP_DIR = join(ROOT, 'backups');
 const BACK_DIR = join(ROOT, 'tickets-back');
 const FRONT_DIR = join(ROOT, 'tickets-front');
+const OVERRIDE_FILE = join(ROOT, 'docker-compose.override.yml');
+const OVERRIDE_MARK = '# Generado por resolvo';
+// Paquete de instalación (sin código fuente): no se puede compilar la imagen ni usar el modo desarrollo
+const CAN_BUILD = existsSync(join(ROOT, 'Dockerfile'));
+const HAS_SOURCE = existsSync(BACK_DIR) && existsSync(FRONT_DIR);
 const HEALTH_TIMEOUT_MS = 180_000;
 const SAFE_VALUE = /^[A-Za-z0-9_./:@+-]*$/;
 
@@ -38,6 +43,7 @@ const MSG = {
   update          Respaldo + descarga de la última versión + reinicio
   backup          Respaldo de la base de datos en ./backups
   restore <file>  Restaura un respaldo (reemplaza los datos actuales)
+  db              Datos para conectarte a la base con TablePlus, DBeaver o pgAdmin
   dev             Modo desarrollo: base en Docker + API y web locales con recarga
   help            Esta ayuda`,
     noDocker: 'No se encontró Docker. Instálalo desde https://docs.docker.com/get-docker/ y vuelve a intentarlo.',
@@ -95,6 +101,14 @@ const MSG = {
     yes: 's',
     yesNo: '(s/n)',
     envOnly: 'Configuración lista. Continúa el arranque con Docker.',
+    sectionDb: 'Acceso a la base de datos',
+    dbAccess: '¿Permitir conectarse a la base desde este equipo con TablePlus, DBeaver o pgAdmin?',
+    dbPort: 'Puerto local de PostgreSQL',
+    dbTitle: 'Conexión a la base de datos (PostgreSQL)',
+    dbNotExposed: 'La base no está publicada. Actívala con: resolvo config (pregunta "Acceso a la base de datos")',
+    dbOnlyLocal: 'Solo acepta conexiones desde este equipo. Desde otro, usa un túnel SSH.',
+    pullFailedNoBuild: 'No se pudo descargar la imagen. Revisa la conexión a Internet y vuelve a intentarlo.',
+    devNeedsSource: 'El modo desarrollo necesita el código fuente: git clone https://github.com/jmobandod2000/resolvo-helpdesk.git',
   },
   en: {
     title: 'Resolvo · IT help desk',
@@ -109,6 +123,7 @@ const MSG = {
   update          Backup + pull the latest version + restart
   backup          Database backup into ./backups
   restore <file>  Restore a backup (replaces current data)
+  db              Connection details for TablePlus, DBeaver or pgAdmin
   dev             Development mode: database in Docker + local API and web with reload
   help            This help`,
     noDocker: 'Docker was not found. Install it from https://docs.docker.com/get-docker/ and try again.',
@@ -166,6 +181,14 @@ const MSG = {
     yes: 'y',
     yesNo: '(y/n)',
     envOnly: 'Configuration ready. Continue starting with Docker.',
+    sectionDb: 'Database access',
+    dbAccess: 'Allow connecting to the database from this machine with TablePlus, DBeaver or pgAdmin?',
+    dbPort: 'Local PostgreSQL port',
+    dbTitle: 'Database connection (PostgreSQL)',
+    dbNotExposed: 'The database is not published. Enable it with: resolvo config ("Database access")',
+    dbOnlyLocal: 'Only accepts connections from this machine. From another one, use an SSH tunnel.',
+    pullFailedNoBuild: 'Could not download the image. Check the Internet connection and try again.',
+    devNeedsSource: 'Development mode needs the source code: git clone https://github.com/jmobandod2000/resolvo-helpdesk.git',
   },
 }[LANG];
 
@@ -264,11 +287,21 @@ const waitForHealth = async (port = appPort()) => {
 // ---------- preguntas ----------
 const createPrompt = () => {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
+  // Sin terminal (respuestas por tubería o en scripts) se leen las líneas en orden, sin perder ninguna
+  const lines = process.stdin.isTTY ? null : rl[Symbol.asyncIterator]();
+  const question = async (text) => {
+    if (!lines) return rl.question(text);
+    process.stdout.write(text);
+    const { value, done } = await lines.next();
+    process.stdout.write('\n');
+    if (done) process.exit(1); // la entrada terminó antes de completar el asistente
+    return value;
+  };
 
   const ask = async (label, fallback = '', validate) => {
     for (;;) {
       const suffix = fallback ? dim(` [${fallback}]`) : '';
-      const answer = (await rl.question(`  ${label}${suffix}: `)).trim() || fallback;
+      const answer = (await question(`  ${label}${suffix}: `)).trim() || fallback;
       const error = validate?.(answer);
       if (!error) return answer;
       warn(error);
@@ -277,7 +310,7 @@ const createPrompt = () => {
 
   const confirm = async (label, fallback = true) => {
     const hint = fallback ? MSG.yesNo.replace(MSG.yes, MSG.yes.toUpperCase()) : MSG.yesNo.replace('n)', 'N)');
-    const answer = (await rl.question(`  ${label} ${dim(hint)}: `)).trim().toLowerCase();
+    const answer = (await question(`  ${label} ${dim(hint)}: `)).trim().toLowerCase();
     if (!answer) return fallback;
     return answer.startsWith(MSG.yes) || answer.startsWith('y');
   };
@@ -287,7 +320,7 @@ const createPrompt = () => {
     new Promise((done) => {
       const stdin = process.stdin;
       if (!stdin.isTTY) {
-        rl.question(`  ${label}: `).then((value) => done(value.trim()));
+        question(`  ${label}: `).then((value) => done(value.trim()));
         return;
       }
       rl.pause();
@@ -321,6 +354,19 @@ const createPrompt = () => {
     });
 
   return { ask, confirm, secretInput, close: () => rl.close() };
+};
+
+// Publica PostgreSQL solo en 127.0.0.1 mediante docker-compose.override.yml (Compose lo carga solo)
+const writeDbOverride = (env) => {
+  if (env.DB_EXPOSE_PORT) {
+    writeFileSync(
+      OVERRIDE_FILE,
+      `${OVERRIDE_MARK} (resolvo config). Publica PostgreSQL solo en este equipo.\nservices:\n  db:\n    ports:\n      - 127.0.0.1:${env.DB_EXPOSE_PORT}:5432\n`,
+      'utf8',
+    );
+    return;
+  }
+  if (existsSync(OVERRIDE_FILE) && readFileSync(OVERRIDE_FILE, 'utf8').startsWith(OVERRIDE_MARK)) unlinkSync(OVERRIDE_FILE);
 };
 
 const isEmail = (value) => (/^[^\s@']+@[^\s@']+\.[^\s@']+$/.test(value) ? null : MSG.invalidEmail);
@@ -383,8 +429,12 @@ const wizard = async () => {
       mail.MAIL_FROM = await prompt.ask(MSG.mailFrom, mail.MAIL_FROM || `Resolvo <${mail.SMTP_USER || adminEmail}>`, noQuote);
     }
 
+    section(MSG.sectionDb);
+    const dbAccess = await prompt.confirm(MSG.dbAccess, Boolean(current.DB_EXPOSE_PORT));
+    const dbPort = dbAccess ? await prompt.ask(MSG.dbPort, current.DB_EXPOSE_PORT || '5433', isPort) : '';
+
     console.log('');
-    const prebuilt = await prompt.confirm(MSG.image, (current.RESOLVO_BUILD || 'false') !== 'true');
+    const prebuilt = CAN_BUILD ? await prompt.confirm(MSG.image, (current.RESOLVO_BUILD || 'false') !== 'true') : true;
 
     const values = {
       ...current,
@@ -399,12 +449,14 @@ const wizard = async () => {
       DB_PASSWORD: current.DB_PASSWORD || secret(18),
       JWT_SECRET: current.JWT_SECRET || secret(32),
       JWT_EXPIRES_IN: current.JWT_EXPIRES_IN || '12h',
+      DB_EXPOSE_PORT: dbPort,
       LOGIN_NAME: adminName,
       LOGIN_EMAIL: adminEmail.toLowerCase(),
       LOGIN_PASSWORD: adminPassword,
       ...mail,
     };
     writeEnv(values);
+    writeDbOverride(values);
     ok(MSG.envSaved);
     return { values, generatedPassword };
   } finally {
@@ -421,6 +473,7 @@ const prepareImage = (env) => {
   }
   info(MSG.pulling);
   if (compose(['pull', 'app']).status === 0) return;
+  if (!CAN_BUILD) fail(MSG.pullFailedNoBuild);
   warn(MSG.pullFailed);
   if (compose(['build', 'app']).status !== 0) process.exit(1);
 };
@@ -571,6 +624,7 @@ const commands = {
   },
 
   async dev() {
+    if (!HAS_SOURCE) fail(MSG.devNeedsSource);
     ensureDocker();
     if (run('pnpm', ['--version'], { stdio: 'ignore' }).status !== 0)
       fail(MSG.devNeedsPnpm);
@@ -627,6 +681,24 @@ const commands = {
     };
     process.on('SIGINT', stopAll);
     process.on('SIGTERM', stopAll);
+  },
+
+  db() {
+    const env = requireEnv();
+    if (!env.DB_EXPOSE_PORT) {
+      warn(MSG.dbNotExposed);
+      return;
+    }
+    const user = env.DB_USER || 'resolvo';
+    const database = env.DB_NAME || 'resolvo';
+    console.log(`\n${bold(MSG.dbTitle)}`);
+    console.log(`  Host      127.0.0.1`);
+    console.log(`  Port      ${env.DB_EXPOSE_PORT}`);
+    console.log(`  Database  ${database}`);
+    console.log(`  User      ${user}`);
+    console.log(`  Password  ${env.DB_PASSWORD}`);
+    console.log(`  URL       postgresql://${user}:${env.DB_PASSWORD}@127.0.0.1:${env.DB_EXPOSE_PORT}/${database}`);
+    console.log(`\n  ${dim(MSG.dbOnlyLocal)}\n`);
   },
 
   help() {

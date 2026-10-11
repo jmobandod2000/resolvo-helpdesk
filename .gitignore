@@ -1,3 +1,5 @@
 # Configuración de producción y respaldos (nunca al repositorio)
 .env
 backups/
+docker-compose.override.yml
+release/
