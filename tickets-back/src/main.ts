@@ -3,6 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
+import { existsSync } from 'fs';
+import { join, resolve } from 'path';
 
 import { AppModule } from './app.module';
 import { validationExceptionFactory } from './i18n';
@@ -16,6 +18,18 @@ async function bootstrap() {
   app.useBodyParser('json', { limit: '100kb' });
 
   app.setGlobalPrefix('api');
+
+  // Despliegue de un solo servicio: la API sirve también la web compilada (WEB_DIR)
+  const webDir = process.env.WEB_DIR && resolve(process.env.WEB_DIR);
+  if (webDir && existsSync(join(webDir, 'index.html'))) {
+    app.useStaticAssets(join(webDir, 'assets'), {
+      prefix: '/assets',
+      immutable: true,
+      maxAge: '1y',
+    });
+    app.useStaticAssets(webDir, { index: 'index.html', maxAge: 0 });
+    logger.log(`Web servida desde ${webDir}`);
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -1,9 +1,9 @@
 import * as Joi from 'joi';
 
 export const JoiValidationSchema = Joi.object({
-  APP_MODE: Joi.string().valid('dev', 'prod').required(),
-  HOST: Joi.string().required(),
-  PORT: Joi.number().required(),
+  APP_MODE: Joi.string().valid('dev', 'prod').default('prod'),
+  HOST: Joi.string().optional(),
+  PORT: Joi.number().default(3010),
   JWT_SECRET: Joi.string().min(16).required(),
   JWT_EXPIRES_IN: Joi.string().default('12h'),
   LOGIN_NAME: Joi.string().required(),
@@ -12,12 +12,15 @@ export const JoiValidationSchema = Joi.object({
 
   DATABASE_URL: Joi.string().required(),
 
-  DB_PS_DATABASE: Joi.string().required(),
-  DB_PS_USERNAME: Joi.string().required(),
-  DB_PS_PASSWORD: Joi.string().required(),
-  DB_PS_PORT: Joi.number().required(),
-  DB_PS_DOCKER_PORT: Joi.number().required(),
-  DB_PS_DOCKER_VOLUME: Joi.string().required(),
+  DB_PS_DATABASE: Joi.string().optional(),
+  DB_PS_USERNAME: Joi.string().optional(),
+  DB_PS_PASSWORD: Joi.string().optional(),
+  DB_PS_PORT: Joi.number().optional(),
+  DB_PS_DOCKER_PORT: Joi.number().optional(),
+  DB_PS_DOCKER_VOLUME: Joi.string().optional(),
+
+  // Carpeta con la web compilada; si existe, la API también sirve el front (despliegue de un solo servicio)
+  WEB_DIR: Joi.string().optional().allow(''),
 
   SEED_EXAMPLE_TICKETS: Joi.boolean().default(false),
 
