@@ -666,6 +666,19 @@ export default {
     messageHint: 'Opcional. Por ejemplo: horario de atención o qué datos incluir.',
     linkTitle: 'Enlace del portal',
     open: 'Abrir portal',
+    mail: {
+      configured: 'Correo configurado',
+      notConfigured: 'El correo no está configurado',
+      notConfiguredHint:
+        'Los avisos no saldrán hasta definir SMTP_HOST y MAIL_FROM en el .env del servidor. El portal funciona igual sin correo.',
+      from: 'Remitente: {from}',
+      appUrl: 'Enlaces: {url}',
+      testLabel: 'Enviar correo de prueba a',
+      testSend: 'Enviar prueba',
+      testSent: 'Correo de prueba enviado a {email}. Revisa la bandeja (y spam).',
+      testFailed: 'No se pudo enviar el correo de prueba. Revisa la configuración SMTP y los registros del servidor.',
+      invalidEmail: 'Escribe un correo válido',
+    },
     tips: {
       share: 'Compártelo por correo, en la intranet o como acceso directo en los equipos.',
       network: 'Lo recomendable es publicarlo solo dentro de la red de la empresa.',

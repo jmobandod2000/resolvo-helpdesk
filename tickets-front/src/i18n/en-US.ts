@@ -665,6 +665,19 @@ const messages: MessageSchema = {
     messageHint: 'Optional. For example: support hours or what details to include.',
     linkTitle: 'Portal link',
     open: 'Open portal',
+    mail: {
+      configured: 'Email is configured',
+      notConfigured: 'Email is not configured',
+      notConfiguredHint:
+        'Notifications will not be sent until SMTP_HOST and MAIL_FROM are set in the server .env. The portal works without email.',
+      from: 'Sender: {from}',
+      appUrl: 'Links: {url}',
+      testLabel: 'Send a test email to',
+      testSend: 'Send test',
+      testSent: 'Test email sent to {email}. Check the inbox (and spam).',
+      testFailed: 'The test email could not be sent. Check the SMTP settings and the server logs.',
+      invalidEmail: 'Enter a valid email',
+    },
     tips: {
       share: 'Share it by email, on the intranet or as a desktop shortcut.',
       network: 'Ideally publish it only inside the company network.',

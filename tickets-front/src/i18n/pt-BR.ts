@@ -667,6 +667,19 @@ const messages: MessageSchema = {
     messageHint: 'Opcional. Por exemplo: horário de atendimento ou quais dados incluir.',
     linkTitle: 'Link do portal',
     open: 'Abrir portal',
+    mail: {
+      configured: 'E-mail configurado',
+      notConfigured: 'O e-mail não está configurado',
+      notConfiguredHint:
+        'Os avisos não serão enviados até definir SMTP_HOST e MAIL_FROM no .env do servidor. O portal funciona sem e-mail.',
+      from: 'Remetente: {from}',
+      appUrl: 'Links: {url}',
+      testLabel: 'Enviar e-mail de teste para',
+      testSend: 'Enviar teste',
+      testSent: 'E-mail de teste enviado para {email}. Confira a caixa de entrada (e o spam).',
+      testFailed: 'Não foi possível enviar o e-mail de teste. Verifique o SMTP e os logs do servidor.',
+      invalidEmail: 'Digite um e-mail válido',
+    },
     tips: {
       share: 'Compartilhe por e-mail, na intranet ou como atalho nos computadores.',
       network: 'O ideal é publicá-lo apenas dentro da rede da empresa.',

@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n';
 import useNotify from 'src/modules/shared/composables/useNotify';
 import { buildPortalUrl } from 'src/modules/portal/helpers/portalLinks';
 import { useOrganization } from '../composables/useOrganization';
+import MailStatusCard from './MailStatusCard.vue';
 
 const MESSAGE_MAX = 500;
 
@@ -75,6 +76,8 @@ const copyLink = async () => {
           </div>
         </q-card-section>
       </q-card>
+
+      <MailStatusCard v-if="emailEnabled" />
 
       <q-input
         v-model="message"
