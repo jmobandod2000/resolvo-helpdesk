@@ -1,6 +1,6 @@
 {
   "name": "resolvo-back",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Resolvo: mesa de ayuda (help desk) de TI de código abierto, autoalojada y en tres idiomas",
   "productName": "Resolvo",
   "private": true,

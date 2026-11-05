@@ -20,7 +20,7 @@ Reglas de trabajo:
 const main = async () => {
   const client = new ResolvoClient(loadConfig());
   const server = new McpServer(
-    { name: 'resolvo', version: '1.0.0' },
+    { name: 'resolvo', version: '1.1.0' },
     { instructions: INSTRUCTIONS },
   );
   registerTools(server, client);

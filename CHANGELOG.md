@@ -2,6 +2,17 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); las versiones siguen [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.1.0] - 2026-11-05
+
+### Agregado
+
+- Arranque automático con Windows: doble clic en `activar-inicio-automatico.cmd` o `resolvo autostart on`. Docker Desktop abre al iniciar sesión y Resolvo se levanta solo, comprueba que responda y lo anota en `logs/autostart.log`. No pide permisos de administrador.
+- Comandos `resolvo autostart status` y `resolvo autostart off`, y `desactivar-inicio-automatico.cmd` para quitarlo.
+
+### Corregido
+
+- La tabla de tickets ya no corta la columna Estado en pantallas medianas (1280 px).
+
 ## [1.0.0] - 2026-10-10
 
 Primera versión pública de Resolvo.
@@ -37,4 +48,5 @@ Primera versión pública de Resolvo.
 - Interfaz y mensajes del API en español, inglés y portugués.
 - Servidor MCP para que asistentes de IA trabajen los tickets: Claude, Gemini, Codex, Copilot y Cursor.
 
+[1.1.0]: https://github.com/jmobandod2000/resolvo-helpdesk/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/jmobandod2000/resolvo-helpdesk/releases/tag/v1.0.0
