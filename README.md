@@ -132,8 +132,19 @@ Al entrar por primera vez, el **asistente de configuración** de la app pide los
 | `resolvo update` | Respaldo, última versión y reinicio, sin perder datos |
 | `resolvo db` | Datos de conexión a PostgreSQL para TablePlus, DBeaver o pgAdmin |
 | `resolvo dev` | Modo desarrollo: API y web locales con recarga automática |
+| `resolvo autostart on` / `off` / `status` | Arranque automático al encender el equipo (Windows) |
 
 Resolvo se inicia solo cuando arranca el servidor (`restart: unless-stopped`).
+
+#### Arranque automático en Windows
+
+En un equipo con Docker Desktop, haz doble clic en **`activar-inicio-automatico.cmd`** (o ejecuta `resolvo autostart on`). No pide permisos de administrador. A partir de ahí, al encender el equipo e iniciar sesión:
+
+1. Docker Desktop abre solo (se activa su opción *Start Docker Desktop when you sign in*).
+2. Resolvo espera a que Docker responda, levanta `db` y `app` aunque se hayan detenido con `resolvo stop`, y comprueba `/api/health`.
+3. Cada arranque queda anotado en `logs/autostart.log`.
+
+`resolvo autostart status` muestra si está activo y las últimas líneas del registro. **`desactivar-inicio-automatico.cmd`** (o `resolvo autostart off`) lo quita y deja Docker Desktop como estaba. Docker Desktop necesita una sesión de Windows: en un equipo dedicado, configura el inicio de sesión automático de Windows o usa un servidor Linux. En Linux, ejecuta `sudo systemctl enable docker` y listo.
 
 ### Qué queda instalado
 

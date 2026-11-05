@@ -3,3 +3,6 @@
 backups/
 docker-compose.override.yml
 release/
+
+# Registro del arranque automático
+logs/

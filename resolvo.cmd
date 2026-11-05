@@ -19,7 +19,10 @@ if /i "%CMD%"=="restart" (docker compose restart app & exit /b)
 if /i "%CMD%"=="status" (docker compose ps & exit /b)
 if /i "%CMD%"=="logs" (docker compose logs -f --tail 200 app & exit /b)
 if /i "%CMD%"=="update" goto :update
-echo Comandos sin Node: install, config, start, stop, restart, status, logs, update
+set "AUTOSTART_ACTION=%~2"
+if "%AUTOSTART_ACTION%"=="" set "AUTOSTART_ACTION=status"
+if /i "%CMD%"=="autostart" (powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0cli\autostart.ps1" -Action %AUTOSTART_ACTION% & exit /b)
+echo Comandos sin Node: install, config, start, stop, restart, status, logs, update, autostart
 echo Para backup, restore y dev instala Node 18+ (https://nodejs.org).
 exit /b
 :configure

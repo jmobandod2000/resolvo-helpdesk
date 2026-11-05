@@ -44,6 +44,7 @@ const MSG = {
   backup          Respaldo de la base de datos en ./backups
   restore <file>  Restaura un respaldo (reemplaza los datos actuales)
   db              Datos para conectarte a la base con TablePlus, DBeaver o pgAdmin
+  autostart on|off|status  Arranque automático al encender el equipo (Windows)
   dev             Modo desarrollo: base en Docker + API y web locales con recarga
   help            Esta ayuda`,
     noDocker: 'No se encontró Docker. Instálalo desde https://docs.docker.com/get-docker/ y vuelve a intentarlo.',
@@ -98,6 +99,8 @@ const MSG = {
     devMigrate: 'Aplicando migraciones...',
     devRunning: 'API en http://localhost:3010/api · Web en http://localhost:9010 · Ctrl+C para detener',
     unknown: 'Comando desconocido',
+    autostartOther:
+      'En Linux basta con que Docker arranque con el sistema (sudo systemctl enable docker): los contenedores tienen "restart: unless-stopped". En macOS activa "Start Docker Desktop when you sign in" en Docker Desktop.',
     yes: 's',
     yesNo: '(s/n)',
     envOnly: 'Configuración lista. Continúa el arranque con Docker.',
@@ -124,6 +127,7 @@ const MSG = {
   backup          Database backup into ./backups
   restore <file>  Restore a backup (replaces current data)
   db              Connection details for TablePlus, DBeaver or pgAdmin
+  autostart on|off|status  Start automatically when the computer turns on (Windows)
   dev             Development mode: database in Docker + local API and web with reload
   help            This help`,
     noDocker: 'Docker was not found. Install it from https://docs.docker.com/get-docker/ and try again.',
@@ -178,6 +182,8 @@ const MSG = {
     devMigrate: 'Applying migrations...',
     devRunning: 'API at http://localhost:3010/api · Web at http://localhost:9010 · Ctrl+C to stop',
     unknown: 'Unknown command',
+    autostartOther:
+      'On Linux it is enough for Docker to start with the system (sudo systemctl enable docker): containers use "restart: unless-stopped". On macOS turn on "Start Docker Desktop when you sign in" in Docker Desktop.',
     yes: 'y',
     yesNo: '(y/n)',
     envOnly: 'Configuration ready. Continue starting with Docker.',
@@ -699,6 +705,18 @@ const commands = {
     console.log(`  Password  ${env.DB_PASSWORD}`);
     console.log(`  URL       postgresql://${user}:${env.DB_PASSWORD}@127.0.0.1:${env.DB_EXPOSE_PORT}/${database}`);
     console.log(`\n  ${dim(MSG.dbOnlyLocal)}\n`);
+  },
+
+  autostart() {
+    const action = process.argv[3] || 'status';
+    if (!['on', 'off', 'status'].includes(action)) fail('resolvo autostart on|off|status');
+    if (!IS_WINDOWS) {
+      info(MSG.autostartOther);
+      return;
+    }
+    const script = join(ROOT, 'cli', 'autostart.ps1');
+    const result = run('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', script, '-Action', action]);
+    process.exit(result.status ?? 1);
   },
 
   help() {

@@ -18,7 +18,17 @@ const out = join(ROOT, 'release', name);
 rmSync(out, { recursive: true, force: true });
 mkdirSync(join(out, 'cli'), { recursive: true });
 
-for (const file of ['resolvo', 'resolvo.cmd', 'cli/resolvo.mjs', '.env.example', 'LICENSE', 'NOTICE'])
+for (const file of [
+  'resolvo',
+  'resolvo.cmd',
+  'cli/resolvo.mjs',
+  'cli/autostart.ps1',
+  'activar-inicio-automatico.cmd',
+  'desactivar-inicio-automatico.cmd',
+  '.env.example',
+  'LICENSE',
+  'NOTICE',
+])
   copyFileSync(join(ROOT, file), join(out, file));
 chmodSync(join(out, 'resolvo'), 0o755);
 
@@ -43,6 +53,10 @@ El asistente configura todo y al final muestra la dirección de la app y el usua
 ## Comandos
 
 \`resolvo start\` · \`stop\` · \`status\` · \`logs\` · \`backup\` · \`restore <archivo>\` · \`update\` · \`config\` · \`db\` · \`help\`
+
+## Arranque automático al encender el equipo (Windows)
+
+Doble clic en \`activar-inicio-automatico.cmd\` (o \`resolvo autostart on\`). No pide permisos de administrador: Docker Desktop abre al iniciar sesión y Resolvo se levanta y se comprueba solo. Se quita con \`desactivar-inicio-automatico.cmd\` (o \`resolvo autostart off\`); \`resolvo autostart status\` muestra el estado y el registro (\`logs/autostart.log\`).
 
 Documentación completa: https://github.com/jmobandod2000/resolvo-helpdesk
 
